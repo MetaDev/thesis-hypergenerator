@@ -1,4 +1,11 @@
+import matplotlib
+matplotlib.use('TKAgg')
+
 from matplotlib import pyplot
+
 pyplot.close('all')
-fig = pyplot.figure(figsize=(20,10))
+if(pyplot.gcf()==0):
+    fig = pyplot.figure("main")
+fig=pyplot.gcf()
 pyplot.show()
+pyplot.close('all')
