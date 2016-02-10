@@ -4,9 +4,9 @@ Created on Tue Feb  9 17:30:20 2016
 
 @author: Harald
 """
-import scipy.stats
+import scipy.stats 
 from shapely.geometry import Polygon
-
+import numpy 
 from shapely import affinity
 class LayoutClass:
     SHAPES={"chair": [(0, 0), (0, 1), (1, 1),(1,0)],
@@ -15,12 +15,17 @@ class LayoutClass:
     class LayoutObject:
         def __init__(self,name,size, position_x,position_y, rotation,shape):
             self.name=name + str(id(self))
+            self.size=size
+            self.position_x=position_x
+            self.position_y=position_y
+            self.rotation=rotation
+            
             self.shape=shape
             self.shape=affinity.translate(self.shape, position_x,position_y,0)
             self.shape=affinity.rotate(self.shape,rotation)
             self.shape=affinity.scale(self.shape,size,size,1)
         def __str__(self):
-            return self.name + " " + str(self.shape)
+            return '\n'.join(key + ": " + str(value) for key, value in vars(self).items())
             
     
     #check for property of the object if its a distribution and return sample or static value
@@ -65,20 +70,41 @@ class LayoutClass:
         self.children=children
 #wrapper class around scipy.stats.rv_continuous generic distributions class
 class Distribution:
-    def __init__(self,distr,low=0, high=1):
+    #low and high is ignored if options (enums) is set
+    #if nr_of_values is -1 the distribution is continous   
+    def __init__(self,distr,low=0, high=1, nr_of_values=-1, options=[]):
         self.low=low
         self.high=high
         self.distr=distr
+        self.nr_of_values=nr_of_values
+        self.options=options
     def sample(self):
-        return self.low + self.distr.rvs(size=1)[0]*(self.high-self.low)
+        #normalise random value
+        rnd = self.normalised_sample()
+        cont_val = self.low + rnd*(self.high-self.low)
+        if self.options:
+            return self.options[int(numpy.round((len(self.options)-1)*rnd))]
+        if self.nr_of_values!=-1:
+            print("kak"+ str(rnd))
+            return self.low + ((self.high-self.low)/self.nr_of_values)*numpy.round(self.distr.rvs(size=1)[0]*self.nr_of_values)
+        return cont_val
+    def normalised_sample(self):
+        #we take the interval for 99.99% of the values because values from distribution can go to infinity
+        _min = self.distr.interval(0.9999)[0]
+        _max = self.distr.interval(0.9999)[1] 
+        return (numpy.clip(self.distr.rvs(size=1)[0],_min,_max)-_min)/(_max-_min)
         
 #test Distribution 
 d1 = Distribution(distr=scipy.stats.uniform,low=0,high=4)
 print (d1.sample()) 
-d2 = Distribution(distr=scipy.stats.norm(loc=3,scale=5),low=0,high=4)
+d2 = Distribution(distr=scipy.stats.norm(),low=0,high=4)
 print (d2.sample()) 
+d3 = Distribution(distr=scipy.stats.uniform,options=["test1","test2","test3"])
+print (d3.sample())
+d3 = Distribution(distr=scipy.stats.norm(),nr_of_values=8)
+print (d3.sample())
 
-
+print(numpy.clip(8,2,5))
 #test LayoutClass 
 rot = Distribution(distr=scipy.stats.uniform,low=0,high=360)
 chair = LayoutClass(size=d2,name="chair", position_x=d1,position_y=d1, rotation=rot,shape_exterior=LayoutClass.SHAPES["chair"])
