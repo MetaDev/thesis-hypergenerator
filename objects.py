@@ -5,14 +5,14 @@ Created on Tue Feb  9 17:30:20 2016
 @author: Harald
 """
 import scipy.stats
-from shapely.geometry import Polygon
-from shapely.geometry import Point
-
 import numpy
+
 from shapely import affinity
+from shapely.geometry import Polygon
+
 from descartes.patch import PolygonPatch
-import matplotlib.pyplot as plt
-from matplotlib import pyplot
+
+from matplotlib import pyplot as plt
 
 COLOR = {
     True:  '#6699cc',
@@ -23,10 +23,15 @@ def v_color(ob):
     return COLOR[ob.is_valid]
 
 
-class LayoutClass:
-    SHAPES={"chair": [(0, 0), (0, 1), (1, 1),(1,0)],
+class LayoutDefinition:
+    shape_exteriors={"chair": [(0, 0), (0, 1), (1, 1),(1,0)],
             "table":[(0, 0), (0, 1), (2, 1),(2,0)]
             }
+    standard_property_map = {"size": lambda parent, child: parent.size*child.size,
+                             "position_x": lambda parent, child: parent.position_x+child.position_x,
+                             "position_y": lambda parent, child: parent.position_y+child.position_y,
+                             "rotation": lambda parent, child: parent.rotation+child.rotation
+                             }
     #check for property of the object if its a distribution and return sample or static value
     @staticmethod
     def __sample_property(prop):
@@ -36,15 +41,17 @@ class LayoutClass:
         else:
             size=prop
         return size
-    class LayoutObject:
-        def __init__(self,name,size, position_x,position_y, rotation,shape):
+    class LayoutSample:
+        def __init__(self,name,size, position_x,position_y, rotation,shape, color):
             self.name=name + str(id(self))
             self.size=size
             self.position_x=position_x
             self.position_y=position_y
             self.rotation=rotation
+            self.color=color
             #transform visual representation according to properties
             self.shape=shape
+
             self.shape=affinity.translate(self.shape, position_x,position_y,0)
             self.shape=affinity.rotate(self.shape,rotation)
             self.shape=affinity.scale(self.shape,size,size,1)
@@ -54,53 +61,64 @@ class LayoutClass:
 
 
     #sample a layout object and its children
-    def sample_object(self,parent=None):
-        LC = LayoutClass
-        #the standard parent relation is scale for size and additional for rotation and position
-        name=self.name
-        size=LC.__sample_property(self.size)
-        position_x=LC.__sample_property(self.position_x)
-        position_y=LC.__sample_property(self.position_y)
-        rotation=LC.__sample_property(self.rotation)
-        if parent != None:
-            size = parent.size * size
-            position_x = position_x + parent.position_x
-            position_y = position_y + parent.position_y
-            rotation = rotation + parent.rotation
-        obj = LC.LayoutObject(name=name,size=size,position_x=position_x,position_y=position_y,rotation=rotation,shape=self.shape)
-        objs=[obj]
-        for child_item in self.children:
-            for i in range(LC.__sample_property(child_item[0])):
-                objs.append(*child_item[1].sample_object())
-        return objs
+    def create_sample(self,parent=None):
+        #some name substitution for readability
+        layout_def = self
+        LC = LayoutDefinition
 
-    def visualise_samples(layout_objects):
+        #sample properties from class property distribution, a property can be defined as property or statically by a value
+        size=LC.__sample_property(layout_def.size)
+        position_x=LC.__sample_property(layout_def.position_x)
+        position_y=LC.__sample_property(layout_def.position_y)
+        rotation=LC.__sample_property(layout_def.rotation)
+        color=LC.__sample_property(layout_def.color)
+
+        #create layout sample
+        layout_sample = LC.LayoutSample(name=layout_def.name,size=size,position_x=position_x,position_y=position_y,rotation=rotation,shape=self.shape,color=color)
+        #calculate properties based on parent properties
+        if parent != None:
+            for prop_name in vars(layout_def).keys():
+                if prop_name in layout_def.property_map:
+                    setattr(layout_sample, prop_name, layout_def.property_map[prop_name](parent,layout_sample))
+
+        samples=[layout_sample]
+        for child_item in layout_def.children:
+            for i in range(LC.__sample_property(child_item[0])):
+                #sample child object given parent sample
+                samples.append(*child_item[1].create_sample(layout_sample))
+        return samples
+
+
+    def visualise_samples(layout_objects,visualise_edges=False):
         if(pyplot.gcf()==0):
             fig = pyplot.figure("main")
         fig=pyplot.gcf()
         fig.clear()
         fig.clear()
         ax = fig.add_subplot(111)
-        xrange=[0,0]
-        yrange=[0,0]
+        xrange=[]
+        yrange=[]
         for layout_object in layout_objects:
-            #plot exterior of polygon
             polygon=layout_object.shape
             x, y = polygon.exterior.xy
-            ax.plot(x, y, 'o', color='#999999', zorder=1)
+            if visualise_edges:
+                #plot edges of polygon
+                ax.plot(x, y, 'o', color='#999999', zorder=1)
             #find range of polygon coordinates
-            xrange = [int(numpy.floor(numpy.min(numpy.append(x,xrange[0])))),int(numpy.ceil(numpy.max(numpy.append(x,xrange[1]))))]
-            yrange = [int(numpy.floor(numpy.min(numpy.append(y,yrange[0])))),int(numpy.ceil(numpy.max(numpy.append(y,yrange[1]))))]
+            if xrange:
+                x=numpy.append(x,xrange)
+                y=numpy.append(y,yrange)
+            xrange = [int(numpy.floor(numpy.min(x))),int(numpy.ceil(numpy.max(x)))]
+            yrange = [int(numpy.floor(numpy.min(y))),int(numpy.ceil(numpy.max(y)))]
             #plot surface
-            patch = PolygonPatch(polygon, facecolor=v_color(polygon), edgecolor=v_color(polygon), alpha=0.5, zorder=1)
+            patch = PolygonPatch(polygon, facecolor=layout_object.color, edgecolor=layout_object.color, alpha=0.5, zorder=1)
             ax.add_patch(patch)
         #finalise figure properties
 
         ax.set_title('Layout visualisation')
         ax.set_xlim(*xrange)
-        ax.set_xticks(list(range(*xrange)) + [xrange[-1]])
         ax.set_ylim(*yrange)
-        ax.set_yticks(list(range(*yrange)) + [yrange[-1]])
+        #aspect ratio of plot
         ax.set_aspect(1)
         #show plot
         plt.show()
@@ -109,14 +127,17 @@ class LayoutClass:
     #size position and rotation are either a distribution
     # shape is a polygon defined by its coordinates
     # children is a collection of tuples that indicates the amount and type of children (instance of layout object)
-    def __init__(self, name="", size=1, position_x=0,position_y=0, rotation=0,shape_exterior=[(0,0),(0,1),(1,1),(1,0)],children=[(0,None)]):
+    #the color variable is used in visualisation using matplotlib
+    def __init__(self, name="", size=1, position_x=0,position_y=0, rotation=0,shape_exterior=[(0,0),(0,1),(1,1),(1,0)], color="b",children=[(0,None)], property_map=standard_property_map):
         self.name=name
         self.size = size
         self.position_x = position_x
         self.position_y=position_y
         self.rotation = rotation
+        self.color=color
         self.shape=Polygon(shape_exterior)
         self.children=children
+        self.property_map=property_map
 #wrapper class around scipy.stats.rv_continuous generic distributions class
 class Distribution:
     #low and high is ignored if options (enums) is set
@@ -134,7 +155,6 @@ class Distribution:
         if self.options:
             return self.options[int(numpy.round((len(self.options)-1)*rnd))]
         if self.nr_of_values!=-1:
-            print("kak"+ str(rnd))
             return self.low + ((self.high-self.low)/self.nr_of_values)*numpy.round(self.distr.rvs(size=1)[0]*self.nr_of_values)
         return cont_val
     def normalised_sample(self):
@@ -148,21 +168,18 @@ d1 = Distribution(distr=scipy.stats.uniform,low=0,high=4)
 print (d1.sample())
 d2 = Distribution(distr=scipy.stats.norm(),low=0,high=4)
 print (d2.sample())
-d3 = Distribution(distr=scipy.stats.uniform,options=["test1","test2","test3"])
+d3 = Distribution(distr=scipy.stats.uniform,options=["red","green","blue"])
 print (d3.sample())
-d3 = Distribution(distr=scipy.stats.norm(),nr_of_values=8)
-print (d3.sample())
+d4 = Distribution(distr=scipy.stats.norm(),nr_of_values=8)
+print (d4.sample())
 
 
-#test LayoutClass
+#test LayoutDefinition
 rot = Distribution(distr=scipy.stats.uniform,low=0,high=360)
-chair = LayoutClass(size=d2,name="chair", position_x=d1,position_y=d1, rotation=rot,shape_exterior=LayoutClass.SHAPES["chair"])
-table = LayoutClass(size=3,name="table",position_x=d1,position_y=d2,shape_exterior=LayoutClass.SHAPES["table"],children=[(5,chair)])
-shape = affinity.scale(Polygon(LayoutClass.SHAPES["table"]),3,3)
-print(shape.exterior.xy)
-table_and_chairs = table.sample_object()
-print ('\n'.join(str(p) for p in table_and_chairs) )
+
+chair = LayoutDefinition(size=0.2,name="chair", position_x=d1,position_y=d1, rotation=rot,shape_exterior=LayoutDefinition.shape_exteriors["chair"], color="green")
+table = LayoutDefinition(size=1,name="table",position_x=2,position_y=2,shape_exterior=LayoutDefinition.shape_exteriors["table"],children=[(4,chair)],color="blue")
+table_and_chairs = table.create_sample()
 
 #test visualisation
-
-LayoutClass.visualise_samples(table_and_chairs)
+LayoutDefinition.visualise_samples(table_and_chairs)
