@@ -18,28 +18,26 @@ class Direct:
         return sum(sample.sample_attr for sample in samples)
         
 #calculate overlapping surface size
-def surface_overlap(layout_objects):
-    shapes = [lo.shape for lo in layout_objects]
-    return cascaded_union([pair[0].intersection(pair[1]) for pair in combinations(shapes, 2)]).area
+def surface_overlap(polygons):
+    return cascaded_union([pair[0].intersection(pair[1]) for pair in combinations(polygons, 2)]).area
 #calculate density (polygon occupation) of surface in a bounded space
-def area_density(layout_objects, bounds):
-    return
+def area_density(polygons, polygon_bound):
+    return cascaded_union([polygon.intersection(polygon_bound) for polygon in polygons]).area
 #total distance between layout_objcts
-def total_dist(layout_objects, dist_metric=numpy.linalg.norm):
-    shapes = [lo.shape for lo in layout_objects]
+def total_dist(layout_samples, dist_metric=numpy.linalg.norm):
     total_dist=0
-    for shape in shapes:
-        total_dist= dist_metric(numpy.array(shape.centroid))
+    for sample in layout_samples:
+        total_dist= dist_metric(numpy.array(sample.centroid))
     return total_dist
-
-#any fitness function can be applied on any collection of polygons
+#calculate collision or intersection between layout samples
+    
 #add named functions, such that 2 layout object collections can be compared e.g. in surface by layout definition name
 
 #nr of intersections between polygons
 
 #gameplay consrtaints
 
-
+#todo combine both methods in single one
 #path between points in graph, if not reachable ?
 #for now approximate possible movement with 8 directions and grid (orthogonal and diagonal)
 def shortest_path(graph, source:(int,int), target:(int,int)):
@@ -47,7 +45,7 @@ def shortest_path(graph, source:(int,int), target:(int,int)):
     return path
 #check if the polygons can be reached in sequence while avoiding other polygon obstacles
 def polygon_path_sequence(graph,polygon_sequence):
-    points=mapping.map_polygons_to_nodes(graph,polygon_sequence)
+    points=mapping.map_geometricobjects_to_nodes(graph,polygon_sequence)
     paths=[]
     for (polygon_pairs),(point_pairs) in zip(utility.pairwise(polygon_sequence),utility.pairwise(points)):
         path=shortest_path(graph,point_pairs[0],point_pairs[1])

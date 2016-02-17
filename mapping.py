@@ -1,11 +1,10 @@
-from shapely.geometry import LineString
-from shapely.geometry import Polygon
-from shapely.geometry import Point
+from shapely.geometry import *
 
 import networkx as nx
 from shapely import affinity
 import numpy
 import utility
+import search_space
 
 def map_polygons_to_neighbourhoud_graph(polygons,grid_range, step):
     """
@@ -27,28 +26,26 @@ def map_polygons_to_neighbourhoud_graph(polygons,grid_range, step):
                 G.remove_node(edge[1])
     return G
 
-def map_polygons_to_nodes(graph,polygons):
+def map_geometricobjects_to_nodes(graph,geom_objs):
     nodes=[]
-    for p in polygons:
+    for o in geom_objs:
         dist=float("inf")
         node=None
         for n in graph.nodes():
-            if p.distance(Point(n))<dist:
+            if o.distance(Point(n))<dist:
                 node=n
-                dist=p.distance(Point(n))
+                dist=o.distance(Point(n))
         nodes.append(node)
     return nodes
-def map_samples_to_polygons(layout_samples):
-    polygons=[]
-    colors=[]
+def map_layoutsamples_to_geometricobjects(layout_samples,geom_class=Polygon):
+    geom_objs=[]
     for sample in layout_samples:
-        polygon=Polygon(sample.shape)
-        polygon=affinity.rotate(polygon,sample.rotation)
-        polygon=affinity.translate(polygon, sample.position_x,sample.position_y,0)
-        polygon=affinity.scale(polygon,sample.size,sample.size)
-        polygons.append(polygon)
-        colors.append(sample.color)
-    return polygons,colors
+        geom_obj=geom_class(sample.shape)
+        geom_obj=affinity.translate(geom_obj, sample.position_x,sample.position_y,0)
+        geom_obj=affinity.scale(geom_obj,sample.size_x,sample.size_y)
+        geom_obj=affinity.rotate(geom_obj,sample.rotation)
+        geom_objs.append(geom_obj)
+    return geom_objs
 
 
 

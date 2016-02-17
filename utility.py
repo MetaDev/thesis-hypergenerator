@@ -5,21 +5,16 @@ import shapely
 import itertools as it
 import operator as op
 from shapely.geometry import Point
+from shapely.geometry import Polygon
+from shapely.geometry import MultiPolygon
+
 
 def range_from_polygons(polygons, size=1):
-    allx=[]
-    ally=[]
-    for polygon in polygons:
-        x, y = polygon.exterior.xy
-        #find range of polygon coordinates
-        allx.append(x)
-        ally.append(y)
-    xrange = [int(np.floor(np.min(allx))),int(np.ceil(np.max(allx)))]
-    yrange = [int(np.floor(np.min(ally))),int(np.ceil(np.max(ally)))]
-    xextrarange=((xrange[1]-xrange[0])/2)*(size-1)
-    yextrarange=((yrange[1]-yrange[0])/2)*(size-1)
-    xrange=(xrange[0]-xextrarange,xrange[1]+xextrarange)
-    yrange=(yrange[0]-yextrarange,yrange[1]+yextrarange)
+    (minx, miny, maxx, maxy) = MultiPolygon(polygons).bounds
+    xextrarange=((maxx-minx)/2)*(size-1)
+    yextrarange=((maxy-miny)/2)*(size-1)
+    xrange=(minx-xextrarange,maxx+xextrarange)
+    yrange=(miny-yextrarange,maxy+yextrarange)
     return (xrange,yrange)
 def range_offset_from_steps(xrange,yrange,steps,wideness=2):
     xdelta=((xrange[1]-xrange[0])/steps[0])*wideness
@@ -51,3 +46,10 @@ def closest_point_to_polygon(polygon, points):
     return point
 def pairwise(a):
     return [(a1,a2) for a1,a2 in zip(a[1:],a)]
+#split a polygon in n sub polygons
+def split_polygon(polygong,n):
+    return
+def polygon_from_range(xrange,yrange):
+    return Polygon([(xrange[0],yrange[0]),(xrange[0],yrange[1]),(xrange[1],yrange[1]),(xrange[1],yrange[0])])
+#add utitility to extract samples (attributes) from a collection based on type and/or name
+    

@@ -7,7 +7,6 @@ Created on Tue Feb  9 17:30:20 2016
 import scipy.stats
 import numpy
 
-
 class MarkovTreeNode:
     
     #check for property of the object if its a distribution and return sample or static value
@@ -67,16 +66,16 @@ class MarkovTreeNode:
         
         
 class LayoutMarkovTreeNode(MarkovTreeNode):
-    shape_exteriors={"chair": [(0, 0), (0, 1), (1, 1),(1,0)],
-            "table":[(0, 0), (0, 1), (2, 1),(2,0)]
-            }
-    standard_property_map = {"size": lambda parent, size: parent.size*size,
+    shape_exteriors={"square": [(0, 0), (0, 1), (1, 1),(1,0)]}
+           
+    standard_property_map = {"size_x": lambda parent, size_x: parent.size_x*size_x,
+                             "size_y": lambda parent, size_y: parent.size_y*size_y,
                              "position_x": lambda parent, position_x: parent.position_x+position_x,
                              "position_y": lambda parent, position_y: parent.position_y+position_y,
                              "rotation": lambda parent, rotation: parent.rotation+rotation}
      
-    def __init__(self, name, size=1, position_x=0,position_y=0, rotation=0,shape=[(0,0),(0,1),(1,1),(1,0)], color="b",children=[(0,None)], property_map=standard_property_map):
-        super().__init__(name,{"size":size,"position_x":position_x,"position_y":position_y,"rotation":rotation,"color":color,"shape":shape},children,property_map)        
+    def __init__(self, name, size_x=1,size_y=1, position_x=0,position_y=0, rotation=0,shape=[(0,0),(0,1),(1,1),(1,0)], color="b",children=[(0,None)], property_map=standard_property_map):
+        super().__init__(name,{"size_x":size_x,"size_y":size_y, "position_x":position_x,"position_y":position_y,"rotation":rotation,"color":color,"shape":shape},children,property_map)        
 
 #wrapper class around scipy.stats.rv_continuous generic distributions class
 class Distribution:
@@ -106,15 +105,18 @@ class Distribution:
 def test():
     #test Distribution
     d1 = Distribution(distr=scipy.stats.uniform,low=-4,high=4)
-    d2 = Distribution(distr=scipy.stats.norm(),low=0,high=4)
-    d3 = Distribution(distr=scipy.stats.uniform,options=["red","green","blue"])
-    d4 = Distribution(distr=scipy.stats.norm(),nr_of_values=8)
-      
+    d3 = Distribution(distr=scipy.stats.uniform,low=0.2,high=0.4)
+    d2= Distribution(distr=scipy.stats.uniform,options=list(range(1,8)))
+    colors = Distribution(distr=scipy.stats.uniform,options=["red","green","blue"])
     #test MarkovTreeNode
+    #it should be possible to have stochastic shape as well, defined by its own points
+    #to allow this each attribute of a markovnode should be possibly a markov node as well
+#    points=MarkovTreeNode("point",{("x",d3),("y",d3)})
+#    shape= MarkovTreeNode("shape",children=[(d2,points)])
     rot = Distribution(distr=scipy.stats.uniform,low=0,high=360)
     
-    chair = LayoutMarkovTreeNode(size=0.2,name="chair", position_x=d1,position_y=d1, rotation=rot,shape=LayoutMarkovTreeNode.shape_exteriors["chair"], color="green")
-    table = LayoutMarkovTreeNode(size=1,name="table",position_x=3,position_y=2,shape=LayoutMarkovTreeNode.shape_exteriors["table"],children=[(4,chair)],color="blue")
+    chair = LayoutMarkovTreeNode(size_x=d3,size_y=d3,name="chair", position_x=d1,position_y=d1, rotation=rot,shape=LayoutMarkovTreeNode.shape_exteriors["square"], color=colors)
+    table = LayoutMarkovTreeNode(size_x=1,size_y=2,name="table",position_x=3,position_y=2,shape=LayoutMarkovTreeNode.shape_exteriors["square"],children=[(d2,chair)],color="blue")
     table_and_chairs = table.sample()
     return table_and_chairs
     
