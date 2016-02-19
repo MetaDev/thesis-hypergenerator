@@ -4,9 +4,12 @@ import mapping
 import visualisation
 import utility
 import fitness
+import numpy
+from timeit import Timer
 
-#test search space
+print(numpy.linalg.norm(numpy.array([(0,1),(1,2)])))
 result = search_space.test()
+print(result[0].position_x)
 #test poylygon mapping
 polygons = mapping.map_layoutsamples_to_geometricobjects(result)
 colors = [r.color for r in result]

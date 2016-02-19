@@ -4,6 +4,9 @@ import networkx as nx
 from descartes.patch import PolygonPatch
 
 from matplotlib import pyplot as plt
+import matplotlib as mpl
+import numpy as np
+
 
 import utility
 
@@ -45,4 +48,16 @@ def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False):
     ax.set_ylim(*yrange)
     #aspect ratio of plot
     ax.set_aspect(1)
+def make_ellipses(gmm, fig):
+    for n in range(len(gmm._get_covars())):
+        v, w = np.linalg.eigh(gmm._get_covars()[n][:2, :2])
+        u = w[0] / np.linalg.norm(w[0])
+        angle = np.arctan2(u[1], u[0])
+        angle = 180 * angle / np.pi  # convert to degrees
+        v *= 9
+        ell = mpl.patches.Ellipse(gmm.means_[n, :2], v[0], v[1],
+                                  180 + angle, color='#999999')
+        ell.set_clip_box(fig.gca().bbox)
+        ell.set_alpha(0.5)
+        fig.gca().add_artist(ell)
   

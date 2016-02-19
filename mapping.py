@@ -25,7 +25,7 @@ def map_polygons_to_neighbourhoud_graph(polygons,grid_range, step):
             if not next(nx.all_neighbors(G,edge[1]),None):
                 G.remove_node(edge[1])
     return G
-
+#geom_objs is either polygon or line string
 def map_geometricobjects_to_nodes(graph,geom_objs):
     nodes=[]
     for o in geom_objs:

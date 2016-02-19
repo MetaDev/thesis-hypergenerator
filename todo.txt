@@ -1,0 +1,16 @@
+
+
+add random polygons in sample search space
+change postion_x , position_y to vector
+children is a vector as well and should be part of the search space
+no seperate sampling for distributions
+
+
+save paren child hierarchy in samples
+
+save generated samples in data frame to save space
+
+train different models on data
+
+implement search space in pymc3 using 1 model for the parent child structure and when sampling build new model based on this model
+these new models are cached in map based on their structure, such that each different model only has to be build once

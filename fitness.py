@@ -11,7 +11,7 @@ import networkx as nx
 import numpy
 import mapping
 import utility
-
+import search_space
 
 class Direct:
     def sum_samples(samples,sample_attr):
@@ -23,12 +23,15 @@ def surface_overlap(polygons):
 #calculate density (polygon occupation) of surface in a bounded space
 def area_density(polygons, polygon_bound):
     return cascaded_union([polygon.intersection(polygon_bound) for polygon in polygons]).area
+#this is a direct metric and does not require polygon conversion
 #total distance between layout_objcts
 def total_dist(layout_samples, dist_metric=numpy.linalg.norm):
     total_dist=0
     for sample in layout_samples:
         total_dist= dist_metric(numpy.array(sample.centroid))
     return total_dist
+def dist_between_parent_child(parent,children, dist_metric=numpy.linalg.norm):
+    return numpy.sum([dist_metric(numpy.array([(parent.position_x,parent.position_y),(child.position_x,child.position_y)])) for child in children])
 #calculate collision or intersection between layout samples
     
 #add named functions, such that 2 layout object collections can be compared e.g. in surface by layout definition name
@@ -56,3 +59,6 @@ def polygon_path_sequence(graph,polygon_sequence):
 #a direct metric that calculates the angle of intersection between polygons
 #metric
 #also add fitness function that evaluates a certain metric towards a treshhold
+    
+#MST between points->use graph kernel for likelyhood
+    
