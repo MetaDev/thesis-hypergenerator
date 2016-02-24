@@ -31,7 +31,7 @@ def total_dist(layout_samples, dist_metric=numpy.linalg.norm):
         total_dist= dist_metric(numpy.array(sample.centroid))
     return total_dist
 def dist_between_parent_child(parent,children, dist_metric=numpy.linalg.norm):
-    return numpy.sum([dist_metric(numpy.array([(parent.position_x,parent.position_y),(child.position_x,child.position_y)])) for child in children])
+    return numpy.sum([dist_metric(numpy.array([parent.position,child.position])) for child in children])
 #calculate collision or intersection between layout samples
     
 #add named functions, such that 2 layout object collections can be compared e.g. in surface by layout definition name
@@ -61,4 +61,3 @@ def polygon_path_sequence(graph,polygon_sequence):
 #also add fitness function that evaluates a certain metric towards a treshhold
     
 #MST between points->use graph kernel for likelyhood
-    

@@ -8,50 +8,78 @@ import scipy.stats
 import numpy
 
 class MarkovTreeNode:
-    
+    @staticmethod
+    def sample_attr(attr):
+        if MarkovTreeNode.attr_is_samplable(attr):
+            sample=attr.sample()
+        else:
+            sample=attr
+        return sample
     #check for property of the object if its a distribution and return sample or static value
     @staticmethod
-    def sample_search_space_distr(ss_distr):
-        sample = getattr(ss_distr, "sample", None)
-        if callable(sample):
-            size=sample()
-        else:
-            size=ss_distr
-        return size
+    def sample_attr_vector(attr):
+        if MarkovTreeNode.attr_is_vector(attr):
+            return [MarkovTreeNode.sample_attr_vector(v) for v in attr]
+        else:       
+            return MarkovTreeNode.sample_attr(attr)
+    @staticmethod                       
+    def attr_is_vector(attr):
+        return isinstance(attr, (list, tuple))
+    @staticmethod
+    def attr_is_samplable(attr):
+        return callable(getattr(attr, "sample", None))
+        
     class NodeSample:
-        def __init__(self,node,parent_sample):
+         #an attribute is calculated
+        def calc_child_attribute_from_parent(self, attr_name, attr_value, parent_sample,p_to_c_map):
+            if not parent_sample:
+                setattr(self,attr_name,MarkovTreeNode.sample_attr_vector(attr_value))
+            elif attr_name not in p_to_c_map:
+                setattr(self,attr_name,MarkovTreeNode.sample_attr_vector(attr_value))
+            else:
+                parent_attr=numpy.array([getattr(parent_sample,attr) for attr in p_to_c_map[attr_name][1]])
+                #TODO check if eah parent attribute has same length as attr value
+                #if a user whishes to map differently for a vector, the user should define those vectors seperately
+                if MarkovTreeNode.attr_is_vector(attr_value):
+                    attr=[p_to_c_map[attr_name][0](a,b)for a,b in zip(attr_value,parent_attr.T)]
+                    #parent_attr is a vector of vector attributes
+                    setattr(self,attr_name,attr)
+                else:
+                    setattr(self,attr_name,p_to_c_map[attr_name][0](attr_value,parent_attr))
+        def __init__(self,node,index,parent_sample):
             #properties are saved independent from the parent, for later use of its values in machine learning
-            self.name=node.name + str(id(self))
+            self.name=node.name
             #sample properties from class property distribution, a property can be defined as property or statically by a value
-            self.independent_attr = dict((ss_name,MarkovTreeNode.sample_search_space_distr(ss_distr))for ss_name, ss_distr in node.search_spaces.items())
+            self.independent_attr = dict((ss_name,MarkovTreeNode.sample_attr_vector(ss_distr))for ss_name, ss_distr in node.search_spaces.items())
 
             #properties are saved related to the parent
-            for ss_name,ss_distr in node.search_spaces.items():
-                if not parent_sample:
-                    setattr(self,ss_name,MarkovTreeNode.sample_search_space_distr(ss_distr))
-                elif ss_name not in node.p_to_c_map:
-                    setattr(self,ss_name,MarkovTreeNode.sample_search_space_distr(ss_distr))
-                else:
-                    setattr(self,ss_name,node.p_to_c_map[ss_name](parent_sample,self.independent_attr[ss_name]))
+            for ss_name,ss_distr in self.independent_attr.items():
+                self.calc_child_attribute_from_parent(ss_name,ss_distr,parent_sample,node.p_to_c_map)
+            if parent_sample:
+                self.index=str(index) + parent_sample.index
+            else:
+                self.index=str(index)
             self.parent_sample=parent_sample
             
         def __str__(self):
             return '\n'.join(key + ": " + str(value) for key, value in vars(self).items())
+   
 
-
-
+        
     #sample a layout object and its children
-    def sample(self,parent_sample:NodeSample=None):
+    def sample(self,parent_sample=None,index=0,sample_list=None):
         #create  sample
-        sample = MarkovTreeNode.NodeSample(self,parent_sample=parent_sample)
-        samples=[sample]
+        sample = MarkovTreeNode.NodeSample(self,index,parent_sample=parent_sample)
+        if sample_list != None:
+            sample_list.append(sample)
+        child_samples=[]
         for child in self.children:
-            for i in range(self.sample_search_space_distr(child[0])):
+            for i in range(self.sample_attr_vector(child[0])):
                 #sample child object given parent sample
                 #the star is to create a singel list in the recursion
-                samples.append(*child[1].sample(sample))
-        return samples
-
+                child_samples.append(child[1].sample(sample,i,sample_list))
+            setattr(sample,"child_samples",child_samples)
+        return sample
 
 
     #size position and rotation are either a distribution
@@ -67,18 +95,20 @@ class MarkovTreeNode:
         
 class LayoutMarkovTreeNode(MarkovTreeNode):
     shape_exteriors={"square": [(0, 0), (0, 1), (1, 1),(1,0)]}
-           
-    standard_property_map = {"size_x": lambda parent, size_x: parent.size_x*size_x,
-                             "size_y": lambda parent, size_y: parent.size_y*size_y,
-                             "position_x": lambda parent, position_x: parent.position_x+position_x,
-                             "position_y": lambda parent, position_y: parent.position_y+position_y,
-                             "rotation": lambda parent, rotation: parent.rotation+rotation}
+    standard_func = {"scale": lambda a, b: a*b,
+                     "add": lambda a,b : a+b
+                             }
+    standard_property_map = {"position":(standard_func["add"],["position"]),
+                    "rotation":(standard_func["add"],["rotation"]),
+                    "size":((standard_func["scale"],["size"]))
+                    }
+   
      
-    def __init__(self, name, size_x=1,size_y=1, position_x=0,position_y=0, rotation=0,shape=[(0,0),(0,1),(1,1),(1,0)], color="b",children=[(0,None)], property_map=standard_property_map):
-        super().__init__(name,{"size_x":size_x,"size_y":size_y, "position_x":position_x,"position_y":position_y,"rotation":rotation,"color":color,"shape":shape},children,property_map)        
+    def __init__(self, name, size=(1,1),position=[0,0], rotation=0,shape=[(0,0),(0,1),(1,1),(1,0)], color="b",children=[(0,None)], property_map=standard_property_map):
+        super().__init__(name,{"size":size, "position":position,"rotation":rotation,"color":color,"shape":shape},children,property_map)        
 
-#wrapper class around scipy.stats.rv_continuous generic distributions class
-class Distribution:
+               
+class Distribution():
     #low and high is ignored if options (enums) is set
     #if nr_of_values is -1 the distribution is continous
     def __init__(self,distr:scipy.stats.rv_continuous,low=0, high=1, nr_of_values=-1, options=[]):
@@ -115,8 +145,9 @@ def test():
 #    shape= MarkovTreeNode("shape",children=[(d2,points)])
     rot = Distribution(distr=scipy.stats.uniform,low=0,high=360)
     
-    chair = LayoutMarkovTreeNode(size_x=d3,size_y=d3,name="chair", position_x=d1,position_y=d1, rotation=rot,shape=LayoutMarkovTreeNode.shape_exteriors["square"], color=colors)
-    table = LayoutMarkovTreeNode(size_x=1,size_y=2,name="table",position_x=3,position_y=2,shape=LayoutMarkovTreeNode.shape_exteriors["square"],children=[(d2,chair)],color="blue")
-    table_and_chairs = table.sample()
-    return table_and_chairs
+    chair = LayoutMarkovTreeNode(size=(d3,d3),name="chair", position=(d1,d1), rotation=rot,shape=LayoutMarkovTreeNode.shape_exteriors["square"], color=colors)
+    table = LayoutMarkovTreeNode(size=(1,2),name="table",position=(3,2),shape=LayoutMarkovTreeNode.shape_exteriors["square"],children=[(d2,chair)],color="blue")
+    list_of_samples=[]    
+    root = table.sample(sample_list=list_of_samples)
+    return list_of_samples,root
     

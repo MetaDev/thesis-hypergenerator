@@ -41,8 +41,9 @@ def map_layoutsamples_to_geometricobjects(layout_samples,geom_class=Polygon):
     geom_objs=[]
     for sample in layout_samples:
         geom_obj=geom_class(sample.shape)
-        geom_obj=affinity.translate(geom_obj, sample.position_x,sample.position_y,0)
-        geom_obj=affinity.scale(geom_obj,sample.size_x,sample.size_y)
+        print(vars(sample))
+        geom_obj=affinity.translate(geom_obj, sample.position[0],sample.position[1],0)
+        geom_obj=affinity.scale(geom_obj,sample.size[0],sample.size[1])
         geom_obj=affinity.rotate(geom_obj,sample.rotation)
         geom_objs.append(geom_obj)
     return geom_objs

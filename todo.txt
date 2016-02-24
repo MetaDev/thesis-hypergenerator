@@ -1,16 +1,38 @@
+learn conditional distributions (P(attr|index,nr_of_siblings,parent_attr)) on the independ values (of one or more attributes) of the samples, using kde or GMM
+the samples of which distribution is estimated are a subset of all samples defined by a fitness criteria rejection function
+this fitness rejection function defines a hyperplane (can be stochastic) that seperates valid from invalid samples
+
+TODO: test for multiple attributes, multiple fitness , multiple models and hyperparameters
+
+test conditional model to generate valid data conditional on index and number of siblings parent values  and train different model
+for each number of children
+
+use statsmodel ()  for kernel density estimator model
+
+maybe try hidden markov model with gaussian mixture, to model the sequence of children?
 
 
-add random polygons in sample search space
-change postion_x , position_y to vector
-children is a vector as well and should be part of the search space
-no seperate sampling for distributions
+another method would be to train a classifier for valid/invalid samples and use rejection sampling to generate
+estimated valid samples, apply this for expensive fittnes functions
+
+in the same spirit a regressor could be trained on fitness values and use rejection sampling
+or even better use regression to find the approximate inverse of the fitness
 
 
-save paren child hierarchy in samples
+
+add random polygons (distribution for points, make seperate node class for shape) in sample search space
+
 
 save generated samples in data frame to save space
 
-train different models on data
+
+start pokemon use case
+
+
+There are 2 options to make markov model
+either sample first from the possible number of children combinations and use this to build a bayesian network
+or add a state (markov state) for each possible number of children of a category and choose each state with given probability
+and finally connect the actual child attribute distributions to each state, repeat until comple network is build
 
 implement search space in pymc3 using 1 model for the parent child structure and when sampling build new model based on this model
 these new models are cached in map based on their structure, such that each different model only has to be build once

@@ -2,11 +2,14 @@
 import networkx as nx
 import numpy as np
 import shapely
+
 import itertools as it
 import operator as op
 from shapely.geometry import Point
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPolygon
+
+
 
 
 def range_from_polygons(polygons, size=1):
@@ -55,9 +58,9 @@ def polygon_from_range(xrange,yrange):
     
 def extract_samples_attributes(samples,sample_name:str=None,attr_name:str=None):
     if attr_name and sample_name:
-        return [sample.attr_name for sample in samples if sample.name.startswith(sample_name)]
+        return [getattr(sample,attr_name) for sample in samples if sample.name.startswith(sample_name)]
     elif attr_name:
-        return [sample.attr_name for sample in samples]
+        return [getattr(sample,attr_name) for sample in samples]
     elif sample_name:
         return [sample for sample in samples if sample.name.startswith(sample_name)]
-    
+        

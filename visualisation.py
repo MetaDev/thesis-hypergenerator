@@ -28,7 +28,7 @@ def finish():
     #show plot
     plt.show()
 def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False):
-    color="blue"
+    color="b"
     for i in range(len(polygons)):
         polygon=polygons[i]
         if colors:

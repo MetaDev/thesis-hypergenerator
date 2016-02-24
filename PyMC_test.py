@@ -1,4 +1,5 @@
 import pymc
+import pymc3
 import numpy as np
 def make_model(x):
     a = pymc.Exponential('a', beta=x, value=0.5)
@@ -25,4 +26,16 @@ M = pymc.MCMC(make_model(3))
 for i in range(100):
     M.draw_from_prior()
     print(M.a.value)
+basic_model = pymc3.Model()
+
+with basic_model:
+
+    # Priors for unknown model parameters
+    alpha = pymc3.Uniform('alpha', lower=0, upper=10)
+    beta = pymc3.Uniform('alpha',lower=alpha, upper=alpha+5)
+    test = pymc3.DiscreteUniform('alpha', lower=1, upper=10)
+for i in range(100):
+    print(alpha.random())
+    print(beta.random())
+    print(test.random())
     
