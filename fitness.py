@@ -25,13 +25,11 @@ def area_density(polygons, polygon_bound):
     return cascaded_union([polygon.intersection(polygon_bound) for polygon in polygons]).area
 #this is a direct metric and does not require polygon conversion
 #total distance between layout_objcts
-def total_dist(layout_samples, dist_metric=numpy.linalg.norm):
-    total_dist=0
-    for sample in layout_samples:
-        total_dist= dist_metric(numpy.array(sample.centroid))
-    return total_dist
+#todo calculate distance bqsed on polygon centroid
+def pairwise_dist(positions, dist_metric=numpy.linalg.norm):
+    return [dist_metric(numpy.array([position_pair[0],position_pair[1]])) for position_pair in utility.pairwise(positions)]
 def dist_between_parent_child(parent,children, dist_metric=numpy.linalg.norm):
-    return numpy.sum([dist_metric(numpy.array([parent.position,child.position])) for child in children])
+    return [dist_metric(numpy.array([parent.position,child.position])) for child in children]
 #calculate collision or intersection between layout samples
     
 #add named functions, such that 2 layout object collections can be compared e.g. in surface by layout definition name

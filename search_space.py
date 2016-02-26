@@ -37,6 +37,7 @@ class MarkovTreeNode:
             elif attr_name not in p_to_c_map:
                 setattr(self,attr_name,MarkovTreeNode.sample_attr_vector(attr_value))
             else:
+                #if multiple parent attributes are given
                 parent_attr=numpy.array([getattr(parent_sample,attr) for attr in p_to_c_map[attr_name][1]])
                 #TODO check if eah parent attribute has same length as attr value
                 #if a user whishes to map differently for a vector, the user should define those vectors seperately
@@ -51,7 +52,6 @@ class MarkovTreeNode:
             self.name=node.name
             #sample properties from class property distribution, a property can be defined as property or statically by a value
             self.independent_attr = dict((ss_name,MarkovTreeNode.sample_attr_vector(ss_distr))for ss_name, ss_distr in node.search_spaces.items())
-
             #properties are saved related to the parent
             for ss_name,ss_distr in self.independent_attr.items():
                 self.calc_child_attribute_from_parent(ss_name,ss_distr,parent_sample,node.p_to_c_map)
@@ -59,7 +59,7 @@ class MarkovTreeNode:
                 self.index=str(index) + parent_sample.index
             else:
                 self.index=str(index)
-            self.parent_sample=parent_sample
+            self.parent=parent_sample
             
         def __str__(self):
             return '\n'.join(key + ": " + str(value) for key, value in vars(self).items())
@@ -74,11 +74,11 @@ class MarkovTreeNode:
             sample_list.append(sample)
         child_samples=[]
         for child in self.children:
-            for i in range(self.sample_attr_vector(child[0])):
+            for i in range(int(self.sample_attr_vector(child[0]))):
                 #sample child object given parent sample
                 #the star is to create a singel list in the recursion
                 child_samples.append(child[1].sample(sample,i,sample_list))
-            setattr(sample,"child_samples",child_samples)
+            setattr(sample,"children",child_samples)
         return sample
 
 
@@ -111,12 +111,19 @@ class LayoutMarkovTreeNode(MarkovTreeNode):
 class Distribution():
     #low and high is ignored if options (enums) is set
     #if nr_of_values is -1 the distribution is continous
-    def __init__(self,distr:scipy.stats.rv_continuous,low=0, high=1, nr_of_values=-1, options=[]):
+    def __init__(self,distr:scipy.stats.rv_continuous=scipy.stats.uniform,low=0, high=1, nr_of_values=-1, options=[]):
         self.low=low
         self.high=high
         self.distr=distr
         self.nr_of_values=nr_of_values
         self.options=options
+        #Continous, Ordered Discrete ,Unordered Discrete
+        if self.options:
+            self.var_type="u"
+        elif self.nr_of_values!= -1:
+            self.var_type="o"
+        else:
+            self.var_type="c"
     def sample(self):
         #normalise random value
         rnd = self.normalised_sample()
@@ -131,22 +138,28 @@ class Distribution():
         _min = self.distr.interval(0.9999)[0]
         _max = self.distr.interval(0.9999)[1]
         return (numpy.clip(self.distr.rvs(size=1)[0],_min,_max)-_min)/(_max-_min)
+   
+        
         
 def test():
     #test Distribution
-    d1 = Distribution(distr=scipy.stats.uniform,low=-4,high=4)
-    d3 = Distribution(distr=scipy.stats.uniform,low=0.2,high=0.4)
-    d2= Distribution(distr=scipy.stats.uniform,options=list(range(1,8)))
-    colors = Distribution(distr=scipy.stats.uniform,options=["red","green","blue"])
+    d1 = Distribution(low=-1,high=1)
+    d3 = Distribution(low=0.2,high=0.4)
+    d2= Distribution(low=4,high=8,nr_of_values=4)
+    colors = Distribution(options=["red","green","blue"])
     #test MarkovTreeNode
     #it should be possible to have stochastic shape as well, defined by its own points
     #to allow this each attribute of a markovnode should be possibly a markov node as well
-#    points=MarkovTreeNode("point",{("x",d3),("y",d3)})
-#    shape= MarkovTreeNode("shape",children=[(d2,points)])
+    #shapes1= Distribution(options=[[(0, 0), (0, 1), (1, 1),(1,0)],[(0, 0), (0, 1),(0.5,1),(0.5,0.5),(1, 0.5),(1,0)]])
+    shapes1= Distribution(options=[[(0, 0), (0, 1),(0.5,1),(0.5,0.5),(1, 0.5),(1,0)]])
+
+    p1=Distribution(low=0,high=0.5)
+    p2=Distribution(low=0.5,high=1)
+    shapes2= [(p1,p1),(p1,p2),(p2,p2),(p2,p1)]
     rot = Distribution(distr=scipy.stats.uniform,low=0,high=360)
     
-    chair = LayoutMarkovTreeNode(size=(d3,d3),name="chair", position=(d1,d1), rotation=rot,shape=LayoutMarkovTreeNode.shape_exteriors["square"], color=colors)
-    table = LayoutMarkovTreeNode(size=(1,2),name="table",position=(3,2),shape=LayoutMarkovTreeNode.shape_exteriors["square"],children=[(d2,chair)],color="blue")
+    chair = LayoutMarkovTreeNode(size=(d3,d3),name="chair", position=(d1,d1), rotation=rot,shape=shapes2, color=colors)
+    table = LayoutMarkovTreeNode(name="table",position=(1,1),shape=shapes1,children=[(d2,chair)],color="blue")
     list_of_samples=[]    
     root = table.sample(sample_list=list_of_samples)
     return list_of_samples,root

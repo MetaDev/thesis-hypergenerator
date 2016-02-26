@@ -16,6 +16,7 @@ def init(name="visualisation"):
     fig=plt.gcf()
     fig.clear()
     ax = fig.add_subplot(111)
+    ax.set_aspect(1)
     return ax
 def draw_graph(ax,graph,with_labels=False,node_size=0):
     pos=dict([ (n, n) for n in graph.nodes() ])
@@ -27,7 +28,7 @@ def draw_graph_path(ax,graph,path,color='b',with_labels=False,node_size=50,node_
 def finish():
     #show plot
     plt.show()
-def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False):
+def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=True):
     color="b"
     for i in range(len(polygons)):
         polygon=polygons[i]
@@ -43,19 +44,19 @@ def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False):
         ax.add_patch(patch)
     #finalise figure properties
     ax.set_title('Layout visualisation')
-    (xrange,yrange)=utility.range_from_polygons(polygons, size)
-    ax.set_xlim(*xrange)
-    ax.set_ylim(*yrange)
-    #aspect ratio of plot
-    ax.set_aspect(1)
-def make_ellipses(gmm, fig):
-    for n in range(len(gmm._get_covars())):
-        v, w = np.linalg.eigh(gmm._get_covars()[n][:2, :2])
+    if set_range:
+        (xrange,yrange)=utility.range_from_polygons(polygons, size)
+        ax.set_xlim(*xrange)
+        ax.set_ylim(*yrange)
+   
+def make_ellipses(gmm_means,gmm_covars, fig):
+    for n in range(len(gmm_covars)):
+        v, w = np.linalg.eigh(gmm_covars[n][:2, :2])
         u = w[0] / np.linalg.norm(w[0])
         angle = np.arctan2(u[1], u[0])
         angle = 180 * angle / np.pi  # convert to degrees
         v *= 9
-        ell = mpl.patches.Ellipse(gmm.means_[n, :2], v[0], v[1],
+        ell = mpl.patches.Ellipse(gmm_means[n, :2], v[0], v[1],
                                   180 + angle, color='#999999')
         ell.set_clip_box(fig.gca().bbox)
         ell.set_alpha(0.5)

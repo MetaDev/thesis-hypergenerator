@@ -1,3 +1,34 @@
+#port search space to pymc3
+polygons mogen stochastisch zijn, maar met vast aantal parameters
+
+1) experiment with conditional gmm 
+    -make experiment to show how training 
+        on filtered data is done for hard constraints
+        on augmented data for fitness
+        on conditional data for soft constraints
+    -compare augmented data vs non-augemented data
+    -compare seperate models (for each number of children) and pair-wise trained models
+    -compare training on multiple fitness
+    -use dimensionality reduction to find independent components->only try to find cond distr between dep components
+    
+2) model pokemon world probabilistically
+    find top down constraints
+3) extend mixture models to find general mixture models (include discrete distribution)
+    -find conditional distributions reflecting the number of children in the hierarchy conditional on the fitness
+
+3) build hierachical model in pomegranata
+
+learning is applicable to top down constraints which are can do not require complex mapping (directly on the sample property)
+-> show with graph
+These hard constraints can however still be learned early in the generation procedure (early stop)
+
+identify independent stages in the modelling process reduces dimensionality and allows for parallel learning
+
+
+in highly constrained space, high probability for collision, objects are placed conditional on the siblings
+
+
+
 learn conditional distributions (P(attr|index,nr_of_siblings,parent_attr)) on the independ values (of one or more attributes) of the samples, using kde or GMM
 the samples of which distribution is estimated are a subset of all samples defined by a fitness criteria rejection function
 this fitness rejection function defines a hyperplane (can be stochastic) that seperates valid from invalid samples
@@ -7,20 +38,9 @@ TODO: test for multiple attributes, multiple fitness , multiple models and hyper
 test conditional model to generate valid data conditional on index and number of siblings parent values  and train different model
 for each number of children
 
-use statsmodel ()  for kernel density estimator model
-
-maybe try hidden markov model with gaussian mixture, to model the sequence of children?
+kernel density, try to find the same conditional probabilities as gaussian mixture
 
 
-another method would be to train a classifier for valid/invalid samples and use rejection sampling to generate
-estimated valid samples, apply this for expensive fittnes functions
-
-in the same spirit a regressor could be trained on fitness values and use rejection sampling
-or even better use regression to find the approximate inverse of the fitness
-
-
-
-add random polygons (distribution for points, make seperate node class for shape) in sample search space
 
 
 save generated samples in data frame to save space
