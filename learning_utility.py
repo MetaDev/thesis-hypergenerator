@@ -166,7 +166,8 @@ def sample_gaussian_mixture(centroids, ccov, mc = None, samples = 1,loose_norm_w
         EPS=1e-12
     else:
         EPS = mixture.gmm.EPS
-    n=np.abs(1-np.sum(mc)) 
+        
+
     if np.abs(1-np.sum(mc)) > EPS:
         raise ValueError ("The sum of mc must be 1.0")
 
@@ -213,7 +214,8 @@ class GMM_weighted(mixture.gmm.GMM):
                 Posterior probabilities of each mixture component for each
                 observation.
             """
-    
+            #normalise the weights between [0,1]
+            Xweights=(np.array(Xweights)-np.min(Xweights))/(np.max(Xweights)-np.min(Xweights))
             # initialization step
             X = check_array(X, dtype=np.float64, ensure_min_samples=2,
                             estimator=self)
@@ -284,7 +286,7 @@ class GMM_weighted(mixture.gmm.GMM):
                             break
     
                     # Maximization step
-                    self._do_weighted_mstep(X,Xweights,responsibilities, self.params,
+                    self._do_mstep(X,responsibilities, self.params,
                                    self.min_covar)
                     if self.verbose > 1:
                         print('\t\tEM iteration ' + str(i + 1) + ' took {0:.5f}s'.format(
@@ -357,20 +359,4 @@ class GMM_weighted(mixture.gmm.GMM):
         logprob=np.array([l*w for l,w in zip(logprob,Xweights)])
         responsibilities = np.exp(lpr - logprob[:, np.newaxis])
         return logprob, responsibilities
-    def _do_weighted_mstep(self, X,Xweights, responsibilities, params, min_covar=0):
-        """Perform the Mstep of the EM algorithm and return the cluster weights.
-        """
-        weights = responsibilities.sum(axis=0)
-        weighted_X_sum = np.dot(responsibilities.T, X)
-        inverse_weights = 1.0 / (weights[:, np.newaxis] + 10 * mixture.gmm.EPS)
-
-        if 'w' in params:
-            self.weights_ = (weights / (weights.sum() + 10 * mixture.gmm.EPS) + mixture.gmm.EPS)
-        if 'm' in params:
-            self.means_ = weighted_X_sum * inverse_weights
-        if 'c' in params:
-            covar_mstep_func = mixture.gmm._covar_mstep_funcs[self.covariance_type]
-            self.covars_ = covar_mstep_func(
-                self, X, responsibilities, weighted_X_sum, inverse_weights,
-                min_covar)
-        return weights
+  

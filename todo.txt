@@ -1,14 +1,30 @@
+add experiment to show that both the fitness and conditional distributions work
+work with regular formed children
+add boxplot for fitness
+visualise with ellipses instead of with samples
+
+next experiment should show possibility to constraints that are enforced on siblings
+
+increase variables with rotation and size  (add maybe covariance estimation to reduce traingin time if for example rotation doesn't affect the constrained)
+
+start generating scenes for pokemon
+
+use methode to sample node create from parent_sample
+
+add method to sample node to extract data (from generated samples) which is random and thus of which the distr can be learned (for easier use), additional covariance estimation before training
+s
 all papers in downloads->put in mendeley
-compare result before and after training on the fitness
+
 
 show some metrics on the computation time difference between "shape" likelihood and gameplay likelihood
+
+
 
 1) experiment with conditional gmm 
     -make experiment to show how training 
         on filtered data is done for hard constraints
-        on augmented data for fitness
         on conditional data for soft constraints
-    -compare augmented data vs non-augemented data
+        using weighted samples on for fitness 
     -compare seperate models (for each number of children) and pair-wise trained models
     -compare training on multiple fitness
     -use dimensionality reduction to find independent components->only try to find cond distr between dep components

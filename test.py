@@ -26,7 +26,6 @@ visualisation.draw_graph(axs[0],graph)
 chairs = [polygons[i]  for i in range(len(result)) if result[i].name.startswith("chair")]
 chair_paths = fitness.polygon_path_sequence(graph,chairs)
 visualisation.draw_graph_path(axs[0],graph,chair_paths)
-print("Total overlapping surface: "+ str(fitness.surface_overlap(polygons)))
 print("total distance between chairs: "+ str(fitness.pairwise_dist(utility.extract_samples_attributes(result,attr_name="position",sample_name="chair"))))
 
 centroids=[np.array(p.centroid) for p in polygons]

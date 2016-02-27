@@ -37,20 +37,19 @@ def map_geometricobjects_to_nodes(graph,geom_objs):
                 dist=o.distance(Point(n))
         nodes.append(node)
     return nodes
+def map_to_polygon(shape,position,rotation,size):
+    geom_obj=Polygon(shape)
+    centroid=np.array(geom_obj.centroid)
+    geom_obj=affinity.translate(geom_obj, -centroid[0],-centroid[1],0)
+    geom_obj=affinity.translate(geom_obj, position[0],position[1],0)
+    geom_obj=affinity.scale(geom_obj,size[0],size[1],origin="centroid")       
+    geom_obj=affinity.rotate(geom_obj,rotation,origin="centroid")
+    return geom_obj
 #map a sample to a shape of which it's center is at the position of the sample
-def map_layoutsamples_to_geometricobjects(layout_samples,geom_class=Polygon):
+def map_layoutsamples_to_geometricobjects(layout_samples):
     geom_objs=[]
     for sample in layout_samples:
-        geom_obj=geom_class(sample.shape)
-        centroid=np.array(geom_obj.centroid)
-        geom_obj=affinity.translate(geom_obj, -centroid[0],-centroid[1],0)
-        geom_obj=affinity.translate(geom_obj, sample.position[0],sample.position[1],0)
-        geom_obj=affinity.scale(geom_obj,sample.size[0],sample.size[1],origin="centroid")       
-        geom_obj=affinity.rotate(geom_obj,sample.rotation,origin="centroid")
-        
-        
-        
-        geom_objs.append(geom_obj)
+        geom_objs.append(map_to_polygon(sample.shape,sample.position,sample.rotation,sample.size))
     return geom_objs
 
 

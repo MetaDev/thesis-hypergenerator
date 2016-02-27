@@ -31,7 +31,7 @@ def draw_graph_path(ax,graph,path,color='b',with_labels=False,node_size=50,node_
 def finish():
     #show plot
     plt.show()
-def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=True):
+def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=False):
     color="b"
     for i in range(len(polygons)):
         polygon=polygons[i]
@@ -52,16 +52,16 @@ def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=True
         ax.set_xlim(*xrange)
         ax.set_ylim(*yrange)
    
-def make_ellipses(gmm_means,gmm_covars, fig):
+def make_ellipses(gmm_means,gmm_covars, ax):
     for n in range(len(gmm_covars)):
         v, w = np.linalg.eigh(gmm_covars[n][:2, :2])
         u = w[0] / np.linalg.norm(w[0])
         angle = np.arctan2(u[1], u[0])
         angle = 180 * angle / np.pi  # convert to degrees
         v *= 9
-        ell = mpl.patches.Ellipse(gmm_means[n, :2], v[0], v[1],
+        ell = mpl.patches.Ellipse(gmm_means[n], v[0], v[1],
                                   180 + angle, color='#999999')
-        ell.set_clip_box(fig.gca().bbox)
+        ell.set_clip_box(ax.bbox)
         ell.set_alpha(0.5)
-        fig.gca().add_artist(ell)
+        ax.add_artist(ell)
   

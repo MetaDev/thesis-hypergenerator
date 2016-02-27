@@ -38,7 +38,6 @@ class MarkovTreeNode:
             elif attr_name not in self.p_to_c_map:
                 setattr(self,attr_name,MarkovTreeNode.sample_attr_vector(ind_attr[attr_name]))
             else:
-                #TODO if multiple parent attributes are given
                 parent_attr=numpy.array([getattr(self.parent,attr) for attr in self.p_to_c_map[attr_name][1]])
                 #TODO check if eah parent attribute has same length as attr value
                 #if a user whishes to map differently for a vector, the user should define those vectors seperately
@@ -148,15 +147,16 @@ class Distribution():
         
 def test():
     #test Distribution
-    d1 = Distribution(low=-1,high=1)
+    d1 = Distribution(low=-1.5,high=1.5)
     d3 = Distribution(low=0.2,high=0.4)
     d2= Distribution(low=4,high=8,nr_of_values=4)
+    d4=Distribution(low=0.5,high=2)
     colors = Distribution(options=["red","green","blue"])
     #test MarkovTreeNode
     #it should be possible to have stochastic shape as well, defined by its own points
     #to allow this each attribute of a markovnode should be possibly a markov node as well
     #shapes1= Distribution(options=[[(0, 0), (0, 1), (1, 1),(1,0)],[(0, 0), (0, 1),(0.5,1),(0.5,0.5),(1, 0.5),(1,0)]])
-    shapes1= Distribution(options=[[(0, 0), (0, 1),(0.5,1),(0.5,0.5),(1, 0.5),(1,0)]])
+    shapes1= Distribution(options=[[(0, 0), (0, 1),(0.5,1),(d4,d4),(1, 0.5),(1,0)]])
 
     p1=Distribution(low=0,high=0.5)
     p2=Distribution(low=0.5,high=1)
