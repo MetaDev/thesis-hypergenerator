@@ -10,14 +10,17 @@ import numpy as np
 
 import utility
 
-def init(name="visualisation"):
+def init(name="visualisation",n_plots=1):
     if(plt.gcf()==0):
         fig = plt.figure(name)
     fig=plt.gcf()
     fig.clear()
-    ax = fig.add_subplot(111)
-    ax.set_aspect(1)
-    return ax
+    axs=[]
+    for i in range(n_plots):
+        ax = fig.add_subplot(n_plots,1,i+1)
+        ax.set_aspect(1)
+        axs.append(ax)
+    return axs
 def draw_graph(ax,graph,with_labels=False,node_size=0):
     pos=dict([ (n, n) for n in graph.nodes() ])
     labels =dict([ (n,str(n)) for n in graph.nodes() ])

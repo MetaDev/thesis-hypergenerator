@@ -116,7 +116,7 @@ def mulnormpdf(X, MU, SIGMA):
     if ex.ndim == 2: ex = np.sum(ex, axis = 0)
     K = 1 / np.sqrt ( np.power(2*np.pi, N) * linalg.det(sigma) )
     return K*np.exp(ex)
-def sample_gaussian_mixture(centroids, ccov, mc = None, samples = 1):
+def sample_gaussian_mixture(centroids, ccov, mc = None, samples = 1,loose_norm_weights=False):
     """
     Draw samples from a Mixture of Gaussians (MoG)
 
@@ -162,7 +162,11 @@ def sample_gaussian_mixture(centroids, ccov, mc = None, samples = 1):
             "of elements.")
 
     # Check if the mixing coefficients sum to one:
-    EPS = mixture.gmm.EPS
+    if loose_norm_weights:
+        EPS=1e-12
+    else:
+        EPS = mixture.gmm.EPS
+    n=np.abs(1-np.sum(mc)) 
     if np.abs(1-np.sum(mc)) > EPS:
         raise ValueError ("The sum of mc must be 1.0")
 
@@ -188,57 +192,7 @@ from sklearn.utils import  check_array
 from sklearn.utils.extmath import logsumexp
 class GMM_weighted(mixture.gmm.GMM):
 
-    def score_weighted_samples(self, X,Xweights):
-        """Return the per-sample likelihood of the data under the model.
-        Compute the log probability of X under the model and
-        return the posterior distribution (responsibilities) of each
-        mixture component for each element of X.
-        Parameters
-        ----------
-        X: array_like, shape (n_samples, n_features)
-            List of n_features-dimensional data points. Each row
-            corresponds to a single data point.
-        Returns
-        -------
-        logprob : array_like, shape (n_samples,)
-            Log probabilities of each data point in X.
-        responsibilities : array_like, shape (n_samples, n_components)
-            Posterior probabilities of each mixture component for each
-            observation
-        """
-        check_is_fitted(self, 'means_')
-
-        X = check_array(X)
-        if X.ndim == 1:
-            X = X[:, np.newaxis]
-        if X.size == 0:
-            return np.array([]), np.empty((0, self.n_components))
-        if X.shape[1] != self.means_.shape[1]:
-            raise ValueError('The shape of X  is not compatible with self')
-        X=np.array([xw[0]*xw[1] for xw in zip(X,Xweights)])
-        lpr = (mixture.gmm.log_multivariate_normal_density(X, self.means_, self.covars_,
-                                               self.covariance_type) +
-               np.log(self.weights_))
-        logprob = logsumexp(lpr, axis=1)
-        responsibilities = np.exp(lpr - logprob[:, np.newaxis])
-        return logprob, responsibilities
-    def _do_weighted_mstep(self, X,XWeights, responsibilities, params, min_covar=0):
-        """Perform the Mstep of the EM algorithm and return the cluster weights.
-        """
-        weights = responsibilities.sum(axis=0)/sum(XWeights)
-        weighted_X_sum = np.dot(responsibilities.T, X)
-        inverse_weights = 1.0 / (weights[:, np.newaxis] + 10 * mixture.gmm.EPS)
-
-        if 'w' in params:
-            self.weights_ = (weights / (weights.sum() + 10 * mixture.gmm.EPS) + mixture.gmm.EPS)
-        if 'm' in params:
-            self.means_ = weighted_X_sum * inverse_weights
-        if 'c' in params:
-            covar_mstep_func = mixture.gmm._covar_mstep_funcs[self.covariance_type]
-            self.covars_ = covar_mstep_func(
-                self, X, responsibilities, weighted_X_sum, inverse_weights,
-                min_covar)
-        return weights
+    
 
     def weighted_fit(self, X, Xweights, y=None, do_prediction=False):
             #sample weight need to be normalised
@@ -314,6 +268,8 @@ class GMM_weighted(mixture.gmm.GMM):
                     # Expectation step
                     log_likelihoods, responsibilities = self.score_weighted_samples(X,Xweights)
                     
+                    
+                    
                     current_log_likelihood = log_likelihoods.mean()
     
                     # Check for convergence.
@@ -328,7 +284,7 @@ class GMM_weighted(mixture.gmm.GMM):
                             break
     
                     # Maximization step
-                    self._do_weighted_mstep(X,Xweights, responsibilities, self.params,
+                    self._do_weighted_mstep(X,Xweights,responsibilities, self.params,
                                    self.min_covar)
                     if self.verbose > 1:
                         print('\t\tEM iteration ' + str(i + 1) + ' took {0:.5f}s'.format(
@@ -366,3 +322,55 @@ class GMM_weighted(mixture.gmm.GMM):
                 responsibilities = np.zeros((X.shape[0], self.n_components))
     
             return responsibilities
+    def score_weighted_samples(self, X,Xweights):
+        """Return the per-sample likelihood of the data under the model.
+        Compute the log probability of X under the model and
+        return the posterior distribution (responsibilities) of each
+        mixture component for each element of X.
+        Parameters
+        ----------
+        X: array_like, shape (n_samples, n_features)
+            List of n_features-dimensional data points. Each row
+            corresponds to a single data point.
+        Returns
+        -------
+        logprob : array_like, shape (n_samples,)
+            Log probabilities of each data point in X.
+        responsibilities : array_like, shape (n_samples, n_components)
+            Posterior probabilities of each mixture component for each
+            observation
+        """
+        check_is_fitted(self, 'means_')
+
+        X = check_array(X)
+        if X.ndim == 1:
+            X = X[:, np.newaxis]
+        if X.size == 0:
+            return np.array([]), np.empty((0, self.n_components))
+        if X.shape[1] != self.means_.shape[1]:
+            raise ValueError('The shape of X  is not compatible with self')
+
+        lpr = (mixture.gmm.log_multivariate_normal_density(X, self.means_, self.covars_,
+                                               self.covariance_type) +
+               np.log(self.weights_))
+        logprob = logsumexp(lpr, axis=1)
+        logprob=np.array([l*w for l,w in zip(logprob,Xweights)])
+        responsibilities = np.exp(lpr - logprob[:, np.newaxis])
+        return logprob, responsibilities
+    def _do_weighted_mstep(self, X,Xweights, responsibilities, params, min_covar=0):
+        """Perform the Mstep of the EM algorithm and return the cluster weights.
+        """
+        weights = responsibilities.sum(axis=0)
+        weighted_X_sum = np.dot(responsibilities.T, X)
+        inverse_weights = 1.0 / (weights[:, np.newaxis] + 10 * mixture.gmm.EPS)
+
+        if 'w' in params:
+            self.weights_ = (weights / (weights.sum() + 10 * mixture.gmm.EPS) + mixture.gmm.EPS)
+        if 'm' in params:
+            self.means_ = weighted_X_sum * inverse_weights
+        if 'c' in params:
+            covar_mstep_func = mixture.gmm._covar_mstep_funcs[self.covariance_type]
+            self.covars_ = covar_mstep_func(
+                self, X, responsibilities, weighted_X_sum, inverse_weights,
+                min_covar)
+        return weights

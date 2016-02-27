@@ -31,35 +31,40 @@ class MarkovTreeNode:
         
     class NodeSample:
          #an attribute is calculated
-        def calc_child_attribute_from_parent(self, attr_name, attr_value, parent_sample,p_to_c_map):
-            if not parent_sample:
-                setattr(self,attr_name,MarkovTreeNode.sample_attr_vector(attr_value))
-            elif attr_name not in p_to_c_map:
-                setattr(self,attr_name,MarkovTreeNode.sample_attr_vector(attr_value))
+        def calc_child_attribute_from_parent(self, attr_name):
+            ind_attr=self.independent_attr
+            if not self.parent:
+                setattr(self,attr_name,MarkovTreeNode.sample_attr_vector(ind_attr[attr_name]))
+            elif attr_name not in self.p_to_c_map:
+                setattr(self,attr_name,MarkovTreeNode.sample_attr_vector(ind_attr[attr_name]))
             else:
-                #if multiple parent attributes are given
-                parent_attr=numpy.array([getattr(parent_sample,attr) for attr in p_to_c_map[attr_name][1]])
+                #TODO if multiple parent attributes are given
+                parent_attr=numpy.array([getattr(self.parent,attr) for attr in self.p_to_c_map[attr_name][1]])
                 #TODO check if eah parent attribute has same length as attr value
                 #if a user whishes to map differently for a vector, the user should define those vectors seperately
-                if MarkovTreeNode.attr_is_vector(attr_value):
-                    attr=[p_to_c_map[attr_name][0](a,b)for a,b in zip(attr_value,parent_attr.T)]
+                if MarkovTreeNode.attr_is_vector(ind_attr[attr_name]):
+                    attr=[self.p_to_c_map[attr_name][0](a,b)for a,b in zip(ind_attr[attr_name],parent_attr.T)]
                     #parent_attr is a vector of vector attributes
                     setattr(self,attr_name,attr)
                 else:
-                    setattr(self,attr_name,p_to_c_map[attr_name][0](attr_value,parent_attr))
+                    setattr(self,attr_name,self.p_to_c_map[attr_name][0](ind_attr[attr_name],parent_attr))
         def __init__(self,node,index,parent_sample):
             #properties are saved independent from the parent, for later use of its values in machine learning
             self.name=node.name
             #sample properties from class property distribution, a property can be defined as property or statically by a value
             self.independent_attr = dict((ss_name,MarkovTreeNode.sample_attr_vector(ss_distr))for ss_name, ss_distr in node.search_spaces.items())
+            #attributes to calc dependent values            
+            self.p_to_c_map=node.p_to_c_map
+            self.parent=parent_sample      
+            
             #properties are saved related to the parent
-            for ss_name,ss_distr in self.independent_attr.items():
-                self.calc_child_attribute_from_parent(ss_name,ss_distr,parent_sample,node.p_to_c_map)
+            for ss_name in self.independent_attr.keys():
+                self.calc_child_attribute_from_parent(ss_name)
             if parent_sample:
                 self.index=str(index) + parent_sample.index
             else:
                 self.index=str(index)
-            self.parent=parent_sample
+            
             
         def __str__(self):
             return '\n'.join(key + ": " + str(value) for key, value in vars(self).items())
@@ -159,7 +164,7 @@ def test():
     rot = Distribution(distr=scipy.stats.uniform,low=0,high=360)
     
     chair = LayoutMarkovTreeNode(size=(d3,d3),name="chair", position=(d1,d1), rotation=rot,shape=shapes2, color=colors)
-    table = LayoutMarkovTreeNode(name="table",position=(1,1),shape=shapes1,children=[(d2,chair)],color="blue")
+    table = LayoutMarkovTreeNode(name="table",position=(1,2),shape=shapes1,children=[(d2,chair)],color="blue")
     list_of_samples=[]    
     root = table.sample(sample_list=list_of_samples)
     return list_of_samples,root

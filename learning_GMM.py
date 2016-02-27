@@ -19,26 +19,28 @@ from skimage import exposure
 import matplotlib.cm as cm
 import mapping
 import learning_utility
-ndata=10
+
+from sklearn.decomposition import PCA
+
+ndata=100
 
 data=[]
 fitness_values=[]
-fitness_test = lambda fitness , value : fitness > value
 polygons_vis=[]
+
 def feauture_fitness_extraction(samples,fitness_func):
     chairs=utility.extract_samples_attributes(samples,sample_name="chair")
     ind_attrs = utility.extract_samples_attributes(chairs,attr_name="independent_attr")
     indexs = utility.extract_samples_attributes(chairs,attr_name="index")
     parents = utility.extract_samples_attributes(chairs,attr_name="parent")
     data=[(ind_attr["position"][0],ind_attr["position"][1],index,len(parent.children)) for ind_attr,index,parent in zip(ind_attrs,indexs,parents)]
-    fitness=[fitness_func([chair,parent])>0 for chair,parent in zip(chairs,parents)]
+    fitness=[fitness_func([chair,parent]) for chair,parent in zip(chairs,parents)]
     return data,fitness
 def fitness_extraction_dist(samples):
     return fitness.dist_between_parent_child(utility.extract_samples_attributes(samples,sample_name="table")[0],utility.extract_samples_attributes(samples,sample_name="chair"))
 def fitness_extraction_overl(samples):
     polygons=mapping.map_layoutsamples_to_geometricobjects(samples)
-    polygons_vis.append(polygons[0])
-    return fitness.surface_overlap(polygons)
+    return fitness.pairwise_overlap(polygons,normalized=True)
 #todo add fitness close to L
 #augment data using multiple fitness
 #train on parametrised shape
@@ -51,55 +53,64 @@ for i in range(ndata):
     
 f_value=0.1
 
-plt.show()
-accept = lambda f, value: f < value
-subset,fitness_subset = zip(*[(d,f) for d,f in zip(data,fitness_values)])
 
-x,y,index,parent_children=zip(*subset)
 
-#print(full_subset[0])
-# Fit a mixture of Gaussians with EM using five components
-gmm = mixture.GMM(n_components=4, covariance_type='full',min_covar=0.0000001)
+filtered_data=False
+if filtered_data:
+    cut_off_value=0
+    accept = lambda f, value: f < value
+    data,fitness_values = zip(*[(d,f) for d,f in zip(data,fitness_values) if accept(f,cut_off_value)])
 
-norm_f_subs=(fitness_subset-np.min(fitness_subset))/(np.max(fitness_subset)-np.min(fitness_subset))
 
-def normalised_fitness(fitness):
-    return fitness/np.sum(fitness)
+x,y,index,parent_children=zip(*data)
 
-ax=visualisation.init()
-table=mapping.map_layoutsamples_to_geometricobjects(utility.extract_samples_attributes(samples,sample_name="table"))[0]
-polygons_vis.append(table)
-visualisation.draw_polygons(ax,polygons_vis)
+if(plt.gcf()==0):
+    fig = plt.figure("name")
+fig=plt.gcf()
+fig.clear()
 
+ax = fig.add_subplot(1,1,1)
+ax.set_aspect(1)
 
 
 
+position=np.array(utility.extract_samples_attributes(samples,attr_name="position",sample_name="table"))[0]
 
-#plot the points
-position=np.array(table.centroid)
 
+n_components=10
+n_samples=len(data)*5
 conditional=False
-weighted=False
+weighted=True
+
 if conditional:
-    training = np.column_stack((x,y,fitness_subset))
+    gmm = mixture.GMM(n_components=n_components, covariance_type='full',min_covar=0.0000001)
+    training = np.column_stack((x,y,fitness_values))
     gmm.fit(training)
     y_0=15
     (con_cen, con_cov, new_p_k) = learning_utility.cond_dist(np.array([np.nan,np.nan, 0.001]), gmm.means_, gmm._get_covars(), gmm.weights_)
-    samples=learning_utility.sample_gaussian_mixture(con_cen, con_cov, new_p_k,samples=100)
+    position_samples=learning_utility.sample_gaussian_mixture(con_cen, con_cov, new_p_k,samples=n_samples)
     x_new,y_new=zip(*samples)
 elif weighted:
-    wgmm = learning_utility.GMM_weighted(n_components=100, covariance_type='full',min_covar=0.0000001)
+    wgmm = learning_utility.GMM_weighted(n_components=n_components,n_init=1,verbose=1, covariance_type='diag',min_covar=0.00001)
     training = np.column_stack((x,y))
-    fitness_values=1-np.array(exposure.equalize_hist(fitness_values))
-    plt.hist(fitness_values)
+    #give heavy penalty for intersection
+    #inverse and normalise fitness
+    fitness_values=fitness.normalise_fitness(fitness.invert_fitness(fitness_values))**6
     wgmm.weighted_fit(training,fitness_values)
-    #visualisation.make_ellipses(wgmm.means_,wgmm.covars_,plt.gcf())
-    samples=learning_utility.sample_gaussian_mixture(wgmm.means_,wgmm._get_covars(),wgmm.weights_,samples=100)
+    
+    position_samples=learning_utility.sample_gaussian_mixture(wgmm.means_,wgmm._get_covars(),wgmm.weights_,samples=n_samples,loose_norm_weights=True)
 else:
+    gmm = mixture.GMM(n_components=n_components, covariance_type='full',min_covar=0.0000001)
     training = np.column_stack((x,y))
     gmm.fit(training)
-    samples=gmm.sample(100)
-x_new,y_new=zip(*samples)
+    position_samples=gmm.sample(n_samples)
+ 
+#don't visualise non overlapping fitness
+
+
+table=mapping.map_layoutsamples_to_geometricobjects(utility.extract_samples_attributes(samples,sample_name="table"))
+#visualisation.draw_polygons(ax,table)
+x_new,y_new=zip(*position_samples)
 x_new=np.array(x_new)+position[0]
 y_new=np.array(y_new)+position[1]
 plt.scatter(x_new,y_new,color='r')
@@ -108,13 +119,13 @@ x=np.array(x)+position[0]
 y=np.array(y)+position[1]
 
 plt.scatter(x,y,c=fitness_values,cmap=cm.Blues)
-print(x,y)
-print(([np.array(p.centroid) for p in polygons_vis ]))
 plt.colorbar()
-(xrange,yrange)=((min(x),max(x)),(min(y),max(y)))
+#
+#
+(xrange,yrange)=((min(x_new),max(x_new)),(min(y_new),max(y_new)))
 ax.set_xlim(*xrange)
 ax.set_ylim(*yrange)
-print(gmm.converged_)
+print(wgmm.converged_)
 
 
 plt.show()

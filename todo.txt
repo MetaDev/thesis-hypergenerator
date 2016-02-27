@@ -1,5 +1,7 @@
-#port search space to pymc3
-polygons mogen stochastisch zijn, maar met vast aantal parameters
+all papers in downloads->put in mendeley
+compare result before and after training on the fitness
+
+show some metrics on the computation time difference between "shape" likelihood and gameplay likelihood
 
 1) experiment with conditional gmm 
     -make experiment to show how training 
@@ -10,19 +12,21 @@ polygons mogen stochastisch zijn, maar met vast aantal parameters
     -compare seperate models (for each number of children) and pair-wise trained models
     -compare training on multiple fitness
     -use dimensionality reduction to find independent components->only try to find cond distr between dep components
-    
+
 2) model pokemon world probabilistically
     find top down constraints
-3) extend mixture models to find general mixture models (include discrete distribution)
+
+3) extend mixture models to find general mixture models (include discrete distribution) (pomegranata)
     -find conditional distributions reflecting the number of children in the hierarchy conditional on the fitness
 
-3) build hierachical model in pomegranata
+3) try to learn relation beyond parent-> child but also child->child using Hidden markov model
 
+3) create experiment with pymc3 to be able to compare inference with and without learning
 learning is applicable to top down constraints which are can do not require complex mapping (directly on the sample property)
 -> show with graph
 These hard constraints can however still be learned early in the generation procedure (early stop)
 
-identify independent stages in the modelling process reduces dimensionality and allows for parallel learning
+4) maybe experiment with dimensionality reduction
 
 
 in highly constrained space, high probability for collision, objects are placed conditional on the siblings
