@@ -1,7 +1,21 @@
 add experiment to show that both the fitness and conditional distributions work
+
 work with regular formed children
+
 add boxplot for fitness
+
 visualise with ellipses instead of with samples
+
+
+sibling fitness
+---------------
+
+check if gmm can be used for discrete random var as well (nr_siblings, index (fixed order, not index from samples))
+
+construct seperate models for each number of children if trained on (ordered) sibling data and their fitness that is calculated between siblings
+or train model on the joint of (nr_siblings, index (fixed order, not index from samples)) and parent sibling  using pomegranata (use rejection sampling for sampling, or better MCMC (PyMC!))
+and train a model seperately on the structure of the network, using only (parent_n_siblings, n_siblings)->fitness to generate (conditional) n_siblings 
+than use training data to estimate optimal distribution for the number of children ()
 
 next experiment should show possibility to constraints that are enforced on siblings
 

@@ -1,0 +1,4 @@
+Ask gaetan if he knows someone at UGent that knows a lot about conditional density estimation on weighted samples of (discrete and) continous data
+ask gaetan what would be best large use-case (lots of scenes, pokemon)
+seperate experiments with more complex models (e.g mixture of GP still continuous model) or 
+MCMC sampling from conditional mixture model ss

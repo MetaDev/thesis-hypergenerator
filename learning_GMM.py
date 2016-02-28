@@ -19,7 +19,7 @@ from skimage import exposure
 import matplotlib.cm as cm
 import mapping
 import learning_utility
-
+from operator import add
 
 ndata=100
 
@@ -64,7 +64,7 @@ if filtered_data:
 x,y,x_shape,y_shape=zip(*data)
 
 n_components=10
-n_samples=50
+n_samples=100
 conditional=True
 weighted=True
 
@@ -91,10 +91,11 @@ fig.clear()
 
 if conditional:
     position=(1,2)
+    print
     x= np.array(x)+position[0]
     y=np.array(y)+position[1]
     n=1;
-    values=np.arange(0.5,2,0.5)
+    values=np.arange(0.5,2,0.25)
     print(values)
     for p in values:
         shape=[(0, 0), (0, 1),(0.5,1),(p,p),(1, 0.5),(1,0)]
@@ -117,6 +118,7 @@ if conditional:
         plt.colorbar()
         visualisation.draw_polygons(ax,[polygon])
         #TODO move centers with position
+        con_cen=[list(map(add, c, position))for c in con_cen]
         visualisation.make_ellipses(con_cen,con_cov,ax)
         plt.scatter(x_new,y_new,color='r')
         n+=1
