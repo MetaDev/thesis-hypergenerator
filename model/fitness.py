@@ -9,9 +9,9 @@ from shapely.ops import cascaded_union
 from itertools import combinations
 import networkx as nx
 import numpy as np
-import mapping
-import utility
-import search_space
+import model.mapping as mp
+import util.utility as ut
+
 
 class Direct:
     def sum_samples(samples,sample_attr):
@@ -36,7 +36,7 @@ def area_density(polygons, polygon_bound):
 #total distance between layout_objcts
 #todo calculate distance bqsed on polygon centroid
 def pairwise_dist(positions, dist_metric=np.linalg.norm):
-    return [dist_metric(np.array([position_pair[0],position_pair[1]])) for position_pair in utility.pairwise(positions)]
+    return [dist_metric(np.array([position_pair[0],position_pair[1]])) for position_pair in ut.pairwise(positions)]
 def dist_between_parent_child(parent,children, dist_metric=np.linalg.norm):
     return [dist_metric(np.array([parent.position,child.position])) for child in children]
 #calculate collision or intersection between layout samples
@@ -55,9 +55,9 @@ def shortest_path(graph, source:(int,int), target:(int,int)):
     return path
 #check if the polygons can be reached in sequence while avoiding other polygon obstacles
 def polygon_path_sequence(graph,polygon_sequence):
-    points=mapping.map_geometricobjects_to_nodes(graph,polygon_sequence)
+    points=mp.map_geometricobjects_to_nodes(graph,polygon_sequence)
     paths=[]
-    for (polygon_pairs),(point_pairs) in zip(utility.pairwise(polygon_sequence),utility.pairwise(points)):
+    for (polygon_pairs),(point_pairs) in zip(ut.pairwise(polygon_sequence),ut.pairwise(points)):
         path=shortest_path(graph,point_pairs[0],point_pairs[1])
         paths.extend(path)
     return paths

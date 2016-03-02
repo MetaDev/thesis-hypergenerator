@@ -4,6 +4,12 @@ import numpy as np
 from copy import deepcopy
 from sklearn import mixture
 
+def condition(setY,means,weight,diag_cov):
+    set_ind=setY
+    pass
+
+
+
 def cond_dist(Y, centroids, ccov, mc):
     """Finds the conditional distribution p(X|Y) for a GMM.
 
@@ -29,6 +35,7 @@ def cond_dist(Y, centroids, ccov, mc):
     not_set_idx = np.nonzero(np.isnan(Y))[0]
     set_idx = np.nonzero(True - np.isnan(Y))[0]
     new_idx = np.concatenate((not_set_idx, set_idx))
+    print(not_set_idx)
     y = Y[set_idx]
     # New centroids and covar matrices
     new_cen = []
@@ -69,16 +76,17 @@ def cond_dist(Y, centroids, ccov, mc):
     new_mc = new_mc / np.sum(new_mc)
     return (new_cen, new_ccovs, new_mc)
 
+
 def mulnormpdf(X, MU, SIGMA):
     """Evaluates the PDF for the multivariate Guassian distribution.
 
     Parameters
     ----------
     X : np array
-        Inputs/entries row-wise. Can also be a 1-d array if only a 
+        Inputs/entries row-wise. Can also be a 1-d array if only a
         single point is evaluated.
     MU : nparray
-        Center/mean, 1d array. 
+        Center/mean, 1d array.
     SIGMA : 2d np array
         Covariance matrix.
 
@@ -86,7 +94,7 @@ def mulnormpdf(X, MU, SIGMA):
     -------
     prob : 1d np array
         Probabilities for entries in `X`.
-    
+
     Examples
     --------
     ::
@@ -102,7 +110,7 @@ def mulnormpdf(X, MU, SIGMA):
     # Check if inputs are ok:
     if MU.ndim != 1:
         raise ValueError( "MU must be a 1 dimensional array")
-    
+
     # Evaluate pdf at points or point:
     mu = MU
     x = X.T
@@ -149,7 +157,7 @@ def sample_gaussian_mixture(centroids, ccov, mc = None, samples = 1,loose_norm_w
     """
     cc = centroids
     D = len(cc[0]) # Determin dimensionality
-    
+
     # Check if inputs are ok:
     K = len(cc)
     if mc is None: # Default equally likely clusters
@@ -163,13 +171,13 @@ def sample_gaussian_mixture(centroids, ccov, mc = None, samples = 1,loose_norm_w
 
     # Check if the mixing coefficients sum to one:
     if loose_norm_weights:
-        EPS=1e-12
+        EPS=1e-14
     else:
         EPS = mixture.gmm.EPS
-        
+
 
     if np.abs(1-np.sum(mc)) > EPS:
-        raise ValueError ("The sum of mc must be 1.0")
+        raise ValueError ("The sum of mc must be 1.0, it was:", np.sum(mc))
 
     # Cluster selection
     cs_mc = np.cumsum(mc)
@@ -193,7 +201,7 @@ from sklearn.utils import  check_array
 from sklearn.utils.extmath import logsumexp
 class GMM_weighted(mixture.gmm.GMM):
 
-    
+
 
     def weighted_fit(self, X, Xweights, y=None, do_prediction=False):
             #sample weight need to be normalised
@@ -223,30 +231,30 @@ class GMM_weighted(mixture.gmm.GMM):
                 raise ValueError(
                     'GMM estimation with %s components, but got only %s samples' %
                     (self.n_components, X.shape[0]))
-    
+
             max_log_prob = -np.infty
-    
+
             if self.verbose > 0:
                 print('Expectation-maximization algorithm started.')
-    
+
             for init in range(self.n_init):
                 if self.verbose > 0:
                     print('Initialization ' + str(init + 1))
                     start_init_time = time()
-    
+
                 if 'm' in self.init_params or not hasattr(self, 'means_'):
                     self.means_ = cluster.KMeans(
                         n_clusters=self.n_components,
                         random_state=self.random_state).fit(X).cluster_centers_
                     if self.verbose > 1:
                         print('\tMeans have been initialized.')
-    
+
                 if 'w' in self.init_params or not hasattr(self, 'weights_'):
                     self.weights_ = np.tile(1.0 / self.n_components,
                                             self.n_components)
                     if self.verbose > 1:
                         print('\tWeights have been initialized.')
-    
+
                 if 'c' in self.init_params or not hasattr(self, 'covars_'):
                     cv = np.cov(X.T,aweights=Xweights) + self.min_covar * np.eye(X.shape[1])
                     if not cv.shape:
@@ -256,12 +264,12 @@ class GMM_weighted(mixture.gmm.GMM):
                             cv, self.covariance_type, self.n_components)
                     if self.verbose > 1:
                         print('\tCovariance matrices have been initialized.')
-    
+
                 # EM algorithms
                 current_log_likelihood = None
                 # reset self.converged_ to False
                 self.converged_ = False
-    
+
                 for i in range(self.n_iter):
                     if self.verbose > 0:
                         print('\tEM iteration ' + str(i + 1))
@@ -269,11 +277,11 @@ class GMM_weighted(mixture.gmm.GMM):
                     prev_log_likelihood = current_log_likelihood
                     # Expectation step
                     log_likelihoods, responsibilities = self.score_weighted_samples(X,Xweights)
-                    
-                    
-                    
+
+
+
                     current_log_likelihood = log_likelihoods.mean()
-    
+
                     # Check for convergence.
                     if prev_log_likelihood is not None:
                         change = abs(current_log_likelihood - prev_log_likelihood)
@@ -284,14 +292,14 @@ class GMM_weighted(mixture.gmm.GMM):
                             if self.verbose > 0:
                                 print('\t\tEM algorithm converged.')
                             break
-    
+
                     # Maximization step
                     self._do_mstep(X,responsibilities, self.params,
                                    self.min_covar)
                     if self.verbose > 1:
                         print('\t\tEM iteration ' + str(i + 1) + ' took {0:.5f}s'.format(
                             time() - start_iter_time))
-    
+
                 # if the results are better, keep it
                 if self.n_iter:
                     if current_log_likelihood > max_log_prob:
@@ -301,11 +309,11 @@ class GMM_weighted(mixture.gmm.GMM):
                                        'covars': self.covars_}
                         if self.verbose > 1:
                             print('\tBetter parameters were found.')
-    
+
                 if self.verbose > 1:
                     print('\tInitialization ' + str(init + 1) + ' took {0:.5f}s'.format(
                         time() - start_init_time))
-    
+
             # check the existence of an init param that was not subject to
             # likelihood computation issue.
             if np.isneginf(max_log_prob) and self.n_iter:
@@ -313,7 +321,7 @@ class GMM_weighted(mixture.gmm.GMM):
                     "EM algorithm was never able to compute a valid likelihood " +
                     "given initial parameters. Try different init parameters " +
                     "(or increasing n_init) or check for degenerate data.")
-    
+
             if self.n_iter:
                 self.covars_ = best_params['covars']
                 self.means_ = best_params['means']
@@ -322,7 +330,7 @@ class GMM_weighted(mixture.gmm.GMM):
                 # Need to make sure that there are responsibilities to output
                 # Output zeros because it was just a quick initialization
                 responsibilities = np.zeros((X.shape[0], self.n_components))
-    
+
             return responsibilities
     def score_weighted_samples(self, X,Xweights):
         """Return the per-sample likelihood of the data under the model.
@@ -359,4 +367,3 @@ class GMM_weighted(mixture.gmm.GMM):
         logprob=np.array([l*w for l,w in zip(logprob,Xweights)])
         responsibilities = np.exp(lpr - logprob[:, np.newaxis])
         return logprob, responsibilities
-  

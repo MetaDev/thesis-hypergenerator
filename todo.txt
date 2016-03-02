@@ -1,21 +1,62 @@
-add experiment to show that both the fitness and conditional distributions work
+show fitness before and after training
 
-work with regular formed children
+train parent child with child of varying size and rotation (overlap fitness), and sample from it
 
-add boxplot for fitness
+add second constraint: train child for non overlap and closeness to corners of polygon
 
-visualise with ellipses instead of with samples
+----------------------------------------
+
+experiment weighted samples vs slicing and  data or show that data with 0 weight is equal to sliced data
+
+check if data augmentation helps, extra samples where the fitness function varies a lot between close points
+find high uncertainty in search space, especially around the borders
+
+find attributes in children that don't interfere with fitness (covariance analysis)
+or even better (and in the case of child-child training): for large number of chidlren, deduce hierarchical independence between children
+e.g. tables far apart will not likely collide
+and train in a hierachical divided search space (naive bayes?, divide search space in n clusters)
+
+train gaussian mixture using pomegranate (added benefit of decay, priority based multi-objective)
+
+different model and constraints: generate chamber in a house, this is a shape->shape relation
+
+plot, during training, the fitness histogram (avg, var), and the expressiveness (the ratio of the interval you're still reaching, or the amount of variance)
+
+find a list that summarizes constraints, dist based, surface based, ratios,
+
+define constraints as either a hard,soft constraint , or a variable constraint
+check what works best for soft and hard constraints: slice/filter data or use weighted samples
+the variable constraint acts as condition on the to generate data
+
+refactor distribution class, to be able to use either uniform (unknow density) (or other scipy stats distr.) or mix of gaussians (trained density)
+support shape (for random vector) in distribution
+
+factory method to generate new hierarchical samples after training, by automatically sampling from trained and untrained distributions
+given only a set of attributes to train on and fitness function on the attribute vector for the weight of the samples
+
+test learning with larger hierachy -> 2 level constraints (room->table_chairs)
 
 
 sibling fitness
 ---------------
 
+-1. don't do (try it out anyway)
 check if gmm can be used for discrete random var as well (nr_siblings, index (fixed order, not index from samples))
+No it can't and it shouldn't for discrete variables you should use binomial
 
-construct seperate models for each number of children if trained on (ordered) sibling data and their fitness that is calculated between siblings
-or train model on the joint of (nr_siblings, index (fixed order, not index from samples)) and parent sibling  using pomegranata (use rejection sampling for sampling, or better MCMC (PyMC!))
-and train a model seperately on the structure of the network, using only (parent_n_siblings, n_siblings)->fitness to generate (conditional) n_siblings 
-than use training data to estimate optimal distribution for the number of children ()
+2.
+construct seperate models for each number of children if trained on (ordered) sibling data and their fitness that is calculated between siblings (tree structure)
+
+and train a model seperately on the structure of the network, using only (parent_n_siblings, n_siblings)->fitness to generate (conditional) n_siblings, than use training data to estimate optimal distribution for the number of children ()
+
+3.
+or train model on the joint of (nr_siblings, index (fixed order, not index from samples)) and parent  using pomegranata (use rejection sampling for sampling, or better MCMC (PyMC!))
+
+4. for a large range in the number of children (for example a large area where trees are placed but the area can be both dense or open)-> seperate models unfeasible, fit distribution for a markov chain between ordered siblings (using gmm)
+
+or better with a Hidden markov model using the children attributes as sequences
+the hmm library is either hmmlearn or bnpy (use weighted sampels), propably won't integrate well with hierarchical model, set number of states the max(n_children) initialise transation distr according to specification in search space if the distr of n_children should not be learned
+how do we condition on the parent state, convert the model to pymc and set the first state to observed. we could add the parent to the start of the sequence, but this would reduce our hierarchical model to a single long chain, not if we can condition on the first state
 
 next experiment should show possibility to constraints that are enforced on siblings
 
@@ -34,11 +75,11 @@ show some metrics on the computation time difference between "shape" likelihood 
 
 
 
-1) experiment with conditional gmm 
-    -make experiment to show how training 
+1) experiment with conditional gmm
+    -make experiment to show how training
         on filtered data is done for hard constraints
         on conditional data for soft constraints
-        using weighted samples on for fitness 
+        using weighted samples on for fitness
     -compare seperate models (for each number of children) and pair-wise trained models
     -compare training on multiple fitness
     -use dimensionality reduction to find independent components->only try to find cond distr between dep components

@@ -64,3 +64,5 @@ def extract_samples_attributes(samples,sample_name:str=None,attr_name:str=None):
     elif sample_name:
         return [sample for sample in samples if sample.name.startswith(sample_name)]
         
+def normalise_array(arr):
+    return (np.array(arr)-np.min(arr))/(np.max(arr)-np.min(arr))

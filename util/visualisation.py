@@ -8,7 +8,7 @@ import matplotlib as mpl
 import numpy as np
 
 
-import utility
+import util.utility as ut
 
 def init(name="visualisation",n_plots=1):
     if(plt.gcf()==0):
@@ -41,17 +41,17 @@ def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=Fals
         x, y = polygon.exterior.xy
         if show_edges:
             #plot edges of polygon
-            ax.plot(x, y, 'o', color='#999999', zorder=1)   
+            ax.plot(x, y, 'o', color='#999999', zorder=1)
         #plot surface
         patch = PolygonPatch(polygon, facecolor=color, edgecolor=color, alpha=0.5, zorder=1)
         ax.add_patch(patch)
     #finalise figure properties
     ax.set_title('Layout visualisation')
     if set_range:
-        (xrange,yrange)=utility.range_from_polygons(polygons, size)
+        (xrange,yrange)=ut.range_from_polygons(polygons, size)
         ax.set_xlim(*xrange)
         ax.set_ylim(*yrange)
-   
+
 def make_ellipses(gmm_means,gmm_covars, ax):
     for n in range(len(gmm_covars)):
         v, w = np.linalg.eigh(gmm_covars[n][:2, :2])
@@ -62,6 +62,6 @@ def make_ellipses(gmm_means,gmm_covars, ax):
         ell = mpl.patches.Ellipse(gmm_means[n], v[0], v[1],
                                   180 + angle, color='#999999')
         ell.set_clip_box(ax.bbox)
+
         ell.set_alpha(0.5)
         ax.add_artist(ell)
-  
