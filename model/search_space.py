@@ -106,6 +106,7 @@ class VectorVariable(Variable):
     def stochastic(self):
         return self.stochastic_list
 
+
 class DummyStochasticVariable(StochasticVariable):
     def __init__(variable: StochasticVariable):
         super().__init__(variable.name,variable.func)
@@ -113,14 +114,15 @@ class DummyStochasticVariable(StochasticVariable):
     def set_value(self,value):
         self._value=value
 
-
+#maybe add method to generate trained samples if they are turned on
 class GMMVariable(VectorVariable):
+    #the GMM should be trained on vector [non_cond_vars,cond_vars]
     #for the GMM the names are a list names of each variable it generates when sampled
     #the lengths are an array of ints indicating the non_cond var length
-    def __init__(self,non_cond_vars:List[DummyStochasticVariable],gmm: GMM, cond_names):
+    def __init__(self,non_cond_vars:List[DummyStochasticVariable],gmm: GMM, cond_vars:List[Variable]):
         super().__init__("",non_cond_vars)
         self.gmm=gmm
-        self.cond_names=cond_names
+        self.cond_names=[v.name for v in cond_vars]
         self.non_cond_lengths=[v.size for v in non_cond_vars]
         #this is for calculating the edges of the vector to be return in relative value
         self.non_cond_lengths.insert(0,0)
@@ -183,11 +185,23 @@ class MarkovTreeNode:
 
 
         def __str__(self):
-            return '\n'.join(key + ": " + str(value) for key, value in vars(self).items())
+            return "\n".join(key + ": " + str(value) for key, value in vars(self).items())
 
+    #TODO find elegant way to swap back to untrained distr
+    def remove_vars(self,var_names):
+        self.old_vars=[]
+        for name in var_names:
+            for var in self.variables:
+                if var.name ==name:
+                    self.old_vars.append(var)
+                    self.variables.remove(var)
 
-    def swap_distribution(self, trained_var: GMMVariable):
-        pass
+    def swap_distribution(self, var: Variable):
+        if var.unpack:
+            self.remove_vars(var.unpack_names)
+        else:
+            self.remove_vars([var.name])
+        self.variables.append(var)
 
 
     #sample a layout object and its children

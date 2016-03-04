@@ -1,6 +1,14 @@
+refactor other code to work with new search space
+test swap of variables
+
 make interface to swap learned distribution with priorly defined distr in the search space
 
-refactor other code to work with new search space
+
+check how kwargs works
+
+
+train parent child with child of varying size and rotation (overlap fitness), and sample from it
+also train on varying size of parent, will most likely influence optimal number of children
 
 remove variable classes from search_space module
 
@@ -8,13 +16,9 @@ change name markov tree node
 
 when visualising the plot should show also completely the ellipses of the distributions, now they are cut off
 
-add type checking in python, seriously, where necessary
+add type checking in python, seriously, where necessary (see package in bookmark thesis)
 Types as annotations
 
-train parent child with child of varying size and rotation (overlap fitness), and sample from it
-also train on varying size of parent, will most likely influence optimal number of children
-
-stack overflow, ask for type hinting of iwn classes
 
 
 extend search space distribution with sample(n_samples), to generate multiple samples from the search space at once, this is an optimisation

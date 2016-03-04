@@ -20,12 +20,7 @@ def init(name="visualisation",n_plots=1):
         fig = plt.figure(name)
     fig=plt.gcf()
     fig.clear()
-    axs=[]
-    for i in range(n_plots):
-        ax = fig.add_subplot(n_plots,1,i+1)
-        ax.set_aspect(1)
-        axs.append(ax)
-    return axs
+
 def draw_graph(ax,graph,with_labels=False,node_size=0):
     pos=dict([ (n, n) for n in graph.nodes() ])
     labels =dict([ (n,str(n)) for n in graph.nodes() ])
@@ -34,9 +29,7 @@ def draw_graph_path(ax,graph,path,color='b',with_labels=False,node_size=50,node_
     pos=dict([ (n, n) for n in graph.nodes() ])
     nx.draw_networkx_nodes(graph, nodelist=path,node_color=color,node_shape=node_shape,
                            pos=pos,with_labels=with_labels,ax=ax,node_size=node_size)
-def finish():
-    #show plot
-    plt.show()
+
 def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=False):
     color="b"
     for i in range(len(polygons)):

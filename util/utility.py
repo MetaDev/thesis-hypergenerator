@@ -60,12 +60,18 @@ def polygon_from_range(xrange,yrange):
     return Polygon([(xrange[0],yrange[0]),(xrange[0],yrange[1]),(xrange[1],yrange[1]),(xrange[1],yrange[0])])
 #add utitility to extract samples (attributes) from a collection based on type and/or name
 
-def extract_samples_attributes(samples,sample_name:str=None,attr_name:str=None):
-    if attr_name and sample_name:
-        return [getattr(sample,attr_name) for sample in samples if sample.name.startswith(sample_name)]
-    elif attr_name:
-        return [getattr(sample,attr_name) for sample in samples]
-    elif sample_name:
+def extract_samples_vars(samples,sample_name:str=None,var_name:str=None,independent=True):
+    if var_name:
+        samples_variables=[]
+        for sample in samples:
+            if not sample_name or sample.name.startswith(sample_name):
+                if independent:
+                    variables=sample.independent_vars
+                else:
+                    variables=sample.relative_vars
+                samples_variables.extend([v for k,v in variables.items() if k.startswith(var_name)])
+        return samples_variables
+    else:
         return [sample for sample in samples if sample.name.startswith(sample_name)]
 
 def normalise_array(arr):

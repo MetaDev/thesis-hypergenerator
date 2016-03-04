@@ -31,9 +31,9 @@ fitness_values=[]
 polygons_vis=[]
 
 def feauture_fitness_extraction(samples,fitness_func):
-    chairs=ut.extract_samples_attributes(samples,sample_name="child")
-    ind_attrs = ut.extract_samples_attributes(chairs,attr_name="independent_attr")
-    indexs = ut.extract_samples_attributes(chairs,attr_name="index")
+    chairs=ut.extract_samples_vars(samples,sample_name="child")
+    ind_attrs = ut.extract_samples_vars(chairs,var_name="independent_attr")
+    indexs = ut.extract_samples_vars(chairs,attr_name="index")
     parents = ut.extract_samples_attributes(chairs,attr_name="parent")
     data=[(ind_attr["position"][0],ind_attr["position"][1],parent.shape[3][0],parent.shape[3][1]) for ind_attr,index,parent in zip(ind_attrs,indexs,parents)]
     fitness=[fitness_func([chair,parent]) for chair,parent in zip(chairs,parents)]
