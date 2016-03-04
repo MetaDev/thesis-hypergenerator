@@ -7,68 +7,187 @@ Created on Tue Feb  9 17:30:20 2016
 import scipy.stats
 import numpy as np
 from util import setting_values
+from gmr import GMM
+from typing import List
+from util import utility as ut
+from typing import  TypeVar
+
+
+class Variable():
+    #name can be either a string or a list of string
+    #size is an int that defines the size of the variable
+    #the func is a function that is applied on each element
+    def __init__(self, name,func=None):
+        self.name=name
+        self._value=None
+        self.parent_vars_name=None
+        self.unpack=False
+        self.func=func
+        if func:
+            self.parent_vars_name=func.__code__.co_varnames[1:]
+    def sample(self, parent_sample):
+        return self._value
+    #the last boolean is to indicate whether the returned value needs to be unpacked
+    def relative_sample(self,parent_sample):
+        #if there is a function and the parent has the required attributes
+        #todo check this with exceptions
+        if self.func and parent_sample:
+            parent_var_values=[parent_sample.relative_vars[var_name] for var_name in self.parent_vars_name]
+            return self.func(self._value,*parent_var_values)
+        else:
+            return self._value
+
+    #return if is stochastic
+    def stochastic(self):
+        pass
+
+
+
+class StochasticVariable(Variable):
+    @staticmethod
+    def standard_distr(low=0,high=1):
+        return scipy.stats.uniform(loc=low,scale=high-low)
+    @staticmethod
+    def standard_choices(low=0,high=1,num=1):
+        return np.linspace(low,high,num)
+    #low and high is ignored if options (enums) is set
+    #if nr_of_values is -1 the distribution is continous
+    def __init__(self,name,size=1,func=None,distr=None,choices=None):
+        super().__init__(name,func)
+        self.size=size
+        #Discrete
+        if choices is not None:
+            self.choices=choices
+        elif distr is not None and hasattr(distr,"rvs"):
+            #continuous
+            self.distr=distr
+        else:
+            raise ValueError("Either the distribution or the choices have to be set.")
+
+    def sample(self,parent_sample):
+        if hasattr(self,"choices"):
+            self._value=np.random.choice(self.choices,size=self.size)
+        else:
+            self._value=self.distr.rvs(size=self.size)
+        return super().sample(parent_sample)
+
+    def stochastic(self):
+        return True
+
+
+
+
+class DeterministicVariable(Variable):
+    def __init__(self,name,value,func=None):
+        super().__init__(name,func)
+        self._value=value
+
+    def stochastic(self):
+        return False
+
+
+class VectorVariable(Variable):
+    @staticmethod
+    def from_deterministic_list(list_name:str,list_):
+        return [DeterministicVariable(list_name+str(i),list_[i]) for i in range(len(list_))]
+    #name indicates the collection of variables
+    def __init__(self,name,variables:List[Variable]):
+        super().__init__(name,None)
+        self.variables=variables
+        self.unpack=True
+        self.unpack_names=[v.name for v in variables]
+        self.stochastic_list=[v.stochastic() for v in self.variables]
+    def sample(self,parent_sample):
+        return [v.sample(parent_sample) for v in self.variables]
+
+    def relative_sample(self,parent_sample):
+        return [v.relative_sample(parent_sample) for v in self.variables]
+
+    def stochastic(self):
+        return self.stochastic_list
+
+class DummyStochasticVariable(StochasticVariable):
+    def __init__(variable: StochasticVariable):
+        super().__init__(variable.name,variable.func)
+
+    def set_value(self,value):
+        self._value=value
+
+
+class GMMVariable(VectorVariable):
+    #for the GMM the names are a list names of each variable it generates when sampled
+    #the lengths are an array of ints indicating the non_cond var length
+    def __init__(self,non_cond_vars:List[DummyStochasticVariable],gmm: GMM, cond_names):
+        super().__init__("",non_cond_vars)
+        self.gmm=gmm
+        self.cond_names=cond_names
+        self.non_cond_lengths=[v.size for v in non_cond_vars]
+        #this is for calculating the edges of the vector to be return in relative value
+        self.non_cond_lengths.insert(0,0)
+        self.size=sum([v.size for v in non_cond_vars])
+        #create dummy variable list
+
+    #when sampling, sample from a the distribution completely conditioned on the parent independent variable values
+    #values on which is trained of course
+
+    #group the values according the vector structure of the search space (given by dummy variables)
+    def sample(self, parent_sample):
+        #flatten list for calculation of cond distr
+        cond_x=np.flatten([parent_sample.independent_vars[name] for name in self.cond_names])
+        #the first X are cond attributes
+        cond_indices=np.linspace(0,self.gmm.n_components-self.size)
+        #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
+        non_cond_values=self.gmm.cond(cond_indices,cond_x).sample(1)
+        self._value=[non_cond_values[l1:l2] for l1,l2 in ut.pairwise(self.non_cond_lengths)]
+        map(DummyStochasticVariable.set_value,self.variables,non_cond_values)
+        return super().sample()
+
+
+
 
 class MarkovTreeNode:
-    @staticmethod
-    def sample_attr(attr):
-        if MarkovTreeNode.attr_is_samplable(attr):
-            sample=attr.sample()
-        else:
-            sample=attr
-        return sample
-    #check for property of the object if its a distribution and return sample or static value
-    @staticmethod
-    def sample_attr_vector(attr):
-        if MarkovTreeNode.attr_is_vector(attr):
-            return [MarkovTreeNode.sample_attr_vector(v) for v in attr]
-        else:
-            return MarkovTreeNode.sample_attr(attr)
-    @staticmethod
-    def attr_is_vector(attr):
-        return isinstance(attr, (list, tuple,np.ndarray))
-    @staticmethod
-    def attr_is_samplable(attr):
-        return callable(getattr(attr, "sample", None))
 
     class NodeSample:
-         #an attribute is calculated
-        def calc_child_attribute_from_parent(self, attr_name):
-            ind_attr=self.independent_attr
-            if not self.parent:
-                setattr(self,attr_name,ind_attr[attr_name])
-            elif attr_name not in self.p_to_c_map:
-                setattr(self,attr_name,ind_attr[attr_name])
-            else:
-                parent_attr=([getattr(self.parent,attr) for attr in self.p_to_c_map[attr_name][1]])
-                #TODO check if eah parent attribute has same length as attr value
-                if MarkovTreeNode.attr_is_vector(ind_attr[attr_name]):
-                    setattr(self,attr_name,list(map(self.p_to_c_map[attr_name][0],ind_attr[attr_name],*(parent_attr))))
-                else:
-                    setattr(self,attr_name,self.p_to_c_map[attr_name][0](ind_attr[attr_name],*parent_attr))
-
-
-
-        def __init__(self,node,index,parent_sample):
+        #parent_sample: NodeSample
+        def __init__(self,node,index:int,parent_sample):
+            #necessary to be able to retrieve stochastic vars
             #properties are saved independent from the parent, for later use of its values in machine learning
             self.name=node.name
-            #sample properties from class property distribution, a property can be defined as property or statically by a value
-            self.independent_attr = dict((ss_name,MarkovTreeNode.sample_attr_vector(ss_distr))for ss_name, ss_distr in node.search_spaces.items())
-            #attributes to calc dependent values
-            self.p_to_c_map=node.p_to_c_map
-            self.parent=parent_sample
+            self.independent_vars={}
+            self.relative_vars={}
+            self.stochastic_vars={}
+            for var in node.variables:
+                value=var.sample(parent_sample)
+                rel_value=var.relative_sample(parent_sample)
 
-            #properties are saved related to the parent
-            for ss_name in self.independent_attr.keys():
-                self.calc_child_attribute_from_parent(ss_name)
+                if var.unpack:
+                    for v,rel_v,name,stoch in zip(value,rel_value,var.unpack_names,var.stochastic()):
+                        self.independent_vars[name]=v
+                        self.relative_vars[name]=rel_v
+                        if stoch:
+                            self.stochastic_vars[name]=v
+                else:
+                    self.independent_vars[var.name]=value
+                    self.relative_vars[var.name]=rel_value
+                    if var.stochastic:
+                        self.stochastic_vars[var.name]=value
+
+            #save tree structure in 2 ways
+            self.parent=parent_sample
+            #the index is a path of indices from root to curent sample, for printing
             if parent_sample:
                 self.index=str(index) + parent_sample.index
             else:
                 self.index=str(index)
 
 
+
         def __str__(self):
             return '\n'.join(key + ": " + str(value) for key, value in vars(self).items())
 
+
+    def swap_distribution(self, trained_var: GMMVariable):
+        pass
 
 
     #sample a layout object and its children
@@ -78,72 +197,43 @@ class MarkovTreeNode:
         if sample_list != None:
             sample_list.append(sample)
         child_samples=[]
-        for child in self.children:
-            for i in range(int(self.sample_attr_vector(child[0]))):
-                #sample child object given parent sample
-                #the star is to create a singel list in the recursion
-                child_samples.append(child[1].sample(sample,i,sample_list))
-            setattr(sample,"children",child_samples)
+        for n_var,child_node in self.children:
+            if child_node:
+                n_children=n_var.sample(parent_sample)
+                for i in range(n_children):
+                    #sample child object given parent sample
+                    child_samples.append(child_node.sample(sample,i,sample_list))
+                setattr(sample,"children",child_samples)
         return sample
 
-
-    #size position and rotation are either a distribution
-    # shape is a polygon defined by its coordinates
-    # children is a collection of tuples that indicates the amount and type of children (instance of layout object)
-    #the color variable is used in visualisation using matplotlib
-    def __init__(self, name,search_spaces,children=[(0,None)],p_to_c_map=None):
+    #the structure of the variables is important for later mapping from search space sample to actual
+    #generated content
+    leaf_children = [(DeterministicVariable("None",0)),None]
+    #children: List(Variable,MarkovTreeNode)
+    #variables: VectorVariable
+    def __init__(self,name,variables ,children=leaf_children):
         self.name=name
-        self.search_spaces = search_spaces
+        self.variables = variables
         self.children=children
-        self.p_to_c_map=p_to_c_map
 
 
 class LayoutMarkovTreeNode(MarkovTreeNode):
-    shape_exteriors={"square": [(0, 0), (0, 1), (1, 1),(1,0)]}
-    standard_func = {"scale": lambda a, b: a*b,
-                     "add": lambda a,b : a+b
-                             }
-    standard_property_map = {"position":(standard_func["add"],["position"]),
-                    "rotation":(standard_func["add"],["rotation"]),
-                    "size":((standard_func["scale"],["size"]))
-                    }
+    shape_exteriors={"square": VectorVariable("shape",
+                                              VectorVariable.from_deterministic_list
+                                              ("p",[(0, 0), (0, 1), (1, 1),(1,0)]))}
 
+    position_rel= lambda p , position: [p[0]+position[0],p[1]+position[1]]
+    rotation_rel = lambda r, rotation: r + rotation
+    size_rel = lambda s, size: s* size
+
+    default_origin=DeterministicVariable("origin",(0.5,0.5))
     #shape should be normalised in the unit cube, same counts for the origin
-    def __init__(self, name, position,origin,size=(1,1), rotation=0,shape=[(0,0),(0,1),(1,1),(1,0)], color="b",children=[(0,None)], property_map=standard_property_map):
-        super().__init__(name,{"size":size, "position":position,"origin": origin,"rotation":rotation,"color":color,"shape":shape},children,property_map)
+    #TODO create factory method for layout node with named arguments for the variables in constru
+    def __init__(self, name, origin,position, rotation, size,shape,color,children=[(0,None)]):
+        super().__init__(name,[origin,position,rotation,size,shape,color],children)
 
 
-class Distribution():
-    #low and high is ignored if options (enums) is set
-    #if nr_of_values is -1 the distribution is continous
-    def __init__(self,distr:scipy.stats.rv_continuous=scipy.stats.uniform,low=0, high=1, nr_of_values=-1, options=[]):
-        self.low=low
-        self.high=high
-        self.distr=distr
-        self.nr_of_values=nr_of_values
-        self.options=options
-        #Continous, Ordered Discrete ,Unordered Discrete
-        if self.options:
-            self.var_type="u"
-        elif self.nr_of_values!= -1:
-            self.var_type="o"
-        else:
-            self.var_type="c"
-    def sample(self):
-        #normalise random value
-        rnd = self.normalised_sample()
-        cont_val = self.low + rnd*(self.high-self.low)
-        if self.options:
-            return self.options[int(np.round((len(self.options)-1)*rnd))]
-        if self.nr_of_values!=-1:
-            return self.low + ((self.high-self.low)/self.nr_of_values)*np.round(self.distr.rvs(size=1)[0]*self.nr_of_values)
-        return cont_val
-    def normalised_sample(self):
-        #we take the interval for 99.99% of the values because values from distribution can go to infinity
-        _min = self.distr.interval(0.9999)[0]
-        _max = self.distr.interval(0.9999)[1]
-        #the sample is not generated using a random state or there would be no veriaty in the samples
-        return (np.clip(self.distr.rvs(size=1)[0],_min,_max)-_min)/(_max-_min)
+
 
 
 

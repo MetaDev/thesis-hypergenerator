@@ -8,9 +8,13 @@ import operator as op
 from shapely.geometry import Point
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPolygon
+import re
 
-
-
+def get_trailing_number(s):
+    m = re.search(r'\d+$', s)
+    return int(m.group()) if m else None
+def remove_numbers(s):
+    return re.sub("[0-9]", "",s)
 
 def range_from_polygons(polygons, size=1):
     (minx, miny, maxx, maxy) = MultiPolygon(polygons).bounds
@@ -55,7 +59,7 @@ def split_polygon(polygong,n):
 def polygon_from_range(xrange,yrange):
     return Polygon([(xrange[0],yrange[0]),(xrange[0],yrange[1]),(xrange[1],yrange[1]),(xrange[1],yrange[0])])
 #add utitility to extract samples (attributes) from a collection based on type and/or name
-    
+
 def extract_samples_attributes(samples,sample_name:str=None,attr_name:str=None):
     if attr_name and sample_name:
         return [getattr(sample,attr_name) for sample in samples if sample.name.startswith(sample_name)]
@@ -63,6 +67,6 @@ def extract_samples_attributes(samples,sample_name:str=None,attr_name:str=None):
         return [getattr(sample,attr_name) for sample in samples]
     elif sample_name:
         return [sample for sample in samples if sample.name.startswith(sample_name)]
-        
+
 def normalise_array(arr):
     return (np.array(arr)-np.min(arr))/(np.max(arr)-np.min(arr))

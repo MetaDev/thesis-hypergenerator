@@ -1,28 +1,68 @@
-show fitness before and after training
+make interface to swap learned distribution with priorly defined distr in the search space
+
+refactor other code to work with new search space
+
+remove variable classes from search_space module
+
+change name markov tree node
+
+when visualising the plot should show also completely the ellipses of the distributions, now they are cut off
+
+add type checking in python, seriously, where necessary
+Types as annotations
 
 train parent child with child of varying size and rotation (overlap fitness), and sample from it
+also train on varying size of parent, will most likely influence optimal number of children
 
-add second constraint: train child for non overlap and closeness to corners of polygon
+stack overflow, ask for type hinting of iwn classes
 
+
+extend search space distribution with sample(n_samples), to generate multiple samples from the search space at once, this is an optimisation
+make value a hidden attribute in variable also name, due to consistency in api between all variables
+
+factory method to
+
+add second constraint: train child for non overlap and alignment of child shape with the closest line of polygon of parent
+first train on position, rotation,size without extra consrtaints, add later
+find a list that summarizes constraints, dist based, surface based, ratios (read the book)
+
+
+make interface for training, train in batches by sampling from the previous model in the next
+only expose hyperparamters that could influence over/under fitting (to be determined by experimentation)
+Note: larger batches will mean less overfitting because the model will train on more varied data
+smaller batches but more number of batches will more overfit, reducing models expressivens but increasing average fitness faster
+training should be done on scaled data
+given only a set of attributes to train on and fitness function on the attribute vector for the weight of the samples
+
+
+try to make learning deterministic (using random state) to be able to objectively compare between multiple runs
+
+add low and high parameters to learned distribution
+
+
+expand search space such that it is possible to have a tree structure of vars inside a node (to define functional relation between its vars), this can already be achieved by nesting vectorvariables, only thing to add is to pass upper level
+variables within same node as well
 ----------------------------------------
+check if cross validation can benefit the system
 
 experiment weighted samples vs slicing and  data or show that data with 0 weight is equal to sliced data
 
 check if data augmentation helps, extra samples where the fitness function varies a lot between close points
-find high uncertainty in search space, especially around the borders
+find high uncertainty in search space, especially around the borders, this does influence the search space (unintended complexity)
 
-find attributes in children that don't interfere with fitness (covariance analysis)
-or even better (and in the case of child-child training): for large number of chidlren, deduce hierarchical independence between children
+find attributes in children that don't interfere with fitness (can be omitted from training) (automatic feature extraction)
+or attributes independent of others regardin the fitness (covariance analysis) (they can be trained seperately)(dim reduciton)
+
+or even better (and in the case of child-child training): for large number of chidlren, deduce hierarchical independence between children (using clustering), this will return cluster label or each sample, which can be used to slice data accordingly for training
 e.g. tables far apart will not likely collide
 and train in a hierachical divided search space (naive bayes?, divide search space in n clusters)
 
-train gaussian mixture using pomegranate (added benefit of decay, priority based multi-objective)
+train gaussian mixture using pomegranate (mixture of multivariate gaussian) (added benefit of decay, priority based multi-objective) also faster (according to author)
 
 different model and constraints: generate chamber in a house, this is a shape->shape relation
 
 plot, during training, the fitness histogram (avg, var), and the expressiveness (the ratio of the interval you're still reaching, or the amount of variance)
 
-find a list that summarizes constraints, dist based, surface based, ratios,
 
 define constraints as either a hard,soft constraint , or a variable constraint
 check what works best for soft and hard constraints: slice/filter data or use weighted samples
@@ -31,18 +71,18 @@ the variable constraint acts as condition on the to generate data
 refactor distribution class, to be able to use either uniform (unknow density) (or other scipy stats distr.) or mix of gaussians (trained density)
 support shape (for random vector) in distribution
 
-factory method to generate new hierarchical samples after training, by automatically sampling from trained and untrained distributions
-given only a set of attributes to train on and fitness function on the attribute vector for the weight of the samples
+
 
 test learning with larger hierachy -> 2 level constraints (room->table_chairs)
 
 
+next experiment should show possibility to constraints that are enforced on siblings
 sibling fitness
 ---------------
+1. order siblings based on pair-wise fitness (weight function for samples)
 
--1. don't do (try it out anyway)
-check if gmm can be used for discrete random var as well (nr_siblings, index (fixed order, not index from samples))
-No it can't and it shouldn't for discrete variables you should use binomial
+2. train HMM on sequence of (parent,child1),(parent,child2), to be able to calculate conditional distr
+afterwards
 
 2.
 construct seperate models for each number of children if trained on (ordered) sibling data and their fitness that is calculated between siblings (tree structure)
@@ -58,76 +98,27 @@ or better with a Hidden markov model using the children attributes as sequences
 the hmm library is either hmmlearn or bnpy (use weighted sampels), propably won't integrate well with hierarchical model, set number of states the max(n_children) initialise transation distr according to specification in search space if the distr of n_children should not be learned
 how do we condition on the parent state, convert the model to pymc and set the first state to observed. we could add the parent to the start of the sequence, but this would reduce our hierarchical model to a single long chain, not if we can condition on the first state
 
-next experiment should show possibility to constraints that are enforced on siblings
 
-increase variables with rotation and size  (add maybe covariance estimation to reduce traingin time if for example rotation doesn't affect the constrained)
 
-start generating scenes for pokemon
-
-use methode to sample node create from parent_sample
 
 add method to sample node to extract data (from generated samples) which is random and thus of which the distr can be learned (for easier use), additional covariance estimation before training
 s
+
 all papers in downloads->put in mendeley
 
 
 show some metrics on the computation time difference between "shape" likelihood and gameplay likelihood
 
 
-
-1) experiment with conditional gmm
-    -make experiment to show how training
-        on filtered data is done for hard constraints
-        on conditional data for soft constraints
-        using weighted samples on for fitness
     -compare seperate models (for each number of children) and pair-wise trained models
     -compare training on multiple fitness
     -use dimensionality reduction to find independent components->only try to find cond distr between dep components
 
 2) model pokemon world probabilistically
     find top down constraints
-
-3) extend mixture models to find general mixture models (include discrete distribution) (pomegranata)
-    -find conditional distributions reflecting the number of children in the hierarchy conditional on the fitness
+find conditional distributions reflecting the number of children in the hierarchy conditional on the fitness
 
 3) try to learn relation beyond parent-> child but also child->child using Hidden markov model
 
-3) create experiment with pymc3 to be able to compare inference with and without learning
-learning is applicable to top down constraints which are can do not require complex mapping (directly on the sample property)
--> show with graph
-These hard constraints can however still be learned early in the generation procedure (early stop)
-
-4) maybe experiment with dimensionality reduction
 
 
-in highly constrained space, high probability for collision, objects are placed conditional on the siblings
-
-
-
-learn conditional distributions (P(attr|index,nr_of_siblings,parent_attr)) on the independ values (of one or more attributes) of the samples, using kde or GMM
-the samples of which distribution is estimated are a subset of all samples defined by a fitness criteria rejection function
-this fitness rejection function defines a hyperplane (can be stochastic) that seperates valid from invalid samples
-
-TODO: test for multiple attributes, multiple fitness , multiple models and hyperparameters
-
-test conditional model to generate valid data conditional on index and number of siblings parent values  and train different model
-for each number of children
-
-kernel density, try to find the same conditional probabilities as gaussian mixture
-
-
-
-
-save generated samples in data frame to save space
-
-
-start pokemon use case
-
-
-There are 2 options to make markov model
-either sample first from the possible number of children combinations and use this to build a bayesian network
-or add a state (markov state) for each possible number of children of a category and choose each state with given probability
-and finally connect the actual child attribute distributions to each state, repeat until comple network is build
-
-implement search space in pymc3 using 1 model for the parent child structure and when sampling build new model based on this model
-these new models are cached in map based on their structure, such that each different model only has to be build once

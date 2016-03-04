@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
-
-random_state=342
+import numpy
+random_state=numpy.random.seed(123)
