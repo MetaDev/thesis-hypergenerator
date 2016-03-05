@@ -1,5 +1,5 @@
-refactor other code to work with new search space
 test swap of variables
+
 
 make interface to swap learned distribution with priorly defined distr in the search space
 
@@ -46,6 +46,10 @@ add low and high parameters to learned distribution
 
 expand search space such that it is possible to have a tree structure of vars inside a node (to define functional relation between its vars), this can already be achieved by nesting vectorvariables, only thing to add is to pass upper level
 variables within same node as well
+
+optimise GMM learning with gibs sampling and infinite GMM, optimise general sampling by implementing
+search space as markov state/continuous bayesian network in pymc and use it to generate samples
+with batch learning
 ----------------------------------------
 check if cross validation can benefit the system
 

@@ -5,6 +5,8 @@ from shapely import affinity
 import numpy as np
 import util.utility as ut
 from operator import itemgetter
+from model.search_space import VectorVariable
+
 def map_polygons_to_neighbourhoud_graph(polygons,grid_range, step):
     """
     create neighbourhoud graph for points in a grid with a set of polygons as obstacles
@@ -52,12 +54,7 @@ def map_layoutsamples_to_geometricobjects(layout_samples,shape_point_name="p"):
     for sample in layout_samples:
         rel_vars=sample.relative_vars
         #extract points from vars and put in list ordered on their index saved in the name
-        shape=[]
-        for k,v in rel_vars.items():
-            if ut.remove_numbers(k)==shape_point_name:
-                shape.append((ut.get_trailing_number(k),v))
-        shape=[p[1] for p in sorted(shape,key=itemgetter(0))]
-
+        shape=VectorVariable.extract_ordered_list_vars(shape_point_name,rel_vars)
         geom_objs.append(map_to_polygon(shape,rel_vars["origin"],rel_vars["position"],rel_vars["rotation"]
         ,rel_vars["size"]))
     return geom_objs

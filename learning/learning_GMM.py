@@ -20,35 +20,42 @@ from sklearn import mixture
 from util import setting_values
 import matplotlib.cm as cm
 import model.test_models as tm
-
 from operator import add
-
-from gmr import MVN,GMM, plot_error_ellipses
+from model.search_space import GMMVariable,DummyStochasticVariable
+from gmr import GMM
 ndata=200
 
 data=[]
 fitness_values=[]
 polygons_vis=[]
 
-def feauture_fitness_extraction(samples,fitness_func):
-    chairs=ut.extract_samples_vars(samples,sample_name="child")
-    ind_attrs = ut.extract_samples_vars(chairs,var_name="independent_attr")
-    indexs = ut.extract_samples_vars(chairs,attr_name="index")
-    parents = ut.extract_samples_attributes(chairs,attr_name="parent")
-    data=[(ind_attr["position"][0],ind_attr["position"][1],parent.shape[3][0],parent.shape[3][1]) for ind_attr,index,parent in zip(ind_attrs,indexs,parents)]
-    fitness=[fitness_func([chair,parent]) for chair,parent in zip(chairs,parents)]
+#use root
+def feauture_fitness_extraction(root,fitness_func,cond_vars,non_cond_vars):
+    #only get children of a certain name
+    fitness=[]
+    data=[]
+    for child in root.get_children("child"):
+        child_cond_vars=[]
+        for cv in cond_vars:
+            child_cond_vars.append(child.independent_vars[cv.name])
+        parent_non_cond_var=[root.independent_vars[ncv.name] for ncv in non_cond_vars]
+        data.append(np.vstack((child_cond_vars,parent_non_cond_var)).flatten())
+        fitness.append(fitness_func([child,root]))
     return data,fitness
 def fitness_extraction_dist(samples):
-    return fn.dist_between_parent_child(ut.extract_samples_attributes(samples,sample_name="parent")[0],ut.extract_samples_attributes(samples,sample_name="chair"))
+    return fn.dist_between_parent_child(ut.extract_samples_vars(samples,sample_name="parent")[0],ut.extract_samples_vars(samples,sample_name="child"))
 def fitness_extraction_overl(samples):
     polygons=mp.map_layoutsamples_to_geometricobjects(samples)
     return fn.pairwise_overlap(polygons,normalized=True)
 
-
+model_root=tm.test_model_var_child_position_parent_shape()
+var_cond=[model_root.get_child_node("child").get_variable("position")]
+var_non_cond=model_root.get_variable("shape").get_stochastic_var()
 for i in range(ndata):
     #train per child
-    samples,_=tm.test_samples_var_child_position_parent_shape()
-    sample_features,sample_fitness=feauture_fitness_extraction(samples,fitness_extraction_overl)
+    sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
+                                                               fitness_extraction_overl,
+                                                               var_cond,var_non_cond)
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
 
@@ -128,4 +135,7 @@ if conditional:
         plt.scatter(x_new,y_new,color='r')
         n+=1
         plt.show()
-
+#TODO
+#construct new model
+#child = model_root.get_child_node("child"):
+#GMMVariable(DummyStochasticVariable(child.get_variable("position")),gmm,model_root.get_variable(""))

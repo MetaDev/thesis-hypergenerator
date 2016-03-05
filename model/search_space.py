@@ -11,6 +11,7 @@ from gmr import GMM
 from typing import List
 from util import utility as ut
 from typing import  TypeVar
+from operator import itemgetter
 
 
 class Variable():
@@ -87,6 +88,17 @@ class DeterministicVariable(Variable):
 
 
 class VectorVariable(Variable):
+    #using the naming convention of a vector variable p1, p2,...
+    #i extract a vector variable in its correct order from the flattened dict of variable values
+    #in a nodesample
+    @staticmethod
+    def extract_ordered_list_vars(list_name,sample_var_dict):
+        var_list=[]
+        for name,value in sample_var_dict.items():
+            if ut.remove_numbers(name)==list_name:
+                var_list.append((ut.get_trailing_number(name),value))
+        return [var[1] for var in sorted(var_list,key=itemgetter(0))]
+
     @staticmethod
     def from_deterministic_list(list_name:str,list_):
         return [DeterministicVariable(list_name+str(i),list_[i]) for i in range(len(list_))]
@@ -96,7 +108,8 @@ class VectorVariable(Variable):
         self.variables=variables
         self.unpack=True
         self.unpack_names=[v.name for v in variables]
-        self.stochastic_list=[v.stochastic() for v in self.variables]
+        self._stochastic=[v.stochastic() for v in self.variables]
+        self._stochastic_vars=[v for v in self.variables if v.stochastic()]
     def sample(self,parent_sample):
         return [v.sample(parent_sample) for v in self.variables]
 
@@ -104,15 +117,18 @@ class VectorVariable(Variable):
         return [v.relative_sample(parent_sample) for v in self.variables]
 
     def stochastic(self):
-        return self.stochastic_list
-
+        return self._stochastic
+    def get_stochastic_var(self):
+        return self._stochastic_vars
 
 class DummyStochasticVariable(StochasticVariable):
     def __init__(variable: StochasticVariable):
-        super().__init__(variable.name,variable.func)
+        super().__init__(variable.name,variable.size,variable.func)
 
     def set_value(self,value):
         self._value=value
+    def sample(self,parent_sample):
+        pass
 
 #maybe add method to generate trained samples if they are turned on
 class GMMVariable(VectorVariable):
@@ -136,8 +152,8 @@ class GMMVariable(VectorVariable):
     def sample(self, parent_sample):
         #flatten list for calculation of cond distr
         cond_x=np.flatten([parent_sample.independent_vars[name] for name in self.cond_names])
-        #the first X are cond attributes
-        cond_indices=np.linspace(0,self.gmm.n_components-self.size)
+        #the last X are cond attributes
+        cond_indices=np.range(self.size,self.gmm.n_components)
         #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
         non_cond_values=self.gmm.cond(cond_indices,cond_x).sample(1)
         self._value=[non_cond_values[l1:l2] for l1,l2 in ut.pairwise(self.non_cond_lengths)]
@@ -150,6 +166,8 @@ class GMMVariable(VectorVariable):
 class MarkovTreeNode:
 
     class NodeSample:
+
+
         #parent_sample: NodeSample
         def __init__(self,node,index:int,parent_sample):
             #necessary to be able to retrieve stochastic vars
@@ -158,6 +176,7 @@ class MarkovTreeNode:
             self.independent_vars={}
             self.relative_vars={}
             self.stochastic_vars={}
+            self.children={}
             for var in node.variables:
                 value=var.sample(parent_sample)
                 rel_value=var.relative_sample(parent_sample)
@@ -181,8 +200,11 @@ class MarkovTreeNode:
                 self.index=str(index) + parent_sample.index
             else:
                 self.index=str(index)
+        def get_children(self,name):
+            return self.children[name]
 
-
+        def add_children(self,children):
+            self.children[children[0].name]=children
 
         def __str__(self):
             return "\n".join(key + ": " + str(value) for key, value in vars(self).items())
@@ -191,10 +213,9 @@ class MarkovTreeNode:
     def remove_vars(self,var_names):
         self.old_vars=[]
         for name in var_names:
-            for var in self.variables:
-                if var.name ==name:
-                    self.old_vars.append(var)
-                    self.variables.remove(var)
+            var=self.get_variable(name)
+            self.old_vars.append(var)
+            self.variables.remove(var)
 
     def swap_distribution(self, var: Variable):
         if var.unpack:
@@ -203,7 +224,16 @@ class MarkovTreeNode:
             self.remove_vars([var.name])
         self.variables.append(var)
 
+    def get_variable(self,name):
+        for var in self.variables:
+            if var.name ==name:
+                return var
 
+    def get_child_node(self,name):
+        for child in self.children:
+            if child[1].name==name:
+                return child[1]
+    #TODO allow tree structure for nodes
     #sample a layout object and its children
     def sample(self,parent_sample=None,index=0,sample_list=None):
         #create  sample
@@ -217,7 +247,7 @@ class MarkovTreeNode:
                 for i in range(n_children):
                     #sample child object given parent sample
                     child_samples.append(child_node.sample(sample,i,sample_list))
-                setattr(sample,"children",child_samples)
+                sample.add_children(child_samples)
         return sample
 
     #the structure of the variables is important for later mapping from search space sample to actual
