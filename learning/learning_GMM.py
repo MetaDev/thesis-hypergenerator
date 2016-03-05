@@ -137,5 +137,8 @@ if conditional:
         plt.show()
 #TODO
 #construct new model
-#child = model_root.get_child_node("child"):
-#GMMVariable(DummyStochasticVariable(child.get_variable("position")),gmm,model_root.get_variable(""))
+child = model_root.get_child_node("child")
+dummy_vars=[DummyStochasticVariable(vc) for vc in var_cond]
+gmm_var=GMMVariable(gmm,dummy_vars,var_non_cond)
+model_root.get_child_node("child").swap_distribution(gmm_var)
+print(model_root.sample())

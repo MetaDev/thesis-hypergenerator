@@ -122,8 +122,9 @@ class VectorVariable(Variable):
         return self._stochastic_vars
 
 class DummyStochasticVariable(StochasticVariable):
-    def __init__(variable: StochasticVariable):
-        super().__init__(variable.name,variable.size,variable.func)
+    def __init__(self,variable: StochasticVariable):
+        Variable.__init__(self,variable.name,variable.func)
+        self.size=variable.size
 
     def set_value(self,value):
         self._value=value
@@ -135,7 +136,7 @@ class GMMVariable(VectorVariable):
     #the GMM should be trained on vector [non_cond_vars,cond_vars]
     #for the GMM the names are a list names of each variable it generates when sampled
     #the lengths are an array of ints indicating the non_cond var length
-    def __init__(self,non_cond_vars:List[DummyStochasticVariable],gmm: GMM, cond_vars:List[Variable]):
+    def __init__(self,gmm: GMM,non_cond_vars:List[DummyStochasticVariable], cond_vars:List[Variable]):
         super().__init__("",non_cond_vars)
         self.gmm=gmm
         self.cond_names=[v.name for v in cond_vars]
@@ -143,6 +144,7 @@ class GMMVariable(VectorVariable):
         #this is for calculating the edges of the vector to be return in relative value
         self.non_cond_lengths.insert(0,0)
         self.size=sum([v.size for v in non_cond_vars])
+        self.gmm_size=sum([v.size for v in cond_vars])+self.size
         #create dummy variable list
 
     #when sampling, sample from a the distribution completely conditioned on the parent independent variable values
@@ -151,14 +153,14 @@ class GMMVariable(VectorVariable):
     #group the values according the vector structure of the search space (given by dummy variables)
     def sample(self, parent_sample):
         #flatten list for calculation of cond distr
-        cond_x=np.flatten([parent_sample.independent_vars[name] for name in self.cond_names])
+        cond_x=np.array([parent_sample.independent_vars[name] for name in self.cond_names]).flatten()
         #the last X are cond attributes
-        cond_indices=np.range(self.size,self.gmm.n_components)
+        cond_indices=np.arange(self.size,self.gmm_size)
         #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
-        non_cond_values=self.gmm.cond(cond_indices,cond_x).sample(1)
+        non_cond_values=self.gmm.condition(cond_indices,cond_x).sample(1)
         self._value=[non_cond_values[l1:l2] for l1,l2 in ut.pairwise(self.non_cond_lengths)]
         map(DummyStochasticVariable.set_value,self.variables,non_cond_values)
-        return super().sample()
+        return super().sample(parent_sample)
 
 
 

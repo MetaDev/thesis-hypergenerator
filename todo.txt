@@ -1,5 +1,6 @@
 test swap of variables
 
+constatation whenever the fitness is unbalanced (peak in histgram) learning is not good
 
 make interface to swap learned distribution with priorly defined distr in the search space
 
