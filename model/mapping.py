@@ -5,7 +5,7 @@ from shapely import affinity
 import numpy as np
 import util.utility as ut
 from operator import itemgetter
-from model.search_space import VectorVariable
+from model.search_space import VectorVariableUtility
 
 def map_polygons_to_neighbourhoud_graph(polygons,grid_range, step):
     """
@@ -49,12 +49,12 @@ def map_to_polygon(shape,origin,position,rotation,size):
 
     return geom_obj
 #map a sample to a shape of which it's center is at the position of the sample
-def map_layoutsamples_to_geometricobjects(layout_samples,shape_point_name="p"):
+def map_layoutsamples_to_geometricobjects(layout_samples,shape_name):
     geom_objs=[]
     for sample in layout_samples:
         rel_vars=sample.relative_vars
         #extract points from vars and put in list ordered on their index saved in the name
-        shape=VectorVariable.extract_ordered_list_vars(shape_point_name,rel_vars)
+        shape=VectorVariableUtility.extract_ordered_list_vars_values(shape_name,rel_vars)
         geom_objs.append(map_to_polygon(shape,rel_vars["origin"],rel_vars["position"],rel_vars["rotation"]
         ,rel_vars["size"]))
     return geom_objs

@@ -1,15 +1,22 @@
 test swap of variables
 
-constatation whenever the fitness is unbalanced (peak in histgram) learning is not good
+normalise the data you train on [0,1]
+train parent child with child of varying size and rotation (overlap fitness), and sample from it
+also train on varying size of parent, will most likely influence optimal number of children
 
-make interface to swap learned distribution with priorly defined distr in the search space
+better print of node sample
+
+sampling would be greatly improved, and thus also the learning
+if I would sample more (calculate fitness sample value pairs) on variables defined stochastic
+even better would be to do that proportional to it's stochasity, this would be overfitting though
+
+constatation whenever the fitness is unbalanced (peak in histgram) learning is not good
 
 
 check how kwargs works
 
+could add fitness in representative range visualisation (color line in gradient reflecting each value avg fitness)
 
-train parent child with child of varying size and rotation (overlap fitness), and sample from it
-also train on varying size of parent, will most likely influence optimal number of children
 
 remove variable classes from search_space module
 

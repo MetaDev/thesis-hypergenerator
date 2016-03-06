@@ -52,7 +52,7 @@ def closest_point_to_polygon(polygon, points):
             dist=Point(p).distance(polygon)
     return point
 def pairwise(a):
-    return [(a1,a2) for a1,a2 in zip(a[1:],a)]
+    return [(a1,a2) for a1,a2 in zip(a,a[1:])]
 #split a polygon in n sub polygons
 def split_polygon(polygong,n):
     return

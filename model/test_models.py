@@ -1,7 +1,7 @@
 import model.search_space as sp
 import util.utility as ut
 from model.search_space import StochasticVariable as SV
-from model.search_space import VectorVariable as VV
+from model.search_space import VectorVariableUtility as VVU
 from model.search_space import DeterministicVariable as DV
 
 from model.search_space import LayoutMarkovTreeNode as LN
@@ -17,8 +17,9 @@ def test_model_var_child_position_parent_shape():
                                     rotation=DV("rotation",0),shape=LN.shape_exteriors["square"], color=colors)
 
     var_p3= SV("p3",size=2,choices=SV.standard_choices(0.5,2,4))
-    parent_shapes = VV("shape",
-                       [DV("p0",(0, 0)), DV("p1",(0, 1)),DV("p2",(0.5,1)),var_p3,DV("p4",(1, 0.5)),DV("p5",(1,0))])
+    parent_shapes = VVU.from_variable_list("shape",
+                       [DV("p0",(0, 0)), DV("p1",(0, 1)),DV("p2",(0.5,1)),
+                        var_p3,DV("p4",(1, 0.5)),DV("p5",(1,0))])
     parent_pos=DV("position",(1,2))
     n_children=DV("",5)
     parent_size=DV("size",(1,1))

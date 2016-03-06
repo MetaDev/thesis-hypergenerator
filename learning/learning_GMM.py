@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import scipy.stats as ss
 
-
+from model.search_space import VectorVariableUtility
 from sklearn import mixture
 
 from util import setting_values
@@ -30,43 +30,38 @@ fitness_values=[]
 polygons_vis=[]
 
 #use root
-def feauture_fitness_extraction(root,fitness_func,cond_vars,non_cond_vars):
+def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names):
     #only get children of a certain name
     fitness=[]
     data=[]
     for child in root.get_children("child"):
-        child_cond_vars=[]
-        for cv in cond_vars:
-            child_cond_vars.append(child.independent_vars[cv.name])
-        parent_non_cond_var=[root.independent_vars[ncv.name] for ncv in non_cond_vars]
-        data.append(np.vstack((child_cond_vars,parent_non_cond_var)).flatten())
+        child_X_vars=[child.independent_vars[name] for name in X_var_names]
+
+        parent_Y_vars=[root.independent_vars[name] for name in Y_var_names]
+        data.append(np.vstack((child_X_vars,parent_Y_vars)).flatten())
         fitness.append(fitness_func([child,root]))
     return data,fitness
 def fitness_extraction_dist(samples):
     return fn.dist_between_parent_child(ut.extract_samples_vars(samples,sample_name="parent")[0],ut.extract_samples_vars(samples,sample_name="child"))
 def fitness_extraction_overl(samples):
-    polygons=mp.map_layoutsamples_to_geometricobjects(samples)
+    polygons=mp.map_layoutsamples_to_geometricobjects(samples,shape_name="shape")
     return fn.pairwise_overlap(polygons,normalized=True)
 
 model_root=tm.test_model_var_child_position_parent_shape()
-var_cond=[model_root.get_child_node("child").get_variable("position")]
-var_non_cond=model_root.get_variable("shape").get_stochastic_var()
+X_var_names=["position"]
+Y_var_names=["shape3"]
 for i in range(ndata):
     #train per child
     sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
                                                                fitness_extraction_overl,
-                                                               var_cond,var_non_cond)
+                                                               X_var_names,Y_var_names)
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
 
 
 
-
-filtered_data=False
-if filtered_data:
-    cut_off_value=0
-    accept = lambda f, value: f < value
-    data,fitness_values = zip(*[(d,f) for d,f in zip(data,fitness_values) if accept(f,cut_off_value)])
+#better statistics of fittnes
+vis.print_fitness_statistics(fitness_values)
 
 
 x,y,x_shape,y_shape=zip(*data)
@@ -77,15 +72,13 @@ conditional=True
 
 
 
-#better statistics of fittnes
-vis.print_fitness_statistics(fitness_values)
 
 #both full and tied covariance work
 #but tied prevents overfitting but is worse to find conditional estimatation of sharp corners
-gmm = lut.GMM_weighted(n_components=n_components, covariance_type='full',min_covar=0.0000001,random_state=setting_values.random_state)
+gmm = lut.GMM_weighted(n_components=n_components, covariance_type='full',min_covar=0.00000001,random_state=setting_values.random_state)
 #give heavy penalty for intersection
 #inverse and normalise fitness
-fitness_values=(fn.invert_fitness(fitness_values))**8
+fitness_values=(fn.invert_fitness(fitness_values))**4
 gmm.weighted_fit(data,fitness_values)
 #convert grm GMM
 gmm = GMM(n_components=len(gmm.weights_), priors=gmm.weights_, means=gmm.means_, covariances=gmm._get_covars(), random_state=setting_values.random_state)
@@ -99,7 +92,7 @@ fig.clear()
 
 
 ax = plt.gca()
-vis.visualise_gmm_marg_density_1D_gmr(ax,0,gmm)
+vis.visualise_gmm_marg_density_1D_gmr(ax,0,gmm,verbose=True)
 
 plt.show()
 if conditional:
@@ -125,8 +118,8 @@ if conditional:
         (xrange,yrange)=((min(x),max(x)),(min(y),max(y)))
         ax.set_xlim(*xrange)
         ax.set_ylim(*yrange)
-        plt.scatter(x,y,c=fitness_values,cmap=cm.Blues)
-        plt.colorbar()
+#        plt.scatter(x,y,c=fitness_values,cmap=cm.Blues)
+#        plt.colorbar()
         vis.draw_polygons(ax,[polygon])
         #still need to deterministically determine position
         gmm_cond.means=[list(map(add, c, position))for c in gmm_cond.means]
@@ -135,10 +128,32 @@ if conditional:
         plt.scatter(x_new,y_new,color='r')
         n+=1
         plt.show()
-#TODO
+
 #construct new model
 child = model_root.get_child_node("child")
-dummy_vars=[DummyStochasticVariable(vc) for vc in var_cond]
-gmm_var=GMMVariable(gmm,dummy_vars,var_non_cond)
-model_root.get_child_node("child").swap_distribution(gmm_var)
-print(model_root.sample())
+
+X_dummy_vars=[DummyStochasticVariable(child.get_variable("position"))]
+Y_vars=[model_root.get_variable(name) for name in Y_var_names]
+gmm_var=GMMVariable("test",gmm,X_dummy_vars,Y_vars)
+
+model_root.get_child_node("child").set_learned_variable(gmm_var)
+
+
+#repeat sampling
+data=[]
+fitness_values=[]
+#the variable of the child has been replaced by trained model
+
+for i in range(ndata):
+    #train per child
+    sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
+                                                               fitness_extraction_overl,
+                                                               X_var_names,Y_var_names)
+    data.extend(sample_features)
+    fitness_values.extend(sample_fitness)
+
+
+
+#better statistics of fittnes
+
+vis.print_fitness_statistics(fitness_values)
