@@ -21,24 +21,24 @@ class Variable():
     #the func is a function that is applied on each element
     def __init__(self, name,func=None):
         self.name=name
-        self._value=None
         self.parent_vars_name=None
         self.unpack=False
         self.func=func
         if func:
             self.parent_vars_name=func.__code__.co_varnames[1:]
     def sample(self, parent_sample):
-        return self._value
+        pass
+
     #the last boolean is to indicate whether the returned value needs to be unpacked
-    def relative_sample(self,parent_sample):
+    def relative_sample(self,sample,parent_sample):
         #if there is a function and the parent has the required attributes
         #todo check this with exceptions
         if self.func and parent_sample:
             parent_var_values=[parent_sample.relative_vars[var_name]
             for var_name in self.parent_vars_name]
-            return self.func(self._value,*parent_var_values)
+            return self.func(sample,*parent_var_values)
         else:
-            return self._value
+            return sample
 
     #return if is stochastic
     def stochastic(self):
@@ -68,10 +68,9 @@ class StochasticVariable(Variable):
 
     def sample(self,parent_sample):
         if hasattr(self,"choices"):
-            self._value=np.random.choice(self.choices,size=self.size)
+            return np.random.choice(self.choices,size=self.size)
         else:
-            self._value=self.distr.rvs(size=self.size)
-        return super().sample(parent_sample)
+            return self.distr.rvs(size=self.size)
 
     def stochastic(self):
         return True
@@ -86,6 +85,8 @@ class DeterministicVariable(Variable):
 
     def stochastic(self):
         return False
+    def sample(self, parent_sample):
+        return self._value
 
 #TODO change name in Variable utility,  add factory method for creating vector vars
 class VectorVariableUtility():
@@ -124,11 +125,6 @@ class DummyStochasticVariable(StochasticVariable):
         Variable.__init__(self,variable.name,variable.func)
         self.size=variable.size
 
-    def set_value(self,value):
-        self._value=value
-    #weird bug: do not use parent method
-    def sample(self,parent_sample):
-        return self._value
 
 #P(X|Y)
 #maybe add method to generate trained samples if they are turned on
@@ -162,17 +158,12 @@ class GMMVariable(StochasticVariable):
         Y_indices=np.arange(self.size,self.gmm_size)
         #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
         X_values=self.gmm.condition(Y_indices,Y_values).sample(1)[0]
-        self._value=[X_values[l1:l2] for l1,l2 in ut.pairwise(self.X_lengths)]
-        for var,val in zip(self.X_vars,self._value):
-            var.set_value(val)
-        t=[v.sample(parent_sample) for v in self.X_vars]
-        var= self.X_vars[0]._value
-        return t
+        return [X_values[l1:l2] for l1,l2 in ut.pairwise(self.X_lengths)]
 
 
-    def relative_sample(self,parent_sample):
-        return [v.relative_sample(parent_sample) for v in self.X_vars]
 
+    def relative_sample(self,samples,parent_sample):
+        return [var.relative_sample(value,parent_sample) for var,value in zip(self.X_vars,samples)]
 
 class MarkovTreeNode:
 
@@ -192,7 +183,7 @@ class MarkovTreeNode:
             for var in node.sample_variables:
                 if var.unpack:
                     value=var.sample(parent_sample)
-                    rel_value=var.relative_sample(parent_sample)
+                    rel_value=var.relative_sample(value,parent_sample)
                     for v,rel_v,name in zip(value,rel_value,
                                                   var.unpack_names):
                         self.independent_vars[name]=v
@@ -203,7 +194,7 @@ class MarkovTreeNode:
             for var in node.sample_variables:
                 if not var.unpack:
                     value=var.sample(parent_sample)
-                    rel_value=var.relative_sample(parent_sample)
+                    rel_value=var.relative_sample(value,parent_sample)
                     self.independent_vars[var.name]=value
                     self.relative_vars[var.name]=rel_value
                     if var.stochastic():
@@ -225,6 +216,7 @@ class MarkovTreeNode:
             #TODO
             return "\n".join(key + ": " + str(value) for key, value in vars(self).items())
 
+    #TODO make it possible to "freeze' a stochastic variable at a certain position
     #TODO add method to request all stochastic variables
 
     #TODO make it possible to switch back to original prior distribution for a named var
@@ -256,9 +248,9 @@ class MarkovTreeNode:
         sample = MarkovTreeNode.NodeSample(self,index,parent_sample=parent_sample)
         if sample_list != None:
             sample_list.append(sample)
-        child_samples=[]
         for n_var,child_node in self.children:
             if child_node:
+                child_samples=[]
                 n_children=n_var.sample(parent_sample)
                 for i in range(n_children):
                     #sample child object given parent sample

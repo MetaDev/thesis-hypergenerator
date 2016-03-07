@@ -37,13 +37,10 @@ def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names):
     fitness=[]
     data=[]
     for child in root.get_children("child"):
-        child_X_vars=[]
-        for name in X_var_names:
-            child_X_vars.extend(child.independent_vars[name])
-        parent_Y_vars=[]
-        for name in Y_var_names:
-            parent_Y_vars.extend(root.independent_vars[name])
-        data.append(np.hstack((child_X_vars,parent_Y_vars)).flatten())
+        child_X_vars=[child.independent_vars[name] for name in X_var_names]
+
+        parent_Y_vars=[root.independent_vars[name] for name in Y_var_names]
+        data.append(np.vstack((child_X_vars,parent_Y_vars)).flatten())
         fitness.append(fitness_func([child,root]))
     return data,fitness
 def fitness_extraction_dist(samples):
@@ -52,8 +49,8 @@ def fitness_extraction_overl(samples):
     polygons=mp.map_layoutsamples_to_geometricobjects(samples,shape_name="shape")
     return fn.pairwise_overlap(polygons,normalized=True)
 
-model_root=tm.test_samples_var_child_pos_size_rot_parent_shape()
-X_var_names=["position","rotation","size"]
+model_root=tm.test_model_var_child_position_parent_shape()
+X_var_names=["position"]
 Y_var_names=["shape3"]
 for i in range(ndata):
     #train per child
@@ -71,13 +68,13 @@ fitness_values=ut.normalise_array((fn.invert_fitness(fitness_values))**4)
 #better statistics of fittnes
 vis.print_fitness_statistics(fitness_values)
 
-x,y,rotation,sizex,sizey,x_shape,y_shape=zip(*data)
+
+x,y,x_shape,y_shape=zip(*data)
 
 n_components=10
 n_samples=100
 
-plt.scatter(x,y,c=fitness_values,cmap=cm.Blues)
-plt.colorbar()
+
 
 
 #both full and tied covariance work
@@ -97,18 +94,8 @@ fig.clear()
 
 
 ax = plt.gca()
-ax.set_title("x")
 vis.visualise_gmm_marg_density_1D_gmr(ax,0,gmm,verbose=True)
-plt.show()
 
-ax = plt.gca()
-ax.set_title("y")
-vis.visualise_gmm_marg_density_1D_gmr(ax,1,gmm,verbose=True)
-plt.show()
-
-ax = plt.gca()
-ax.set_title("rotation")
-vis.visualise_gmm_marg_density_1D_gmr(ax,2,gmm,verbose=True)
 plt.show()
 
 #construct new model
@@ -120,37 +107,38 @@ gmm_var=GMMVariable("test",gmm,X_dummy_vars,Y_vars)
 
 model_root.get_child_node("child").set_learned_variable(gmm_var)
 
-#position=(1,2)
-#x= np.array(x)+position[0]
-#y=np.array(y)+position[1]
-#n=1;
-#values=np.arange(0.5,2,0.25)
-#for p in values:
-#    shape=[(0, 0), (0, 1),(0.5,1),(p,p),(1, 0.5),(1,0)]
-#    #the original gmm needs to have u full covariance matrix, to estimate conditional matrix
-#    polygon = mp.map_to_polygon(shape,[0.5,0.5],position,0,(1,1))
-#    gmm_cond=gmm.condition([2,3],[p,p])
-#    position_samples=gmm_cond.sample(n_samples)
-#    ax = plt.gca()
-#    ax.set_aspect(1)
-#
-#    gmm_cond.n_components
-#    x_new,y_new=zip(*position_samples)
-#    x_new=np.array(x_new)+position[0]
-#    y_new=np.array(y_new)+position[1]
-#
-#    (xrange,yrange)=((min(x),max(x)),(min(y),max(y)))
-#    ax.set_xlim(*xrange)
-#    ax.set_ylim(*yrange)
-#
-#    vis.draw_polygons(ax,[polygon])
-#    #still need to deterministically determine position
-#    gmm_cond.means=[list(map(add, c, position))for c in gmm_cond.means]
-#    #plot marginal to express expressiveness
-#    vis.visualise_gmm_marg_2D_density_gmr(ax,gmm_cond,colors=["g"])
-#    plt.scatter(x_new,y_new,color='r')
-#    n+=1
-#    plt.show()
+position=(1,2)
+x= np.array(x)+position[0]
+y=np.array(y)+position[1]
+n=1;
+values=np.arange(0.5,2,0.25)
+for p in values:
+    shape=[(0, 0), (0, 1),(0.5,1),(p,p),(1, 0.5),(1,0)]
+    #the original gmm needs to have u full covariance matrix, to estimate conditional matrix
+    polygon = mp.map_to_polygon(shape,[0.5,0.5],position,0,(1,1))
+    gmm_cond=gmm.condition([2,3],[p,p])
+    position_samples=gmm_cond.sample(n_samples)
+    ax = plt.gca()
+    ax.set_aspect(1)
+
+    gmm_cond.n_components
+    x_new,y_new=zip(*position_samples)
+    x_new=np.array(x_new)+position[0]
+    y_new=np.array(y_new)+position[1]
+
+    (xrange,yrange)=((min(x),max(x)),(min(y),max(y)))
+    ax.set_xlim(*xrange)
+    ax.set_ylim(*yrange)
+    plt.scatter(x,y,c=fitness_values,cmap=cm.Blues)
+    plt.colorbar()
+    vis.draw_polygons(ax,[polygon])
+    #still need to deterministically determine position
+    gmm_cond.means=[list(map(add, c, position))for c in gmm_cond.means]
+    #plot marginal to express expressiveness
+    vis.visualise_gmm_marg_2D_density_gmr(ax,gmm_cond,colors=["g"])
+    plt.scatter(x_new,y_new,color='r')
+    n+=1
+    plt.show()
 
 
 
@@ -169,7 +157,7 @@ for i in range(ndata):
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
 
-x,y,rotation,sizex,sizey,x_shape,y_shape=zip(*data)
+x,y,x_shape,y_shape=zip(*data)
 
 #better statistics of fittnes
 fitness_values=ut.normalise_array((fn.invert_fitness(fitness_values))**2)

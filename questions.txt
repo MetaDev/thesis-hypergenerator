@@ -1,4 +1,23 @@
-add support for more complex,prior knowledge, relations between variables of a node (tree structure?)
-worked on so far: refactor generator that acts as prior knowledge
+
+worked on so far:
+refactor generator that acts as prior knowledge
 now usable to replace distr a priori with learned distr
 also: worked on visulisation of fitnnes and expressiveness
+found papers on gmm for distr est for multi optima problems
+
+how to handle multiple fitness through likelyhood
+next focus?
+optimise learning: batch learning, id overfitting hyperparameters
+focus on multi-object?
+start writing about implementation, what can be written?
+I can enumerate a lot of possible techniques
+but all quite complicated
+
+there are so many different possible approaches, do I need to mention them in thesis?
+or can I start implementing a larger scene in my generator
+
+next step is tackling multiple children and their implied relation
+introduce new structure in prior knowledge (chain between children)
+here the learning quickly becomes expensive
+
+than optimise learning of gmm

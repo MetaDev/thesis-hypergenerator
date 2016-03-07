@@ -58,7 +58,6 @@ def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=Fals
 
 def visualise_gmm_marg_1D_density(ax,marg_index,gmm_means,gmm_cov,gmm_weights,
                                   random_state=None,factor=2,xrange=None,verbose=False):
-    marg_index=0
     means=[]
     weights=gmm_weights
     stdevs=[]

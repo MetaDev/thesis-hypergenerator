@@ -1,8 +1,16 @@
-test swap of variables
+add second constraint: train child for non overlap and alignment of child shape with the closest line of polygon of parent
+first train on position, rotation,size without extra consrtaints, add later
+find a list that summarizes constraints, dist based, surface based, ratios (read the book)
+
+do the plates on a table example for multiple fitness
+
+
+add enum to know if stochastif is discrete or continuous
 
 normalise the data you train on [0,1]
-train parent child with child of varying size and rotation (overlap fitness), and sample from it
-also train on varying size of parent, will most likely influence optimal number of children
+use feature extraction to optmize learning, but each feature should be able to be reconverted
+
+use BIC to find optimal number of clusters
 
 better print of node sample
 
@@ -11,7 +19,7 @@ if I would sample more (calculate fitness sample value pairs) on variables defin
 even better would be to do that proportional to it's stochasity, this would be overfitting though
 
 constatation whenever the fitness is unbalanced (peak in histgram) learning is not good
-
+->solved by increasing min covariance
 
 check how kwargs works
 
@@ -30,13 +38,10 @@ Types as annotations
 
 
 extend search space distribution with sample(n_samples), to generate multiple samples from the search space at once, this is an optimisation
-make value a hidden attribute in variable also name, due to consistency in api between all variables
 
-factory method to
 
-add second constraint: train child for non overlap and alignment of child shape with the closest line of polygon of parent
-first train on position, rotation,size without extra consrtaints, add later
-find a list that summarizes constraints, dist based, surface based, ratios (read the book)
+
+
 
 
 make interface for training, train in batches by sampling from the previous model in the next
