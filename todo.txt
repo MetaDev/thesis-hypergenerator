@@ -1,48 +1,25 @@
-add second constraint: train child for non overlap and alignment of child shape with the closest line of polygon of parent
-first train on position, rotation,size without extra consrtaints, add later
-find a list that summarizes constraints, dist based, surface based, ratios (read the book)
 
-do the plates on a table example for multiple fitness
+train model p(c2|c1 p)
+
+refactor search space such that children can be made dependent on children
+ordering of children
+
+find out why alignment is so hard to learn in gmm2
+plot fitness seperately
 
 
-add enum to know if stochastif is discrete or continuous
 
-normalise the data you train on [0,1]
+better print of node sample
+
+learning optimisation
+-------------------------
 use feature extraction to optmize learning, but each feature should be able to be reconverted
 
 use BIC to find optimal number of clusters
 
-better print of node sample
+normalise the data you train on [0,1]
 
-sampling would be greatly improved, and thus also the learning
-if I would sample more (calculate fitness sample value pairs) on variables defined stochastic
-even better would be to do that proportional to it's stochasity, this would be overfitting though
-
-constatation whenever the fitness is unbalanced (peak in histgram) learning is not good
-->solved by increasing min covariance
-
-check how kwargs works
-
-could add fitness in representative range visualisation (color line in gradient reflecting each value avg fitness)
-
-
-remove variable classes from search_space module
-
-change name markov tree node
-
-when visualising the plot should show also completely the ellipses of the distributions, now they are cut off
-
-add type checking in python, seriously, where necessary (see package in bookmark thesis)
-Types as annotations
-
-
-
-extend search space distribution with sample(n_samples), to generate multiple samples from the search space at once, this is an optimisation
-
-
-
-
-
+id hyperparameters for over/underfitting
 
 make interface for training, train in batches by sampling from the previous model in the next
 only expose hyperparamters that could influence over/under fitting (to be determined by experimentation)
@@ -51,25 +28,9 @@ smaller batches but more number of batches will more overfit, reducing models ex
 training should be done on scaled data
 given only a set of attributes to train on and fitness function on the attribute vector for the weight of the samples
 
-
-try to make learning deterministic (using random state) to be able to objectively compare between multiple runs
-
-add low and high parameters to learned distribution
-
-
-expand search space such that it is possible to have a tree structure of vars inside a node (to define functional relation between its vars), this can already be achieved by nesting vectorvariables, only thing to add is to pass upper level
-variables within same node as well
-
-optimise GMM learning with gibs sampling and infinite GMM, optimise general sampling by implementing
-search space as markov state/continuous bayesian network in pymc and use it to generate samples
-with batch learning
-----------------------------------------
 check if cross validation can benefit the system
 
 experiment weighted samples vs slicing and  data or show that data with 0 weight is equal to sliced data
-
-check if data augmentation helps, extra samples where the fitness function varies a lot between close points
-find high uncertainty in search space, especially around the borders, this does influence the search space (unintended complexity)
 
 find attributes in children that don't interfere with fitness (can be omitted from training) (automatic feature extraction)
 or attributes independent of others regardin the fitness (covariance analysis) (they can be trained seperately)(dim reduciton)
@@ -80,24 +41,67 @@ and train in a hierachical divided search space (naive bayes?, divide search spa
 
 train gaussian mixture using pomegranate (mixture of multivariate gaussian) (added benefit of decay, priority based multi-objective) also faster (according to author)
 
-different model and constraints: generate chamber in a house, this is a shape->shape relation
+
+sampling optimisation
+----------------------------
+
+
+sampling would be greatly improved, and thus also the learning
+if I would sample more (calculate fitness sample value pairs) on variables defined stochastic
+even better would be to do that proportional to it's stochasity, this would be overfitting though
+
+extend search space distribution with sample(n_samples), to generate multiple samples from the search space at once, this is an optimisation
+
+sample in batches, resampling is done from trained model
+
+check if data augmentation helps, extra samples where the fitness function varies a lot between close points
+find high uncertainty in search space, especially around the borders, this does influence the search space (unintended complexity)
+
+deterministic/stochastic sampling with stochastic mesh grid tree search
+
+visualisation optimisation
+----------------------------------------
+
+could add fitness in representative range visualisation (color line in gradient reflecting each value avg fitness)
+
+when visualising the plot should show also completely the ellipses of the distributions, now they are cut off
 
 plot, during training, the fitness histogram (avg, var), and the expressiveness (the ratio of the interval you're still reaching, or the amount of variance)
 
-
-define constraints as either a hard,soft constraint , or a variable constraint
-check what works best for soft and hard constraints: slice/filter data or use weighted samples
-the variable constraint acts as condition on the to generate data
-
-refactor distribution class, to be able to use either uniform (unknow density) (or other scipy stats distr.) or mix of gaussians (trained density)
-support shape (for random vector) in distribution
+implement method to cluster (unweighted )samples in X clusters and generate N samples from each cluster
+to visualise as a way to show expressive range
 
 
+code clean up
+----------------------
+
+add enum to know if stochastif is discrete or continuous
+
+remove variable classes from search_space module
+
+change name markov tree node
+
+add type checking in python, seriously, where necessary (see package in bookmark thesis)
+Types as annotations
+
+
+examples
+-------------------------
+
+different model and constraints: generate chamber in a house, this is a shape->shape relation
+
+see paper open world layour for coffee bar exmaple
 
 test learning with larger hierachy -> 2 level constraints (room->table_chairs)
 
+do the plates on a table example for multiple fitness
 
-next experiment should show possibility to constraints that are enforced on siblings
+
+evaluation
+------------------
+influence of model prior (hierachical relations) on learning and fitness (hierachical relations)
+
+
 sibling fitness
 ---------------
 1. order siblings based on pair-wise fitness (weight function for samples)
@@ -117,29 +121,20 @@ or train model on the joint of (nr_siblings, index (fixed order, not index from 
 
 or better with a Hidden markov model using the children attributes as sequences
 the hmm library is either hmmlearn or bnpy (use weighted sampels), propably won't integrate well with hierarchical model, set number of states the max(n_children) initialise transation distr according to specification in search space if the distr of n_children should not be learned
+
 how do we condition on the parent state, convert the model to pymc and set the first state to observed. we could add the parent to the start of the sequence, but this would reduce our hierarchical model to a single long chain, not if we can condition on the first state
 
 
 
 
-add method to sample node to extract data (from generated samples) which is random and thus of which the distr can be learned (for easier use), additional covariance estimation before training
-s
-
 all papers in downloads->put in mendeley
 
 
-show some metrics on the computation time difference between "shape" likelihood and gameplay likelihood
-
-
-    -compare seperate models (for each number of children) and pair-wise trained models
-    -compare training on multiple fitness
-    -use dimensionality reduction to find independent components->only try to find cond distr between dep components
 
 2) model pokemon world probabilistically
     find top down constraints
 find conditional distributions reflecting the number of children in the hierarchy conditional on the fitness
 
-3) try to learn relation beyond parent-> child but also child->child using Hidden markov model
 
 
 

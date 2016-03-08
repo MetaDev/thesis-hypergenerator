@@ -15,6 +15,9 @@ import util.utility as ut
 
 #add interface for fitness, such that it can be either an optimisation (soft constraint) or a threshhold function (hard constraint)
 #also always option to return normalised fitness
+#fitness 1 should mean good 0 bad
+
+
 def angle(line_segment):
     p0=line_segment[0]
     p1=line_segment[1]
@@ -22,14 +25,12 @@ def angle(line_segment):
 def normalise_fitness(fitness_values):
     return (np.array(fitness_values)-np.min(fitness_values))/(np.max(fitness_values)-np.min(fitness_values))
 #max will be min and min will be max
-def invert_fitness(fitness_values):
-    return (np.max(fitness_values)-np.array(fitness_values))
-def pairwise_overlap(polygon0,polygon1,normalized=False):
-    total_surface=1
-    if normalized:
-        total_surface=polygon0.area+polygon1.area
-    return (polygon0.intersection(polygon1)).area/total_surface
-def pairwise_closest_line_alignment(polygon0,polygon1,threshold=30,normalized=False):
+
+def pairwise_overlap(polygon0,polygon1):
+    total_surface=max(polygon0.area,polygon1.area)
+    return 1-((polygon0.intersection(polygon1)).area/total_surface)
+
+def pairwise_closest_line_alignment(polygon0,polygon1,threshold=30):
     min_dist=float("inf")
     min_l0=None
     min_l1=None
@@ -48,6 +49,7 @@ def pairwise_closest_line_alignment(polygon0,polygon1,threshold=30,normalized=Fa
 #calculate overlapping surface size
 def combinatory_unique_surface(polygons):
     return (cascaded_union([pair[0].intersection(pair[1]) for pair in combinations(polygons, 2)]).area)
+
 #calculate density (polygon occupation) of surface in a bounded space
 def area_density(polygons, polygon_bound):
     return cascaded_union([polygon.intersection(polygon_bound) for polygon in polygons]).area

@@ -32,7 +32,7 @@ fitness_values=[]
 polygons_vis=[]
 
 #use root
-def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names):
+def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names,fitness_order=8):
     #only get children of a certain name
     fitness=[]
     data=[]
@@ -41,13 +41,13 @@ def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names):
 
         parent_Y_vars=[root.independent_vars[name] for name in Y_var_names]
         data.append(np.vstack((child_X_vars,parent_Y_vars)).flatten())
-        fitness.append(fitness_func(child,root))
+        fitness.append(fitness_func(child,root)**fitness_order)
     return data,fitness
 def fitness_extraction_dist(samples):
     return fn.dist_between_parent_child(ut.extract_samples_vars(samples,sample_name="parent")[0],ut.extract_samples_vars(samples,sample_name="child"))
 def fitness_polygon_overl(sample1,sample2):
     polygons=mp.map_layoutsamples_to_geometricobjects([sample1,sample2],shape_name="shape")
-    return fn.pairwise_overlap(polygons[0],polygons[1],normalized=True)
+    return fn.pairwise_overlap(polygons[0],polygons[1])
 model_root=tm.test_model_var_child_position_parent_shape()
 X_var_names=["position"]
 Y_var_names=["shape3"]
@@ -62,7 +62,6 @@ for i in range(ndata):
 #give heavy penalty for intersection
 #inverse and normalise fitness
 #higher fitness means less overlap
-fitness_values=ut.normalise_array((fn.invert_fitness(fitness_values))**4)
 
 #better statistics of fittnes
 vis.print_fitness_statistics(fitness_values)
@@ -164,7 +163,7 @@ for i in range(ndata):
 x,y,x_shape,y_shape=zip(*data)
 
 #better statistics of fittnes
-fitness_values=ut.normalise_array((fn.invert_fitness(fitness_values))**2)
+fitness_values=fitness_values
 plt.scatter(x,y,c=fitness_values,cmap=cm.Blues)
 plt.colorbar()
 plt.show()
