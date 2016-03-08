@@ -32,7 +32,7 @@ fitness_values=[]
 polygons_vis=[]
 
 #use root
-def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names):
+def feauture_fitness_extraction(root,fitness_funcs,X_var_names,Y_var_names):
     #only get children of a certain name
     fitness=[]
     data=[]
@@ -44,21 +44,25 @@ def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names):
         for name in Y_var_names:
             parent_Y_vars.extend(root.independent_vars[name])
         data.append(np.hstack((child_X_vars,parent_Y_vars)).flatten())
-        fitness.append(fitness_func([child,root]))
+        fitness_sum=sum([f(child,root) for f in  fitness_funcs])
+        fitness.append(fitness_sum)
     return data,fitness
 def fitness_extraction_dist(samples):
     return fn.dist_between_parent_child(ut.extract_samples_vars(samples,sample_name="parent")[0],ut.extract_samples_vars(samples,sample_name="child"))
-def fitness_extraction_overl(samples):
-    polygons=mp.map_layoutsamples_to_geometricobjects(samples,shape_name="shape")
-    return fn.pairwise_overlap(polygons,normalized=True)
-
+def fitness_polygon_overl(sample1,sample2):
+    polygons=mp.map_layoutsamples_to_geometricobjects([sample1,sample2],shape_name="shape")
+    return fn.pairwise_overlap(polygons[0],polygons[1],normalized=True)
+def fitness_polygon_alignment(sample1,sample2):
+    polygons=mp.map_layoutsamples_to_geometricobjects([sample1,sample2],shape_name="shape")
+    return fn.pairwise_closest_line_alignment(polygons[0],polygons[1])
 model_root=tm.test_samples_var_child_pos_size_rot_parent_shape()
 X_var_names=["position","rotation","size"]
 Y_var_names=["shape3"]
+fitness_funcs=[fitness_polygon_overl,fitness_polygon_alignment]
 for i in range(ndata):
     #train per child
     sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
-                                                               fitness_extraction_overl,
+                                                               fitness_funcs,
                                                                X_var_names,Y_var_names)
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
@@ -164,7 +168,7 @@ fitness_values=[]
 for i in range(ndata):
     #train per child
     sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
-                                                               fitness_extraction_overl,
+                                                               fitness_funcs,
                                                                X_var_names,Y_var_names)
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)

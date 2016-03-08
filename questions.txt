@@ -3,12 +3,26 @@ worked on so far:
 refactor generator that acts as prior knowledge
 now usable to replace distr a priori with learned distr
 also: worked on visulisation of fitnnes and expressiveness
-found papers on gmm for distr est for multi optima problems
+found constraints -> long book 1200 pages language of patterns, important for furniture ->pretty empty space
+maybe generate examples from the book ?
+new fitness
 
-how to handle multiple fitness through likelyhood
+addition to visualising expressiveness is actually "generating" samples with high fitness but very different values
+could use clustering for this and generate one from each cluster
+
+found papers on gmm for distr est for multi optima problems, also uses weighted samples
+
+how to handle multiple fitness through likelyhood, can I implement ad-hoc (penalise large variance?)
+
+next step is tackling multiple children and their implied relation
+introduce new structure in prior knowledge (chain between children)
+here the learning quickly becomes expensive
+
+
 next focus?
-optimise learning: batch learning, id overfitting hyperparameters
-focus on multi-object?
+optimise learning of gmm: batch learning, dimensionality reduction (kernel PCA), covariance estimation (variable X and fitness), id overfitting hyperparameters, data augmentation (see optimising sampling)
+optimis sampling using derivative, exploration vs exploitation, use tree search sampling (with mesh?)
+
 start writing about implementation, what can be written?
 I can enumerate a lot of possible techniques
 but all quite complicated
@@ -16,8 +30,3 @@ but all quite complicated
 there are so many different possible approaches, do I need to mention them in thesis?
 or can I start implementing a larger scene in my generator
 
-next step is tackling multiple children and their implied relation
-introduce new structure in prior knowledge (chain between children)
-here the learning quickly becomes expensive
-
-than optimise learning of gmm

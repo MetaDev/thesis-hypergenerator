@@ -41,21 +41,20 @@ def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names):
 
         parent_Y_vars=[root.independent_vars[name] for name in Y_var_names]
         data.append(np.vstack((child_X_vars,parent_Y_vars)).flatten())
-        fitness.append(fitness_func([child,root]))
+        fitness.append(fitness_func(child,root))
     return data,fitness
 def fitness_extraction_dist(samples):
     return fn.dist_between_parent_child(ut.extract_samples_vars(samples,sample_name="parent")[0],ut.extract_samples_vars(samples,sample_name="child"))
-def fitness_extraction_overl(samples):
-    polygons=mp.map_layoutsamples_to_geometricobjects(samples,shape_name="shape")
-    return fn.pairwise_overlap(polygons,normalized=True)
-
+def fitness_polygon_overl(sample1,sample2):
+    polygons=mp.map_layoutsamples_to_geometricobjects([sample1,sample2],shape_name="shape")
+    return fn.pairwise_overlap(polygons[0],polygons[1],normalized=True)
 model_root=tm.test_model_var_child_position_parent_shape()
 X_var_names=["position"]
 Y_var_names=["shape3"]
 for i in range(ndata):
     #train per child
     sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
-                                                               fitness_extraction_overl,
+                                                               fitness_polygon_overl,
                                                                X_var_names,Y_var_names)
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
@@ -98,6 +97,12 @@ vis.visualise_gmm_marg_density_1D_gmr(ax,0,gmm,verbose=True)
 
 plt.show()
 
+ax = plt.gca()
+
+plt.scatter(x,y,c=fitness_values,cmap=cm.Blues)
+plt.colorbar()
+plt.show()
+
 #construct new model
 child = model_root.get_child_node("child")
 
@@ -129,8 +134,7 @@ for p in values:
     (xrange,yrange)=((min(x),max(x)),(min(y),max(y)))
     ax.set_xlim(*xrange)
     ax.set_ylim(*yrange)
-    plt.scatter(x,y,c=fitness_values,cmap=cm.Blues)
-    plt.colorbar()
+
     vis.draw_polygons(ax,[polygon])
     #still need to deterministically determine position
     gmm_cond.means=[list(map(add, c, position))for c in gmm_cond.means]
@@ -152,7 +156,7 @@ fitness_values=[]
 for i in range(ndata):
     #train per child
     sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
-                                                               fitness_extraction_overl,
+                                                               fitness_polygon_overl,
                                                                X_var_names,Y_var_names)
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
