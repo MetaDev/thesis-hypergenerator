@@ -24,7 +24,6 @@ def angle(line_segment):
     return np.rad2deg(np.arctan2((p1[1]-p0[1]),(p1[0]-p0[0])))
 def normalise_fitness(fitness_values):
     return (np.array(fitness_values)-np.min(fitness_values))/(np.max(fitness_values)-np.min(fitness_values))
-#max will be min and min will be max
 
 def pairwise_overlap(polygon0,polygon1):
     total_surface=max(polygon0.area,polygon1.area)
@@ -43,9 +42,14 @@ def pairwise_closest_line_alignment(polygon0,polygon1,threshold=30):
                 min_dist=dist
                 min_l0=l0.coords
                 min_l1=l1.coords
+
     #the fitness is a thresholded difference between the 2 closest lines of a polygon
     #whether a line is 180 or 0 doesn't mather for alignment
-    return max(np.abs((angle(min_l0)%180)-(angle(min_l1)%180))-threshold,0)/(180-threshold)
+    return 1-(max(np.abs((angle(min_l0)%180)-(angle(min_l1)%180))-threshold,0)/(180-threshold))
+
+def pairwise_min_dist(position0,position1,threshold, dist_metric=np.linalg.norm):
+    return 1-max((threshold-dist_metric(np.array([position0,position1])))/threshold,0)
+
 #calculate overlapping surface size
 def combinatory_unique_surface(polygons):
     return (cascaded_union([pair[0].intersection(pair[1]) for pair in combinations(polygons, 2)]).area)
@@ -56,8 +60,7 @@ def area_density(polygons, polygon_bound):
 #this is a direct metric and does not require polygon conversion
 #total distance between layout_objcts
 #todo calculate distance bqsed on polygon centroid
-def pairwise_dist(positions, dist_metric=np.linalg.norm):
-    return [dist_metric(np.array([position_pair[0],position_pair[1]])) for position_pair in ut.pairwise(positions)]
+
 def dist_between_parent_child(parent,children, dist_metric=np.linalg.norm):
     return [dist_metric(np.array([parent.position,child.position])) for child in children]
 #calculate collision or intersection between layout samples

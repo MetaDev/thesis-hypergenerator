@@ -1,18 +1,19 @@
 from pomegranate import *
 
-a = NormalDistribution( 5, 2 )
-b = TriangleKernelDensity( [1,5,2,3,4], weights=[4,2,6,3,1] )
-c = MixtureDistribution( [ NormalDistribution( 2, 4 ), ExponentialDistribution( 8 ) ], weights=[1, 0.01] )
 
-print (a.log_probability( 8 ))
-print (b.log_probability( 8 ))
-print (c.log_probability( 8 ))
+c = MixtureDistribution( [ NormalDistribution( 2, 4 ), NormalDistribution( 2, 4 ) ], weights=[1, 1] )
 
-c.from_sample([1, 5, 7, 3, 2, 4, 3, 5, 7, 8, 2, 4, 6, 7, 2, 4, 5, 1, 3, 2, 1])
-print (c)
+child0=State(c,"child0")
+child1=State(c,"child1")
+hmm = HiddenMarkovModel( "HT" )
+hmm.add_states([child0, child1])
 
-c = MixtureDistribution( [ NormalDistribution( 2, 4 ), ExponentialDistribution( 8 ) ], weights=[1, 0.01] )
-c.summarize([1, 5, 7, 3, 2, 4, 3])
-c.summarize([5, 7, 8])
-c.summarize([2, 4, 6, 7, 2, 4, 5, 1, 3, 2, 1])
-c.from_summaries()
+hmm.add_transition( hmm.start, child0, 1 )
+hmm.add_transition( child0, child1, 0.5 )
+
+hmm.add_transition( child1, hmm.end, 1 )
+hmm.add_transition( child0, hmm.end, 0.5 )
+hmm.bake()
+
+sequence = hmm.sample()
+print( sequence)

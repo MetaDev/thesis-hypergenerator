@@ -1,13 +1,25 @@
+train on 2 children
+check if visualisation is correct
 
-train model p(c2|c1 p)
+add pomegranate for weights
+
+train model p(c1|c0 p)
+->learn full distribution p(c)
 
 refactor search space such that children can be made dependent on children
-ordering of children
+ordering of children-> node should possibly have multiple parents but (dag, check for this)
+->use reactive programming
+
+in training utility, a method sould receive the samples, and the fitness function and return
+the fitness values and according data used to calculate it
+also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
+
+rename learning utility as GMM extension
 
 find out why alignment is so hard to learn in gmm2
-plot fitness seperately
+plot fitness seperately, fitness func is maybe not correct, try to visualise it
 
-
+ask writer gmr for references on the methods used in condition and marginal
 
 better print of node sample
 
@@ -23,8 +35,13 @@ id hyperparameters for over/underfitting
 
 make interface for training, train in batches by sampling from the previous model in the next
 only expose hyperparamters that could influence over/under fitting (to be determined by experimentation)
+
+learn(n_sample_barhces,n_batches,child_attributes,parent_attributes,fitness_funcs, GMM_hyperparams)
+
 Note: larger batches will mean less overfitting because the model will train on more varied data
 smaller batches but more number of batches will more overfit, reducing models expressivens but increasing average fitness faster
+
+
 training should be done on scaled data
 given only a set of attributes to train on and fitness function on the attribute vector for the weight of the samples
 
@@ -39,7 +56,7 @@ or even better (and in the case of child-child training): for large number of ch
 e.g. tables far apart will not likely collide
 and train in a hierachical divided search space (naive bayes?, divide search space in n clusters)
 
-train gaussian mixture using pomegranate (mixture of multivariate gaussian) (added benefit of decay, priority based multi-objective) also faster (according to author)
+train gaussian mixture using pomegranate (mixture of multivariate gaussian) (added benefit of decay, priority based multi-objective) also faster, correct see http://homes.cs.washington.edu/~jmschr/lectures/pomegranate.html
 
 
 sampling optimisation
@@ -96,6 +113,7 @@ test learning with larger hierachy -> 2 level constraints (room->table_chairs)
 
 do the plates on a table example for multiple fitness
 
+do an example of room generation, where the fitness can be the validity of a polygon (non-convex)
 
 evaluation
 ------------------

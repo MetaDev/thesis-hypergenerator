@@ -50,8 +50,8 @@ class StochasticVariable(Variable):
     def standard_distr(low=0,high=1):
         return scipy.stats.uniform(loc=low,scale=high-low)
     @staticmethod
-    def standard_choices(low=0,high=1,num=1):
-        return np.linspace(low,high,num)
+    def standard_choices(low=0,high=1,step=1):
+        return np.arange(low,high,step)
     #low and high is ignored if options (enums) is set
     #if nr_of_values is -1 the distribution is continous
     def __init__(self,name,size=1,func=None,distr=None,choices=None):

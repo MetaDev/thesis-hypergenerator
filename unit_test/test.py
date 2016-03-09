@@ -9,6 +9,7 @@ from shapely.geometry import *
 import numpy as np
 import numpy.linalg as la
 
+from itertools import combinations
 
 
 root = tm.test_model_var_child_position_parent_shape()
@@ -27,14 +28,16 @@ vis.draw_polygons(ax,polygons,set_range=False)
 #test visualisation of search space mapping
 graph = mp.map_polygons_to_neighbourhoud_graph(polygons,[xrange,yrange],step=step)
 #vis.draw_graph(ax,graph)
-
+children =[v for v in sample_list if v.name.startswith("child")]
 chairs = [polygons[i]  for i in range(len(sample_list)) if sample_list[i].name.startswith("child")]
 table = [polygons[i]  for i in range(len(sample_list)) if sample_list[i].name.startswith("parent")][0]
 chair_paths = fn.polygon_path_sequence(graph,chairs)
 #vis.draw_graph_path(ax,graph,chair_paths)
-for child in chairs:
-    print(fn.pairwise_closest_line_alignment(child,table))
-    print(fn.pairwise_overlap(child,table))
+#for child in chairs:
+#    print(child)
+#    print("alignment angle:",fn.pairwise_closest_line_alignment(child,table))
+for childpair in combinations(children,2):
+    print("dist",fn.pairwise_min_dist(childpair[0].independent_vars["position"],childpair[1].independent_vars["position"],2))
 
 centroids=[np.array(p.centroid) for p in polygons]
 points=ut.extract_samples_vars(sample_list,var_name="position",independent=False)

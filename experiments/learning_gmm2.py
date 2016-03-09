@@ -27,42 +27,18 @@ from model.search_space import GMMVariable,DummyStochasticVariable
 from gmr import GMM
 ndata=200
 
+import learning.training as tr
 
-
-#use root
-def feauture_fitness_extraction(root,fitness_funcs,X_var_names,Y_var_names,fitness_order=8):
-    #only get children of a certain name
-    fitness=[]
-    data=[]
-    for child in root.get_children("child"):
-        child_X_vars=[]
-        for name in X_var_names:
-            child_X_vars.extend(child.independent_vars[name])
-        parent_Y_vars=[]
-        for name in Y_var_names:
-            parent_Y_vars.extend(root.independent_vars[name])
-        data.append(np.hstack((child_X_vars,parent_Y_vars)).flatten())
-        fitness_sum=sum([f(child,root)**fitness_order for f in  fitness_funcs])/len(fitness_funcs)
-        fitness.append(fitness_sum)
-    return data,fitness
-def fitness_extraction_dist(samples):
-    return fn.dist_between_parent_child(ut.extract_samples_vars(samples,sample_name="parent")[0],ut.extract_samples_vars(samples,sample_name="child"))
-def fitness_polygon_overl(sample1,sample2):
-    polygons=mp.map_layoutsamples_to_geometricobjects([sample1,sample2],shape_name="shape")
-    return fn.pairwise_overlap(polygons[0],polygons[1])
-def fitness_polygon_alignment(sample1,sample2):
-    polygons=mp.map_layoutsamples_to_geometricobjects([sample1,sample2],shape_name="shape")
-    return fn.pairwise_closest_line_alignment(polygons[0],polygons[1])
 
 model_root=tm.test_samples_var_child_pos_size_rot_parent_shape()
 X_var_names=["position","rotation","size"]
 Y_var_names=["shape3"]
-fitness_funcs=[fitness_polygon_overl,fitness_polygon_alignment]
+fitness_funcs=[tr.fitness_polygon_alignment,tr.fitness_polygon_overl]
 data=[]
 fitness_values=[]
 for i in range(ndata):
     #train per child
-    sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
+    sample_features,sample_fitness=tr.feauture_fitness_extraction(model_root.sample(),
                                                                fitness_funcs,
                                                                X_var_names,Y_var_names)
     data.extend(sample_features)
@@ -133,7 +109,7 @@ fitness_values=[]
 
 for i in range(ndata):
     #train per child
-    sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
+    sample_features,sample_fitness=tr.feauture_fitness_extraction(model_root.sample(),
                                                                fitness_funcs,
                                                                X_var_names,Y_var_names)
     data.extend(sample_features)

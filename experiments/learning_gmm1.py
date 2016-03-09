@@ -31,37 +31,22 @@ data=[]
 fitness_values=[]
 polygons_vis=[]
 
-#use root
-def feauture_fitness_extraction(root,fitness_func,X_var_names,Y_var_names,fitness_order=8):
-    #only get children of a certain name
-    fitness=[]
-    data=[]
-    for child in root.get_children("child"):
-        child_X_vars=[child.independent_vars[name] for name in X_var_names]
+import learning.training as tr
 
-        parent_Y_vars=[root.independent_vars[name] for name in Y_var_names]
-        data.append(np.vstack((child_X_vars,parent_Y_vars)).flatten())
-        fitness.append(fitness_func(child,root)**fitness_order)
-    return data,fitness
-def fitness_extraction_dist(samples):
-    return fn.dist_between_parent_child(ut.extract_samples_vars(samples,sample_name="parent")[0],ut.extract_samples_vars(samples,sample_name="child"))
-def fitness_polygon_overl(sample1,sample2):
-    polygons=mp.map_layoutsamples_to_geometricobjects([sample1,sample2],shape_name="shape")
-    return fn.pairwise_overlap(polygons[0],polygons[1])
+
 model_root=tm.test_model_var_child_position_parent_shape()
 X_var_names=["position"]
 Y_var_names=["shape3"]
+fitness_funcs=[tr.fitness_polygon_overl]
+
 for i in range(ndata):
     #train per child
-    sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
-                                                               fitness_polygon_overl,
+    sample_features,sample_fitness=tr.feauture_fitness_extraction(model_root.sample(),
+                                                              fitness_funcs,
                                                                X_var_names,Y_var_names)
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
 
-#give heavy penalty for intersection
-#inverse and normalise fitness
-#higher fitness means less overlap
 
 #better statistics of fittnes
 vis.print_fitness_statistics(fitness_values)
@@ -154,8 +139,8 @@ fitness_values=[]
 
 for i in range(ndata):
     #train per child
-    sample_features,sample_fitness=feauture_fitness_extraction(model_root.sample(),
-                                                               fitness_polygon_overl,
+    sample_features,sample_fitness=tu.feauture_fitness_extraction(model_root.sample(),
+                                                               fitness_funcs,
                                                                X_var_names,Y_var_names)
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
