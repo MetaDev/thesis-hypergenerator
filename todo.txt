@@ -1,7 +1,15 @@
-train on 2 children
-check if visualisation is correct
+increase number of children to 3
 
-add pomegranate for weights
+test gmm1 test with pomegranate
+
+add own gmm class wrapper around gmm from 3 different gmm libraries
+add pomegranate for weights and decay (to maybe solve MO)
+initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
+
+learn to fit surface according to ratio in a polygon
+
+find out why alignment is so hard to learn in gmm2
+plot fitness seperately, fitness func is maybe not correct, try to visualise it
 
 train model p(c1|c0 p)
 ->learn full distribution p(c)
@@ -10,14 +18,16 @@ refactor search space such that children can be made dependent on children
 ordering of children-> node should possibly have multiple parents but (dag, check for this)
 ->use reactive programming
 
+sampling should be possible in a grid for the first training step, refactor at the same time as to generate
+
+
 in training utility, a method sould receive the samples, and the fitness function and return
 the fitness values and according data used to calculate it
 also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
 
 rename learning utility as GMM extension
 
-find out why alignment is so hard to learn in gmm2
-plot fitness seperately, fitness func is maybe not correct, try to visualise it
+
 
 ask writer gmr for references on the methods used in condition and marginal
 

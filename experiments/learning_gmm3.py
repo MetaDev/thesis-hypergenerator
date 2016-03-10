@@ -46,7 +46,7 @@ parent_child_fitness_funcs=[tr.fitness_polygon_overl]
 
 #TODO
 #train model P(C0|C1,P)
-ndata=400
+ndata=300
 
 #repeat sampling
 data=[]
@@ -67,9 +67,10 @@ def feauture_fitness_child_child(root,child_child_fitness_funcs,parent_child_fit
         child0_vars=[child0.independent_vars[name] for name in X_var_names]
         child1_vars=[child1.independent_vars[name] for name in X_var_names]
         #the independent variable is
-        data.append(np.hstack((np.array(child1_vars)-np.array(child0_vars),child0_vars)).flatten())
+        data.append(np.hstack((np.array(child1_vars)-np.array(child0_vars),child0_vars,parent_Y_vars)).flatten())
 
-        fitness_sum= sum([f(child1,child0)**2 for f in  child_child_fitness_funcs])
+        fitness_sum= sum([f(child1,child0) for f in  child_child_fitness_funcs]) * sum([f(child1,root)**16 for f in  parent_child_fitness_funcs])
+
         fitness.append(fitness_sum)
     return data,fitness
 for i in range(ndata):
@@ -81,9 +82,8 @@ for i in range(ndata):
     data.extend(sample_features)
     fitness_values.extend(sample_fitness)
 vis.print_fitness_statistics(fitness_values)
-print(len(fitness_values))
-print(len(data))
-child_diff_x,child_diff_y,child0_x,child0_y=zip(*data)
+
+child_diff_x,child_diff_y,child0_x,child0_y,shape_x,shape_y=zip(*data)
 
 #plt.scatter(child1_x,child1_y,c=fitness_values,cmap=cm.Blues)
 #plt.colorbar()
@@ -92,7 +92,7 @@ child_diff_x,child_diff_y,child0_x,child0_y=zip(*data)
 n_components=10
 #both full and tied covariance work
 #but tied prevents overfitting but is worse to find conditional estimatation of sharp corners
-gmm = lut.GMM_weighted(n_components=n_components, covariance_type='full',min_covar=0.0001,random_state=setting_values.random_state)
+gmm = lut.GMM_weighted(n_components=n_components, covariance_type='full',min_covar=0.01,random_state=setting_values.random_state)
 gmm.weighted_fit(data,fitness_values)
 #
 #gmm= mixture.GMM(n_components=n_components, covariance_type='full',min_covar=0.01,random_state=setting_values.random_state)
@@ -108,34 +108,39 @@ n_samples=100
 position=(1,2)
 x= np.array(child0_x)+position[0]
 y=np.array(child0_y)+position[1]
-n=1;
 
-child_positions=np.arange(-1,1,0.5)
-for cp0 in child_positions:
-    for cp1 in child_positions:
-        print(cp0+position[0],cp1+position[1])
-        plt.scatter(cp0+position[0],cp1+position[1],color="blue",marker="o")
+values=np.arange(0.5,2,0.5)
+child_positions=np.arange(-1,2,1)
+for p in values:
+    shape=[(0, 0), (0, 1),(0.5,1),(p,p),(1, 0.5),(1,0)]
+    #the original gmm needs to have u full covariance matrix, to estimate conditional matrix
+    polygon = mp.map_to_polygon(shape,[0.5,0.5],position,0,(1,1))
+    for cpy in child_positions:
+        cpx=-1
+        print(cpx+position[0],cpy+position[1])
+        plt.scatter(cpx+position[0],cpy+position[1],color="blue",marker="o")
         #the original gmm needs to have u full covariance matrix, to estimate conditional matrix
-        gmm_cond=gmm.condition([2,3],[cp0,cp1])
+        gmm_cond=gmm.condition([2,3,4,5],[cpx,cpy,p,p])
         position_samples=gmm_cond.sample(n_samples)
         ax = plt.gca()
         ax.set_aspect(1)
 
         gmm_cond.n_components
         x_diffs,y_diffs=zip(*position_samples)
-        x_new=[x_diff+position[0]+cp0 for x_diff in x_diffs]
-        y_new=[y_diff+position[1]+cp1 for y_diff in y_diffs]
+        x_new=[x_diff+position[0]+cpx for x_diff in x_diffs]
+        y_new=[y_diff+position[1]+cpy for y_diff in y_diffs]
+
+        vis.draw_polygons(ax,[polygon])
 
         (xrange,yrange)=((min(x),max(x)),(min(y),max(y)))
         ax.set_xlim(*xrange)
         ax.set_ylim(*yrange)
 
         #still need to deterministically determine position
-        gmm_cond.means=[list(map(add, c, position))for c in gmm_cond.means]
+        gmm_cond.means=[list(map(add, c, np.array(position)+np.array([cpx,cpy]))) for c in gmm_cond.means]
         #plot marginal to express expressiveness
         vis.visualise_gmm_marg_2D_density_gmr(ax,gmm_cond,colors=["g"])
         plt.scatter(x_new,y_new,color='r')
-        n+=1
         plt.show()
 # -*- coding: utf-8 -*-
 

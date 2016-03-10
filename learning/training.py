@@ -30,4 +30,4 @@ def fitness_polygon_alignment(sample0,sample1):
 def fitness_min_dist(sample0,sample1):
     pos0=sample0.independent_vars["position"]
     pos1=sample1.independent_vars["position"]
-    return fn.pairwise_min_dist(pos0,pos1,threshold=2)
+    return fn.pairwise_min_dist(pos0,pos1,threshold=1)

@@ -48,7 +48,7 @@ def pairwise_closest_line_alignment(polygon0,polygon1,threshold=30):
     return 1-(max(np.abs((angle(min_l0)%180)-(angle(min_l1)%180))-threshold,0)/(180-threshold))
 
 def pairwise_min_dist(position0,position1,threshold, dist_metric=np.linalg.norm):
-    return 1-max((threshold-dist_metric(np.array([position0,position1])))/threshold,0)
+    return min(dist_metric(np.array(position0)- np.array(position1))/threshold,1)
 
 #calculate overlapping surface size
 def combinatory_unique_surface(polygons):
