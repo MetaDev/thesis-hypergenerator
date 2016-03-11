@@ -23,12 +23,13 @@ class Variable():
         self.name=name
         self.parent_vars_name=None
         self.unpack=False
+        self.set_func(func)
+    def sample(self, parent_sample):
+        pass
+    def set_func(self,func):
         self.func=func
         if func:
             self.parent_vars_name=func.__code__.co_varnames[1:]
-    def sample(self, parent_sample):
-        pass
-
     #the last boolean is to indicate whether the returned value needs to be unpacked
     def relative_sample(self,sample,parent_sample):
         #if there is a function and the parent has the required attributes
@@ -216,10 +217,6 @@ class MarkovTreeNode:
             #TODO
             return "\n".join(key + ": " + str(value) for key, value in vars(self).items())
 
-    #TODO make it possible to "freeze' a stochastic variable at a certain position
-    #TODO add method to request all stochastic variables
-
-    #TODO make it possible to switch back to original prior distribution for a named var
 
     def set_learned_variable(self, gmmvar: GMMVariable):
         #set variables that will be replaced to unactive
@@ -232,8 +229,7 @@ class MarkovTreeNode:
     def get_variable(self,name):
         var=self.variable_assignment[name]
         if var.unpack:
-             warnings.warn("The variable "+ var.name + "assigned to " + name+ " is packed, possibly used to sample multiple variables",
-                           RuntimeWarning)
+             warnings.warn("The variable "+ var.name + "assigned to " + name+ " is packed, possibly used to sample multiple variables",RuntimeWarning)
         return var
 
     def get_child_node(self,name):
@@ -241,7 +237,6 @@ class MarkovTreeNode:
             if child[1].name==name:
                 return child[1]
 
-    #TODO allow tree structure for nodes
     #sample a layout object and its children
     def sample(self,parent_sample=None,index=0,sample_list=None):
         #create  sample
@@ -287,8 +282,12 @@ class LayoutMarkovTreeNode(MarkovTreeNode):
 
     default_origin=DeterministicVariable("origin",(0.5,0.5))
     #shape should be normalised in the unit cube, same counts for the origin
-    #TODO create factory method for layout node with named arguments for the variables in constru
-    def __init__(self, name, origin,position, rotation, size,shape,color,children=[(0,None)]):
+    def __init__(self, name,position, rotation, size,shape,color, origin=None,children=[(0,None)]):
+        position.set_func(LayoutMarkovTreeNode.position_rel)
+        rotation.set_func(LayoutMarkovTreeNode.rotation_rel)
+        if origin==None:
+            origin=self.default_origin
+        #size.func=self.size_rel
         super().__init__(name,[origin,position,rotation,size,*shape,color],children)
 
 

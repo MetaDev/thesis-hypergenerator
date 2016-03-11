@@ -7,13 +7,12 @@ from model.search_space import DeterministicVariable as DV
 from model.search_space import LayoutMarkovTreeNode as LN
 def test_model_var_child_position_parent_shape():
     #test Distribution
-    child_position = SV("position",size=2,distr=SV.standard_distr(-1.5,1.5),func=LN.position_rel)
+    child_position = SV("position",size=2,distr=SV.standard_distr(-1.5,1.5))
     colors = DV("color",(0,0,0))
 
 
     child_size = DV("size",(0.2,0.2))
-    origin= LN.default_origin
-    chair = LN(size=child_size,name="child",origin=origin ,position=child_position,
+    chair = LN(size=child_size,name="child" ,position=child_position,
                                     rotation=DV("rotation",0),shape=LN.shape_exteriors["square"], color=colors)
 
     #var_p3= SV("p3",size=2,choices=SV.standard_choices(0.5,2,4))
@@ -25,7 +24,7 @@ def test_model_var_child_position_parent_shape():
     n_children=DV("children",5)
     parent_size=DV("size",(1,1))
     table = LN(size=parent_size,name="parent",rotation=DV("rotation",0),
-                                    origin=origin,position=parent_pos,
+                                    position=parent_pos,
                                     shape=parent_shapes,children=[(n_children,chair)],color=colors)
     return table
 def test_model_var_child_position_parent_shape_reduced():

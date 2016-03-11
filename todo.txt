@@ -1,4 +1,3 @@
-increase number of children to 3
 
 test gmm1 test with pomegranate
 
@@ -6,17 +5,15 @@ add own gmm class wrapper around gmm from 3 different gmm libraries
 add pomegranate for weights and decay (to maybe solve MO)
 initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
 
-learn to fit surface according to ratio in a polygon
-
-find out why alignment is so hard to learn in gmm2
-plot fitness seperately, fitness func is maybe not correct, try to visualise it
-
-train model p(c1|c0 p)
-->learn full distribution p(c)
-
 refactor search space such that children can be made dependent on children
 ordering of children-> node should possibly have multiple parents but (dag, check for this)
 ->use reactive programming
+
+new fitness function
+learn to fit surface according to surface ratio in a polygon
+
+find out why alignment is so hard to learn in gmm2
+plot fitness seperately, fitness func is maybe not correct, try to visualise it
 
 sampling should be possible in a grid for the first training step, refactor at the same time as to generate
 
@@ -27,11 +24,9 @@ also an argument for fitness threshold, fitness target and whether you're lookin
 
 rename learning utility as GMM extension
 
-
-
-ask writer gmr for references on the methods used in condition and marginal
-
-better print of node sample
+apply affine transformation on gmm, to make gmm models more reusable see https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Marginal_distributions
+->this means that all training of variables can be done within a unit cube, only training on the relative
+relation between parent and child. And afterwards the affine transformation of (pos,rot,size) of the parent can be applied on the same gmm without having to recalulate it
 
 learning optimisation
 -------------------------
@@ -40,6 +35,8 @@ use feature extraction to optmize learning, but each feature should be able to b
 use BIC to find optimal number of clusters
 
 normalise the data you train on [0,1]
+
+
 
 id hyperparameters for over/underfitting
 
@@ -98,6 +95,19 @@ plot, during training, the fitness histogram (avg, var), and the expressiveness 
 implement method to cluster (unweighted )samples in X clusters and generate N samples from each cluster
 to visualise as a way to show expressive range
 
+generator additional features
+-------------------------
+
+make it possible to "freeze' a stochastic variable at a certain position
+
+add method to request all stochastic variables
+
+make it possible to switch back to original prior distribution, after learning, for a named var
+
+allow tree structure for node variables, more generically would be to allow variables of a node be a node again
+
+better print of node sample
+
 
 code clean up
 ----------------------
@@ -128,6 +138,8 @@ do an example of room generation, where the fitness can be the validity of a pol
 evaluation
 ------------------
 influence of model prior (hierachical relations) on learning and fitness (hierachical relations)
+compare learning performance with and withour hierarchical relations (additive for pos and rot and scale for size)
+
 
 
 sibling fitness

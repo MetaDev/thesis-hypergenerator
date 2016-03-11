@@ -1,6 +1,8 @@
 from pomegranate import *
 from pomegranate import MultivariateGaussianDistribution
 
+
+
 mu = np.arange(5)
 cov = np.eye(5)
 

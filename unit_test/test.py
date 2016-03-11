@@ -11,8 +11,9 @@ import numpy.linalg as la
 
 from itertools import combinations
 
-
 root = tm.test_model_var_child_position_parent_shape()
+
+
 #test poylygon mapping
 sample_list=[]
 sample_root=root.sample(sample_list=sample_list)

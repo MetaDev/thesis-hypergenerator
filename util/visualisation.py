@@ -56,6 +56,7 @@ def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=Fals
 
 #TODO line for not learned expressiveness should reflect the original distribution
 
+#TODO check dimensionality
 def visualise_gmm_marg_1D_density(ax,marg_index,gmm_means,gmm_cov,gmm_weights,
                                   random_state=None,factor=2,xrange=None,verbose=False):
     means=[]
@@ -90,7 +91,7 @@ def visualise_gmm_marg_2D_density_gmr(ax,gmr_gmm,min_factor=.5,max_factor=3,step
     visualise_gmm_marg_2D_density(ax, gmr_gmm.means,gmr_gmm.covariances,gmr_gmm.priors,
                                   gmr_gmm.random_state,min_factor,max_factor,steps,
                                   colors=colors)
-#TODO also visualise weight of component (using the alpha)
+#TODO check dimensionality
 def visualise_gmm_marg_2D_density(ax,gmm_means,gmm_cov,gmm_weights,random_state=None,
                                   min_factor=.5,max_factor=3,steps=5, colors=["r,g,b"]):
     gmm=GMM(len(gmm_weights),gmm_weights,gmm_means,gmm_cov,random_state)
