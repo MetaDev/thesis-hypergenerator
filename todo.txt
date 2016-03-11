@@ -1,13 +1,16 @@
 
 test gmm1 test with pomegranate
 
-add own gmm class wrapper around gmm from 3 different gmm libraries
-add pomegranate for weights and decay (to maybe solve MO)
+
+test decay for MO
 initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
 
 refactor search space such that children can be made dependent on children
 ordering of children-> node should possibly have multiple parents but (dag, check for this)
-->use reactive programming
+->use reactive programming, which makes it an data flow graph,
+->make it possible to generate n samples, by creating a tree where each parent has max N_children subscriber nodes
+->when sampling (2,5) number of children and 3 is calculated only send data to 3 out of children
+->connect every node to an ouput node where all generated samples are captured
 
 new fitness function
 learn to fit surface according to surface ratio in a polygon
@@ -69,6 +72,7 @@ train gaussian mixture using pomegranate (mixture of multivariate gaussian) (add
 sampling optimisation
 ----------------------------
 
+check which gmm samples the fastest
 
 sampling would be greatly improved, and thus also the learning
 if I would sample more (calculate fitness sample value pairs) on variables defined stochastic
@@ -85,6 +89,9 @@ deterministic/stochastic sampling with stochastic mesh grid tree search
 
 visualisation optimisation
 ----------------------------------------
+
+visualise search space of a variable, a rectangle or line for unifrom and ellipses or normal for gmm
+add a method to the search space to visualise any variable by name
 
 could add fitness in representative range visualisation (color line in gradient reflecting each value avg fitness)
 

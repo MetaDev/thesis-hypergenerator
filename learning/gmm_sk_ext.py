@@ -11,11 +11,12 @@ from time import time
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import  check_array
 from sklearn.utils.extmath import logsumexp
-class GMM_weighted(mixture.gmm.GMM):
+class GMM(mixture.gmm.GMM):
 
 
 
     def weighted_fit(self, X, Xweights, y=None, do_prediction=False):
+
             #sample weight need to be normalised
             """Estimate model parameters with the EM algorithm.
             A initialization step is performed before entering the
@@ -34,6 +35,8 @@ class GMM_weighted(mixture.gmm.GMM):
                 Posterior probabilities of each mixture component for each
                 observation.
             """
+            if not Xweights:
+                return self.fit(X)
             #normalise the weights between [0,1]
             Xweights=(np.array(Xweights)-np.min(Xweights))/(np.max(Xweights)-np.min(Xweights))
             # initialization step
