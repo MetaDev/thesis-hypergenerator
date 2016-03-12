@@ -57,8 +57,8 @@ def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=Fals
 #TODO line for not learned expressiveness should reflect the original distribution
 
 #TODO check dimensionality
-def visualise_gmm_marg_1D_density(ax,marg_index,gmm_means,gmm_cov,gmm_weights,
-                                  random_state=None,factor=2,xrange=None,verbose=False):
+def visualise_gmm_marg_1D_density(ax,marg_index,gmm_weights,gmm_means,gmm_cov,
+                                 factor=2,xrange=None,verbose=False):
     means=[]
     weights=gmm_weights
     stdevs=[]
@@ -81,20 +81,19 @@ def visualise_gmm_marg_1D_density(ax,marg_index,gmm_means,gmm_cov,gmm_weights,
     ax.plot(x, density)
     ax.plot(x,y,color="r")
 #same as above but for GMM from the gmr package
-def visualise_gmm_marg_density_1D_gmr(ax,marg_index,gmr_gmm,factor=3,verbose=False):
-    visualise_gmm_marg_1D_density(ax,marg_index,gmr_gmm.means,gmr_gmm.covariances,gmr_gmm.priors,
-                                  gmr_gmm.random_state,factor,verbose)
+def visualise_gmm_marg_density_1D_gmr(ax,marg_index,gmm,factor=3,verbose=False):
+    visualise_gmm_marg_1D_density(ax,marg_index,*gmm.get_params(),
+                                 factor,verbose)
 #to visualise the density of 2 dimensional data
 #respect covariance between the data
-def visualise_gmm_marg_2D_density_gmr(ax,gmr_gmm,min_factor=.5,max_factor=3,steps=5,
+def visualise_gmm_marg_2D_density_gmr(ax,gmm,min_factor=.5,max_factor=3,steps=5,
                                       colors=["r,g,b"]):
-    visualise_gmm_marg_2D_density(ax, gmr_gmm.means,gmr_gmm.covariances,gmr_gmm.priors,
-                                  gmr_gmm.random_state,min_factor,max_factor,steps,
-                                  colors=colors)
+    visualise_gmm_marg_2D_density(ax, *gmm.get_params(),
+                                  min_factor,max_factor,steps,colors=colors)
 #TODO check dimensionality
-def visualise_gmm_marg_2D_density(ax,gmm_means,gmm_cov,gmm_weights,random_state=None,
+def visualise_gmm_marg_2D_density(ax,gmm_weights,gmm_means,gmm_cov,
                                   min_factor=.5,max_factor=3,steps=5, colors=["r,g,b"]):
-    gmm=GMM(len(gmm_weights),gmm_weights,gmm_means,gmm_cov,random_state)
+    gmm=GMM(len(gmm_weights),gmm_weights,gmm_means,gmm_cov)
     from matplotlib.patches import Ellipse
     from itertools import cycle
     if colors is not None:

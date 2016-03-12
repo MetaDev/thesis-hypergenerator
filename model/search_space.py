@@ -89,7 +89,6 @@ class DeterministicVariable(Variable):
     def sample(self, parent_sample):
         return self._value
 
-#TODO change name in Variable utility,  add factory method for creating vector vars
 class VectorVariableUtility():
     #using the naming convention of a vector variable p1, p2,...
     #to extract a vector variable in its correct order from the flattened dict of variable values

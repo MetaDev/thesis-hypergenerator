@@ -1,9 +1,5 @@
 
-test gmm1 test with pomegranate
-
-
-test decay for MO
-initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
+test new GMM class on N children, with and without marginalising
 
 refactor search space such that children can be made dependent on children
 ordering of children-> node should possibly have multiple parents but (dag, check for this)
@@ -12,6 +8,16 @@ ordering of children-> node should possibly have multiple parents but (dag, chec
 ->when sampling (2,5) number of children and 3 is calculated only send data to 3 out of children
 ->connect every node to an ouput node where all generated samples are captured
 
+mail pomegranate about conversion between sklearn and pmgr
+
+work with fixed shape and variable shape layout nodes
+the shape depends on the variables of the parent (don estimate as joint)
+
+initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
+use standard sk init for this, maybe only updating the covars and setting the means on a grid and weights uniform
+
+test decay for MO
+
 new fitness function
 learn to fit surface according to surface ratio in a polygon
 
@@ -19,6 +25,7 @@ find out why alignment is so hard to learn in gmm2
 plot fitness seperately, fitness func is maybe not correct, try to visualise it
 
 sampling should be possible in a grid for the first training step, refactor at the same time as to generate
+refactor with new gmm class
 
 
 in training utility, a method sould receive the samples, and the fitness function and return
@@ -39,7 +46,7 @@ use BIC to find optimal number of clusters
 
 normalise the data you train on [0,1]
 
-
+use pomegranate library
 
 id hyperparameters for over/underfitting
 
