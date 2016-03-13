@@ -75,13 +75,13 @@ class GMM:
 #            self._set_params_sk()
 
         self._set_params_gmr()
-
+    @staticmethod
     def _get_params_sk(gmm_sk):
         return gmm_sk.weights_, gmm_sk.means_,gmm_sk._get_covars()
-
+    @staticmethod
     def _get_params_gmr(gmm_gmr):
         return gmm_gmr.priors,gmm_gmr.means, gmm_gmr.covariances
-
+    @staticmethod
     def _get_params_pmgr(gmm_pmgr):
         means=[distr.mu for distr in gmm_pmgr.distributions]
         covars=[distr.cov for distr in gmm_pmgr.distributions]
@@ -122,10 +122,10 @@ class GMM:
                 mvn = gmr.MVN(mean=self.gmm_gmr.means[k], covariance=self.gmm_gmr.covariances[k],random_state=self.gmm_gmr.random_state)
                 mvn= mvn.marginalize(indices)
                 mvns.append(mvn)
-            means=np.array([self.gmm_gmr.mean for mvn in mvns])
-            covariances=np.array([self.gmm_gmr.covariance for mvn in mvns])
+            means=np.array([mvn.mean for mvn in mvns])
+            covariances=np.array([mvn.covariance for mvn in mvns])
             #return a GMM of this class
-            return GMM(weights=self.weights,means=means,covariances=covariances,
+            return GMM(weights=self._weights,means=means,covariances=covariances,
                        random_state= self.random_state)
 
 #TODO add visualisation

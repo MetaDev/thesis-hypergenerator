@@ -9,7 +9,6 @@ import model.mapping as mp
 import util.visualisation as vis
 import util.utility as ut
 import model.fitness as fn
-import learning.learning_utility as lut
 
 import numpy as np
 
@@ -17,8 +16,6 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import scipy.stats as ss
 
-from model.search_space import VectorVariableUtility
-from sklearn import mixture
 
 from util import setting_values
 import matplotlib.cm as cm
@@ -74,7 +71,7 @@ def feauture_fitness_child_child(root,child_child_fitness_funcs,parent_child_fit
         data0.append(np.hstack((child0_vars,parent_Y_vars)).flatten())
         data1.append(np.hstack((child1_vars,child0_vars,parent_Y_vars)).flatten())
         fitness_sum0= sum([f(child1,root)**32 for f in  parent_child_fitness_funcs])
-        fitness_sum1= sum([f(child1,child0) for f in  child_child_fitness_funcs]) * sum([f(child1,root)**32 for f in  parent_child_fitness_funcs])
+        fitness_sum1= sum([f(child1,child0) for f in  child_child_fitness_funcs]) * sum([f(child1,root)**32 for f in  parent_child_fitness_funcs]) * sum([f(child0,root)**32 for f in  parent_child_fitness_funcs])
 
         fitness0.append(fitness_sum0)
         fitness1.append(fitness_sum1)
@@ -104,33 +101,27 @@ child0_x,child0_y,shape_x,shape_y=zip(*data0)
 n_components=10
 #both full and tied covariance work
 #but tied prevents overfitting but is worse to find conditional estimatation of sharp corners
-gmm0 = lut.GMM_weighted(n_components=n_components, covariance_type='full',min_covar=0.01,random_state=setting_values.random_state)
-gmm0.weighted_fit(data0,fitness_values0)
 
-gmm1 = lut.GMM_weighted(n_components=n_components, covariance_type='full',min_covar=0.01,random_state=setting_values.random_state)
-gmm1.weighted_fit(data1,fitness_values1)
+data0, fitness_values0= zip(*[(d,f) for d,f in zip(data0,fitness_values0) if f>0.3])
+
+data1, fitness_values1= zip(*[(d,f) for d,f in zip(data1,fitness_values1) if f>0.3])
+
+gmm0 = GMM(n_components=n_components)
+gmm0.fit(data0,fitness_values0,min_covar=0.01)
+
+gmm1 = GMM(n_components=n_components,random_state=setting_values.random_state)
+gmm1.fit(data1,fitness_values1,min_covar=0.01)
 
 
 #
 #gmm= mixture.GMM(n_components=n_components, covariance_type='full',min_covar=0.01,random_state=setting_values.random_state)
 #gmm.fit(data)
 #convert grm GMM
-gmm0 = GMM(n_components=len(gmm0.weights_), priors=gmm0.weights_, means=gmm0.means_, covariances=gmm0._get_covars(), random_state=setting_values.random_state)
 
-gmm1 = GMM(n_components=len(gmm1.weights_), priors=gmm1.weights_, means=gmm1.means_, covariances=gmm1._get_covars(), random_state=setting_values.random_state)
-from gmr import MVN
-def marginalise_gmm(gmm,indices):
-    mvns=[]
-    for k in range(len(gmm.means)):
-        mvn = MVN(mean=gmm.means[k], covariance=gmm.covariances[k],random_state=gmm.random_state)
-        mvn= mvn.marginalize(indices)
-        mvns.append(mvn)
-    means=np.array([mvn.mean for mvn in mvns])
-    covariances=np.array([mvn.covariance for mvn in mvns])
-    return GMM(gmm.n_components,gmm.priors,means,covariances,gmm.random_state)
-test_gmm0 = marginalise_gmm(gmm1,[2,3,4,5])
 
-print(test_gmm0.means,gmm0.means)
+test_gmm0 = gmm1.marginalise([2,3,4,5])
+
+print(test_gmm0._means-gmm0._means)
 
 gmm0=test_gmm0
 parent_position=np.array([1,2])
@@ -170,9 +161,9 @@ for p in values:
         ax.set_ylim(*yrange)
 
         #still need to deterministically determine position
-        gmm_cond.means=[list(map(add, c, np.array(parent_position))) for c in gmm_cond.means]
-
+        gmm_cond._means=[list(map(add, c, np.array(parent_position))) for c in gmm_cond._means]
+        gmm_cond._set_gmms()
         #plot marginal to express expressiveness
-        vis.visualise_gmm_marg_2D_density_gmr(ax,gmm_cond,colors=["g"])
+        vis.visualise_gmm_marg_2D_density(ax,gmm_cond,colors=["g"])
         plt.show()
 # -*- coding: utf-8 -*-

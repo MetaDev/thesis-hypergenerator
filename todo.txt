@@ -1,5 +1,10 @@
 
 test new GMM class on N children, with and without marginalising
+compare with and without marginilasing
+
+it could be that marginalising degrades the result, thus the joint could be partitioned
+each part would be calculated directly and marginalised to get all children
+e.g. 7 children, train on 3, 5,7 ->get 1,2 from marginalising 3; get 4 from marg 5 and 6 from marg 7
 
 refactor search space such that children can be made dependent on children
 ordering of children-> node should possibly have multiple parents but (dag, check for this)
@@ -8,35 +13,21 @@ ordering of children-> node should possibly have multiple parents but (dag, chec
 ->when sampling (2,5) number of children and 3 is calculated only send data to 3 out of children
 ->connect every node to an ouput node where all generated samples are captured
 
-mail pomegranate about conversion between sklearn and pmgr
-
-work with fixed shape and variable shape layout nodes
-the shape depends on the variables of the parent (don estimate as joint)
-
+stochastic grid sampling
 initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
 use standard sk init for this, maybe only updating the covars and setting the means on a grid and weights uniform
 
-test decay for MO
-
 new fitness function
+
 learn to fit surface according to surface ratio in a polygon
 
 find out why alignment is so hard to learn in gmm2
 plot fitness seperately, fitness func is maybe not correct, try to visualise it
 
-sampling should be possible in a grid for the first training step, refactor at the same time as to generate
-refactor with new gmm class
-
-
 in training utility, a method sould receive the samples, and the fitness function and return
 the fitness values and according data used to calculate it
 also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
 
-rename learning utility as GMM extension
-
-apply affine transformation on gmm, to make gmm models more reusable see https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Marginal_distributions
-->this means that all training of variables can be done within a unit cube, only training on the relative
-relation between parent and child. And afterwards the affine transformation of (pos,rot,size) of the parent can be applied on the same gmm without having to recalulate it
 
 learning optimisation
 -------------------------
@@ -44,7 +35,7 @@ use feature extraction to optmize learning, but each feature should be able to b
 
 use BIC to find optimal number of clusters
 
-normalise the data you train on [0,1]
+normalise the data you train on [0,1] -> use affine transform of the search space
 
 use pomegranate library
 
@@ -97,6 +88,8 @@ deterministic/stochastic sampling with stochastic mesh grid tree search
 visualisation optimisation
 ----------------------------------------
 
+calculate the surface difference between search space (rectangle) and a 99% confidence interval ellips
+
 visualise search space of a variable, a rectangle or line for unifrom and ellipses or normal for gmm
 add a method to the search space to visualise any variable by name
 
@@ -111,6 +104,15 @@ to visualise as a way to show expressive range
 
 generator additional features
 -------------------------
+
+work with fixed shape and variable shape layout nodes
+the shape depends on the variables of the parent (don estimate as joint)
+the shape is a child of the node
+->this is interesting for training rooms, or tables that can vary in size
+
+apply affine transformation on gmm, to make gmm models more reusable see https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Marginal_distributions
+->this means that all training of variables can be done within a unit cube, only training on the relative
+relation between parent and child. And afterwards the affine transformation of (pos,rot,size) of the parent can be applied on the same gmm without having to recalulate it
 
 make it possible to "freeze' a stochastic variable at a certain position
 
@@ -153,6 +155,11 @@ evaluation
 ------------------
 influence of model prior (hierachical relations) on learning and fitness (hierachical relations)
 compare learning performance with and withour hierarchical relations (additive for pos and rot and scale for size)
+
+this could be done by modelling search space hierachically: parent-> children
+and flat parent,children and defining a parent->child relation functionaly e.g. by distance
+->closest 5 chairs to table are his children
+afterwards compare expressiveness, learning convergence,..
 
 
 

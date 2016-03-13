@@ -81,19 +81,15 @@ def visualise_gmm_marg_1D_density(ax,marg_index,gmm_weights,gmm_means,gmm_cov,
     ax.plot(x, density)
     ax.plot(x,y,color="r")
 #same as above but for GMM from the gmr package
-def visualise_gmm_marg_density_1D_gmr(ax,marg_index,gmm,factor=3,verbose=False):
+def visualise_gmm_marg_density_1D_GMM(ax,marg_index,gmm,factor=3,verbose=False):
     visualise_gmm_marg_1D_density(ax,marg_index,*gmm.get_params(),
                                  factor,verbose)
 #to visualise the density of 2 dimensional data
 #respect covariance between the data
-def visualise_gmm_marg_2D_density_gmr(ax,gmm,min_factor=.5,max_factor=3,steps=5,
-                                      colors=["r,g,b"]):
-    visualise_gmm_marg_2D_density(ax, *gmm.get_params(),
-                                  min_factor,max_factor,steps,colors=colors)
+
 #TODO check dimensionality
-def visualise_gmm_marg_2D_density(ax,gmm_weights,gmm_means,gmm_cov,
-                                  min_factor=.5,max_factor=3,steps=5, colors=["r,g,b"]):
-    gmm=GMM(len(gmm_weights),gmm_weights,gmm_means,gmm_cov)
+def visualise_gmm_marg_2D_density(ax,gmm,
+                                  min_factor=.5,max_factor=3,steps=5, colors=["r","g","b"]):
     from matplotlib.patches import Ellipse
     from itertools import cycle
     if colors is not None:
@@ -102,7 +98,7 @@ def visualise_gmm_marg_2D_density(ax,gmm_weights,gmm_means,gmm_cov,
     max_alpha=0.8
 
     for factor in np.linspace(min_factor, max_factor, steps):
-        for (mean, (angle, width, height)),weight in zip(gmm.to_ellipses(factor),gmm_weights):
+        for (mean, (angle, width, height)),weight in zip(gmm.gmm_gmr.to_ellipses(factor),gmm._weights):
             ell = Ellipse(xy=mean, width=width, height=height,
                           angle=np.degrees(angle))
             ell.set_alpha((max_alpha-min_alpha)*weight)

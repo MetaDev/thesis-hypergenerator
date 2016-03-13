@@ -37,8 +37,9 @@ class GMM(mixture.gmm.GMM):
             """
             if not Xweights:
                 return self.fit(X)
-            #normalise the weights between [0,1]
-            Xweights=(np.array(Xweights)-np.min(Xweights))/(np.max(Xweights)-np.min(Xweights))
+            #check the weights between [0,1]
+            if np.min(Xweights)<0 or np.max(Xweights)>1:
+                raise ValueError("The sample weights should be in the interval [0,1]")
             # initialization step
             X = check_array(X, dtype=np.float64, ensure_min_samples=2,
                             estimator=self)

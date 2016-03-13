@@ -231,10 +231,10 @@ class MarkovTreeNode:
              warnings.warn("The variable "+ var.name + "assigned to " + name+ " is packed, possibly used to sample multiple variables",RuntimeWarning)
         return var
 
-    def get_child_node(self,name):
+    def get_child(self,name):
         for child in self.children:
             if child[1].name==name:
-                return child[1]
+                return child
 
     #sample a layout object and its children
     def sample(self,parent_sample=None,index=0,sample_list=None):
