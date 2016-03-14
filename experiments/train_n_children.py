@@ -52,7 +52,7 @@ ndata=500
 data=[]
 fitness_values=[]
 #n_children=model_root.get_child("child")[0].sample(None)
-n_children=2
+n_children=3
 #get size of vars
 X_var_length=np.sum([model_root.get_child("child")[1].get_variable(name).size for name in X_var_names])
 Y_var_length=np.sum([model_root.get_variable(name).size for name in Y_var_names])
@@ -67,27 +67,28 @@ def feauture_fitness_child_child(root,child_child_fitness_funcs,parent_child_fit
     #only get children of a certain name
 
     data=[]
-
-    children = root.get_children("child")[:n_children]
-
+    fitness=[]
     parent_Y_vars=[root.independent_vars[name] for name in Y_var_names]
-    child_vars=[]
-    fitness_prod=1
+    for children in combinations(root.get_children("child"),n_children):
 
-    #calculate fitness of each child to parent
-    #TODO watch out for the order of children
-    for child in children:
-        child_vars.extend([child.independent_vars[name] for name in X_var_names])
-        fitness_prod*=sum([f(child,root)**32 for f in  parent_child_fitness_funcs])
-    #the independent variable is
-    child_vars=np.array(child_vars).flatten()
-    parent_Y_vars=np.array(parent_Y_vars).flatten()
-    data.append(np.hstack((child_vars,parent_Y_vars)))
+        child_vars=[]
+        fitness_prod=1
 
-    #calculate pairwise fitness between children
-    for child0,child1 in combinations(children,2):
-        fitness_prod*= sum([f(child0,child1) for f in  child_child_fitness_funcs])
-    return data,fitness_prod
+        #calculate fitness of each child to parent
+        for child in children:
+            child_vars.extend([child.independent_vars[name] for name in X_var_names])
+            fitness_prod*=sum([f(child,root)**32 for f in  parent_child_fitness_funcs])
+        #the independent variable is
+        child_vars=np.array(child_vars).flatten()
+        parent_Y_vars=np.array(parent_Y_vars).flatten()
+        data.append(np.hstack((child_vars,parent_Y_vars)))
+
+        #calculate pairwise fitness between children
+        for child0,child1 in combinations(children,2):
+            fitness_prod*= sum([f(child0,child1)**2 for f in  child_child_fitness_funcs])
+
+        fitness.append(fitness_prod)
+    return data,fitness
 
 
 
@@ -98,68 +99,74 @@ for i in range(ndata):
                                                                parent_child_fitness_funcs,
                                                                X_var_names,Y_var_names)
     data.extend(s_data)
-    fitness_values.append(s_fitness)
+    fitness_values.extend(s_fitness)
 
 
 #cap the data
 
-capped_data, capped_fitness= zip(*[(d,f) for d,f in zip(data,fitness_values) if f>0.3])
+data, fitness_values= zip(*[(d,f) for d,f in zip(data,fitness_values) if f>0.3])
 
-print(len(capped_data),len(capped_fitness))
-vis.print_fitness_statistics(capped_fitness)
-data=capped_data
-fitness_values=capped_fitness
-n_components=10
+
+#vis.print_fitness_statistics(fitness_values)
+
+n_components=15
 
 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
 gmm.fit(data,fitness_values,min_covar=0.01)
 
 gmms=[None]*n_children
+gmms[n_children-1]=gmm
 #marginalise for each child
 #P(c_n,c_n-1,..,c0,p)->P(c_i,c_i+1,..,c_0,p)
-for i in range(n_children):
+for i in range(n_children-1):
     indices=np.arange((n_children-(i+1))*X_var_length,n_children*X_var_length+Y_var_length)
     print(indices)
     gmms[i]=gmm.marginalise(indices)
 
-#plot marginal for each child
-#plot up to 2 dimensions
-for i in range(n_children):
-    print(i)
-    ax = plt.gca()
-    ax.set_aspect(1)
-    vis.visualise_gmm_marg_2D_density(ax,gmm=gmms[i].marginalise([0,1]),colors=["g"])
-    plt.show()
+(xrange,yrange)=((-2,2),(-2,2))
 
 parent_position=np.array([1,2])
 
-(xrange,yrange)=((-1,3),(0,4))
+(xrange,yrange)=((-2,4),(-1,5))
+p_shape_points=[0.5,1,1.5]
+for p_shape in zip(p_shape_points,p_shape_points):
+    shape=[(0, 0), (0, 1),(0.5,1),p_shape,(1, 0.5),(1,0)]
 
-values=[0.5,1,1.5]
-parent_shape=[1,1]
-shape=[(0, 0), (0, 1),(0.5,1),parent_shape,(1, 0.5),(1,0)]
-polygon = mp.map_to_polygon(shape,[0.5,0.5],parent_position,0,(1,1))
+    polygon = mp.map_to_polygon(shape,[0.5,0.5],parent_position,0,(1,1))
 
-previous_gmm_cond=None
-values=parent_shape
-#visualise the conditional distribution of children
-#P(c_i,c_i-1,..,c_0,p) -> P(c_i|c_i-1,..,c_0,p)
-for i in range(n_children):
-    print(i)
-    indices=np.arange((i+1)*X_var_length,(i+1)*X_var_length+Y_var_length)
-    if previous_gmm_cond:
-        values=previous_gmm_cond.sample(1) + values
-    values=np.array(values).flatten()
-    gmm_cond=gmms[i].condition(indices,values)
-    previous_gmm_cond=gmm_cond
+    previous_gmm_cond=None
+    from copy import deepcopy
+    #visualise the conditional distribution of children
+    #P(c_i,c_i-1,..,c_0,p) -> P(c_i|c_i-1,..,c_0,p)
+    values=p_shape
+    points=[]
+    for i in range(0,n_children):
 
-    ax = plt.gca()
-    ax.set_aspect(1)
-    gmm_show=gmm_cond.marginalise([0,1])
-    gmm_show._means=[list(map(add, c, np.array(parent_position))) for c in gmm_show._means]
-    gmm_show._set_gmms()
-    vis.visualise_gmm_marg_2D_density(ax,gmm=gmm_show,colors=["g"])
+        ax = plt.gca()
+        ax.set_aspect(1)
+        ax.set_xlim(*xrange)
+        ax.set_ylim(*yrange)
+        print("child: ",i)
+        indices=np.arange(X_var_length,(i+1)*X_var_length+Y_var_length)
 
-    vis.draw_polygons(ax,[polygon])
-    plt.show()
+        if previous_gmm_cond:
+            sample=np.array(previous_gmm_cond.sample(1)).flatten()
+            values=np.hstack((np.array(sample),np.array(values)))
+            point= np.array(sample) + np.array(parent_position)
+            points.append(point)
+            x,y=zip(*points)
+            ax.scatter(x,y,color="r")
+
+        values=np.array(values).flatten()
+        print(indices,values)
+        gmm_cond=gmms[i].condition(indices,values)
+        previous_gmm_cond=gmm_cond
+
+        gmm_show=deepcopy(gmm_cond)
+        gmm_show._means=[list(map(add, c, np.array(parent_position))) for c in gmm_show._means]
+        gmm_show._set_gmms()
+        vis.visualise_gmm_marg_2D_density(ax,gmm=gmm_show,colors=["g"])
+
+        vis.draw_polygons(ax,[polygon])
+        plt.show()
 

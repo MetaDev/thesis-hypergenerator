@@ -94,14 +94,14 @@ def visualise_gmm_marg_2D_density(ax,gmm,
     from itertools import cycle
     if colors is not None:
         colors = cycle(colors)
-    min_alpha=0.5
-    max_alpha=0.8
+    min_alpha=0.03
+    max_alpha=0.4
 
     for factor in np.linspace(min_factor, max_factor, steps):
         for (mean, (angle, width, height)),weight in zip(gmm.gmm_gmr.to_ellipses(factor),gmm._weights):
             ell = Ellipse(xy=mean, width=width, height=height,
                           angle=np.degrees(angle))
-            ell.set_alpha((max_alpha-min_alpha)*weight)
+            ell.set_alpha(min_alpha+(max_alpha-min_alpha)*weight)
             if colors is not None:
                 ell.set_color(next(colors))
             ax.add_artist(ell)

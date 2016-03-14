@@ -59,21 +59,21 @@ def feauture_fitness_child_child(root,child_child_fitness_funcs,parent_child_fit
     data0=[]
     fitness1=[]
     data1=[]
-
     #add a pair in both ways to the data child1->child0 and child0 ->child1
     for pair in combinations(root.get_children("child"),2):
         child0=pair[0]
         child1=pair[1]
+        child_vars=[]
         parent_Y_vars=[root.independent_vars[name] for name in Y_var_names]
         child0_vars=[child0.independent_vars[name] for name in X_var_names]
         child1_vars=[child1.independent_vars[name] for name in X_var_names]
         #the independent variable is
-        data0.append(np.hstack((child0_vars,parent_Y_vars)).flatten())
-        data1.append(np.hstack((child1_vars,child0_vars,parent_Y_vars)).flatten())
-        fitness_sum0= sum([f(child1,root)**32 for f in  parent_child_fitness_funcs])
+#        data0.append(np.hstack((child0_vars,parent_Y_vars)).flatten())
+        data1.append(np.hstack((child0_vars,child1_vars,parent_Y_vars)).flatten())
+#        fitness_sum0= sum([f(child1,root)**32 for f in  parent_child_fitness_funcs])
         fitness_sum1= sum([f(child1,child0) for f in  child_child_fitness_funcs]) * sum([f(child1,root)**32 for f in  parent_child_fitness_funcs]) * sum([f(child0,root)**32 for f in  parent_child_fitness_funcs])
 
-        fitness0.append(fitness_sum0)
+#        fitness0.append(fitness_sum0)
         fitness1.append(fitness_sum1)
     return data0,data1,fitness0,fitness1
 
@@ -85,14 +85,14 @@ for i in range(ndata):
                                                                child_child_fitness_funcs,
                                                                parent_child_fitness_funcs,
                                                                X_var_names,Y_var_names)
-    data0.extend(s_data0)
+#    data0.extend(s_data0)
     data1.extend(s_data1)
-    fitness_values0.extend(s_fitness0)
+#    fitness_values0.extend(s_fitness0)
     fitness_values1.extend(s_fitness1)
 
-#vis.print_fitness_statistics(fitness_values)
+vis.print_fitness_statistics(fitness_values1)
 
-child0_x,child0_y,shape_x,shape_y=zip(*data0)
+child0_x,child0_y,_,_,shape_x,shape_y=zip(*data1)
 
 #plt.scatter(child1_x,child1_y,c=fitness_values,cmap=cm.Blues)
 #plt.colorbar()
@@ -102,13 +102,13 @@ n_components=10
 #both full and tied covariance work
 #but tied prevents overfitting but is worse to find conditional estimatation of sharp corners
 
-data0, fitness_values0= zip(*[(d,f) for d,f in zip(data0,fitness_values0) if f>0.3])
+#data0, fitness_values0= zip(*[(d,f) for d,f in zip(data0,fitness_values0) if f>0.3])
 
 data1, fitness_values1= zip(*[(d,f) for d,f in zip(data1,fitness_values1) if f>0.3])
-
-gmm0 = GMM(n_components=n_components)
-gmm0.fit(data0,fitness_values0,min_covar=0.01)
-
+#
+#gmm0 = GMM(n_components=n_components)
+#gmm0.fit(data0,fitness_values0,min_covar=0.01)
+print(len(data1),len(fitness_values1))
 gmm1 = GMM(n_components=n_components,random_state=setting_values.random_state)
 gmm1.fit(data1,fitness_values1,min_covar=0.01)
 
@@ -119,15 +119,12 @@ gmm1.fit(data1,fitness_values1,min_covar=0.01)
 #convert grm GMM
 
 
-test_gmm0 = gmm1.marginalise([2,3,4,5])
+gmm0 = gmm1.marginalise([2,3,4,5])
 
-print(test_gmm0._means-gmm0._means)
+(xrange,yrange)=((-2,4),(-1,5))
 
-gmm0=test_gmm0
 parent_position=np.array([1,2])
-x= np.array(child0_x)+parent_position[0]
-y=np.array(child0_y)+parent_position[1]
-(xrange,yrange)=((min(x),max(x)),(min(y),max(y)))
+
 
 values=[0.5,1,1.5]
 for p in values:
