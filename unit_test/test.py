@@ -56,7 +56,8 @@ class End_Of_Sampling(Observer):
             print(i)
 #wait for oncomplete or error
 root.subscribe(rc)
-test = root.to_blocking().subscribe(print)
+t=[]
+test = root.subscribe(t.append)
 #leaves.ignore_elements().subscribe(End_Of_Sampling(rc))
 #when sampling is called the values are calculated
 for i in range(n_samples):
@@ -64,7 +65,7 @@ for i in range(n_samples):
     root.on_next(i)
 
 #do the training in this subscription
-#leaves.ignore_elements().subscribe(print(rc.roots))
+leaves.ignore_elements().subscribe(print(t))
 
 
 #
