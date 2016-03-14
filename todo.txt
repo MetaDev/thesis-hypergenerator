@@ -1,10 +1,13 @@
+implement sibling conditionaliity in search space, together with sample(n)
 
-test new GMM class on N children, with and without marginalising
-compare with and without marginilasing
 
 it could be that marginalising degrades the result, thus the joint could be partitioned
 each part would be calculated directly and marginalised to get all children
 e.g. 7 children, train on 3, 5,7 ->get 1,2 from marginalising 3; get 4 from marg 5 and 6 from marg 7
+
+implement the training for this by using an array that defines the order of sibling relations e.g. [1,1,2]
+which means that child 1 and 2 depend on their predecessor respectively child0 and child1 and child 3 on 2 predecessors (child2 and child1)
+the predecessors define both the data and the fitness values
 
 refactor search space such that children can be made dependent on children
 ordering of children-> node should possibly have multiple parents but (dag, check for this)
@@ -31,6 +34,8 @@ also an argument for fitness threshold, fitness target and whether you're lookin
 
 learning optimisation
 -------------------------
+allow training with tied covariance for the gmm, this should be reset to full after training because gmr doesnt support tied
+
 use feature extraction to optmize learning, but each feature should be able to be reconverted
 
 use BIC to find optimal number of clusters
@@ -160,6 +165,14 @@ this could be done by modelling search space hierachically: parent-> children
 and flat parent,children and defining a parent->child relation functionaly e.g. by distance
 ->closest 5 chairs to table are his children
 afterwards compare expressiveness, learning convergence,..
+
+compare sibling learning between seperate models and full joint with marganilising
+seperate models for P(c1|c0,p), P(c2|c1,c0,p),... or one model for P(c0,c1,c2,..|p) and marginilise out
+
+compare joint learning parent->child child->child with seperate learning
+seperate model for P(c|p) , P(c1|c0),p(c2|c1,c0),... and assume independende between distributions
+thus we get P(c1|c0,p)=P(c1,c0,p)/p(c0,p)=(P(c1|c0)*P(c0|p))/P(c0,p)
+or a single model P(c1|c0,p)
 
 
 
