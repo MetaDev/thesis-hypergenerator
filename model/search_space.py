@@ -15,6 +15,11 @@ from operator import itemgetter
 from itertools import chain
 import warnings
 
+import rx
+from rx import Observable, Observer
+from itertools import combinations
+from rx.subjects import Subject
+
 class Variable():
     #name can be either a string or a list of string
     #size is an int that defines the size of the variable
@@ -24,13 +29,15 @@ class Variable():
         self.parent_vars_name=None
         self.unpack=False
         self.set_func(func)
-    def sample(self, parent_sample):
+    #these samples are for conditional relations
+    def sample(self, parent_sample,sibling_sample):
         pass
     def set_func(self,func):
         self.func=func
         if func:
             self.parent_vars_name=func.__code__.co_varnames[1:]
     #the last boolean is to indicate whether the returned value needs to be unpacked
+    #this passed sample is a data-flow or functional relation
     def relative_sample(self,sample,parent_sample):
         #if there is a function and the parent has the required attributes
         #todo check this with exceptions
@@ -67,7 +74,7 @@ class StochasticVariable(Variable):
         else:
             raise ValueError("Either the distribution or the choices have to be set.")
 
-    def sample(self,parent_sample):
+    def sample(self,parent_sample,sibling_sample):
         if hasattr(self,"choices"):
             return np.random.choice(self.choices,size=self.size)
         else:
@@ -75,7 +82,6 @@ class StochasticVariable(Variable):
 
     def stochastic(self):
         return True
-
 
 
 
@@ -151,7 +157,7 @@ class GMMVariable(StochasticVariable):
     #values on which is trained of course
 
     #group the values according the vector structure of the search space (given by dummy variables)
-    def sample(self, parent_sample):
+    def sample(self, parent_sample,sibling_sample):
         #flatten list for calculation of cond distr
         Y_values=np.array([parent_sample.independent_vars[var.name] for var in self.Y_vars]).flatten()
         #the last X are cond attributes
@@ -171,7 +177,7 @@ class MarkovTreeNode:
 
 
         #parent_sample: NodeSample
-        def __init__(self,node,index:int,parent_sample):
+        def __init__(self,node,index:int,parent_sample,sibling_samples):
             #necessary to be able to retrieve stochastic vars
             #properties are saved independent from the parent, for later use of its values in machine learning
             self.name=node.name
@@ -237,9 +243,9 @@ class MarkovTreeNode:
                 return child
 
     #sample a layout object and its children
-    def sample(self,parent_sample=None,index=0,sample_list=None):
+    def sample(self,index=0,parent_sample=None,sibling_samples=None,sample_list=None):
         #create  sample
-        sample = MarkovTreeNode.NodeSample(self,index,parent_sample=parent_sample)
+        sample = MarkovTreeNode.NodeSample(self,index,parent_sample=parent_sample,sibling_samples=sibling_samples)
         if sample_list != None:
             sample_list.append(sample)
         for n_var,child_node in self.children:
@@ -248,7 +254,8 @@ class MarkovTreeNode:
                 n_children=n_var.sample(parent_sample)
                 for i in range(n_children):
                     #sample child object given parent sample
-                    child_samples.append(child_node.sample(sample,i,sample_list))
+                    #and previous siblings
+                    child_samples.append(child_node.sample(i,sample,child_samples,sample_list))
                 sample.add_children(child_samples)
         return sample
 

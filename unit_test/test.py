@@ -8,64 +8,7 @@ import model.test_models as tm
 from shapely.geometry import *
 import numpy as np
 import numpy.linalg as la
-import rx
-from rx import Observable, Observer
-from itertools import combinations
-from rx.subjects import Subject
 
-#create class that generates 100 random values and X subscribers that print it
-#create on "larger" observer that collects all emitted data
-
-#root is a subject
-
-root = Subject()
-class Root_collector(Observer):
-    def __init__(self):
-        self.roots=[]
-    def on_next(self,x):
-        self.roots.append(x)
-    def on_error(self, e):
-        print("Got error: %s" % e)
-
-    def on_completed(self):
-        pass
-rc=Root_collector()
-n_children=5
-n_samples=20
-#first subscribe all it's children, filter out the amount of children
-
-#merge all leaf children(no children of their own) in a single observer to check when completed
-
-leaves=Observable.empty()
-for i in range(7):
-    child= root.filter(
-        lambda x, i: i<n_children
-    ).map(
-        lambda x, i: x * 2
-    )
-    leaves=leaves.merge(child)
-class End_Of_Sampling(Observer):
-    def __init__(self,root_collector):
-        self.rc=root_collector
-    def on_error(self, e):
-        print("Got error: %s" % e)
-
-    def on_completed(self):
-        print("start training")
-        for i in self.rc.roots:
-            print(i)
-#wait for oncomplete or error
-root.subscribe(rc)
-t=[]
-test = root.subscribe(t.append)
-#leaves.ignore_elements().subscribe(End_Of_Sampling(rc))
-#when sampling is called the values are calculated
-for i in range(n_samples):
-    #pass parent sample in onnext
-    root.on_next(i)
-
-#do the training in this subscription
-leaves.ignore_elements().subscribe(print(t))
 
 
 #
