@@ -1,5 +1,11 @@
-implement sibling conditionaliity in search space, together with sample(n)
+refactor gmm variable to work with siblings
 
+stochastic number of children bug
+set method for set_learned variables in sample node
+
+implement sibling conditionaliity in search space, together with sample(n)
+->make it possible to swap learned distr with order of conditionality
+->apply some metrics
 
 it could be that marginalising degrades the result, thus the joint could be partitioned
 each part would be calculated directly and marginalised to get all children
@@ -9,14 +15,13 @@ implement the training for this by using an array that defines the order of sibl
 which means that child 1 and 2 depend on their predecessor respectively child0 and child1 and child 3 on 2 predecessors (child2 and child1)
 the predecessors define both the data and the fitness values
 
-refactor search space such that children can be made dependent on children
-ordering of children-> node should possibly have multiple parents but (dag, check for this)
-->use reactive programming, which makes it an data flow graph,
-->make it possible to generate n samples, by creating a tree where each parent has max N_children subscriber nodes
-->when sampling (2,5) number of children and 3 is calculated only send data to 3 out of children
-->connect every node to an ouput node where all generated samples are captured
 
-stochastic grid sampling
+research question: How to intelligently reduce the search space of procedural content generator using top-down and bottom-up constraints without negatively impacting expressiveness?
+
+
+stochastic grid sampling-> grid should stay unifrom to avoid clustering
+this means that sampling needs to define the number of samples desired
+this will define the resolution of the grid, implement for stochastic var
 initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
 use standard sk init for this, maybe only updating the covars and setting the means on a grid and weights uniform
 
@@ -34,6 +39,11 @@ also an argument for fitness threshold, fitness target and whether you're lookin
 
 learning optimisation
 -------------------------
+instead of modelling the curve fitting using density estimation (extra likelihood layer), I could do regression on the fitness
+p(p,c0,c1,...ck,f)-> integral (f^1_lowerthreshold)(p(ck|p,c0,...,f))
+and integrate (http://docs.scipy.org/doc/scipy/reference/tutorial/integrate.html)
+this even supports multi variable fitness, thus we could define the fitness as a joint distribution
+
 allow training with tied covariance for the gmm, this should be reset to full after training because gmr doesnt support tied
 
 use feature extraction to optmize learning, but each feature should be able to be reconverted
@@ -75,6 +85,15 @@ train gaussian mixture using pomegranate (mixture of multivariate gaussian) (add
 sampling optimisation
 ----------------------------
 
+remove deterministic affine transformation chain from the nodesample class,
+just sample the nodes and use the original node to calculate the relative values needed for the mapping
+
+convert to more functional structure using rx, see rx_test
+->use reactive programming, which makes it an data flow graph,
+->make it possible to generate n samples, by creating a tree where each parent has max N_children subscriber nodes
+->when sampling (2,5) number of children and 3 is calculated only send data to 3 out of children
+->connect every node to an ouput node where all generated samples are captured
+
 sample in batches using buffer of rx and train on each seperate buffer, afterwards evaluate each trained model
 on average fitness and expressiveness
 
@@ -112,6 +131,8 @@ to visualise as a way to show expressive range
 
 generator additional features
 -------------------------
+
+implicit child->parent relation given by distance metric
 
 work with fixed shape and variable shape layout nodes
 the shape depends on the variables of the parent (don estimate as joint)
@@ -169,6 +190,11 @@ and flat parent,children and defining a parent->child relation functionaly e.g. 
 ->closest 5 chairs to table are his children
 afterwards compare expressiveness, learning convergence,..
 
+a good example would be a long search space for a forest where there needs to be a path between the trees
+dividing this stroke in smaller substrokes is unintuitive for the user and will affect the results expressivens
+using the implicit parent child relation would be more intuitive than explicit search space definition in this stroke
+or when the user doesn't know what the search space will look like.
+
 compare sibling learning between seperate models and full joint with marganilising
 seperate models for P(c1|c0,p), P(c2|c1,c0,p),... or one model for P(c0,c1,c2,..|p) and marginilise out
 
@@ -176,6 +202,12 @@ compare joint learning parent->child child->child with seperate learning
 seperate model for P(c|p) , P(c1|c0),p(c2|c1,c0),... and assume independende between distributions
 thus we get P(c1|c0,p)=P(c1,c0,p)/p(c0,p)=(P(c1|c0)*P(c0|p))/P(c0,p)
 or a single model P(c1|c0,p)
+
+expressiveness evaluaion: difference in surface between polygon and surface of gaussians
+likelihood of handmade examples in learned distribution
+
+the fitted gaussian mixture model can be evaluated by estimating the fitness of a point and plotting
+the MSE, a metric proposed in thesis about gmm regression
 
 
 

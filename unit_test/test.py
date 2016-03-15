@@ -12,38 +12,38 @@ import numpy.linalg as la
 
 
 #
-#root = tm.test_model_var_child_position_parent_shape()
-#
-#
+root = tm.test_model_var_child_position_parent_shape()
+root.sample()
+sample_list=root.get_flat_list()
+
 ##test poylygon mapping
-#sample_list=[]
-#sample_root=root.sample(sample_list=sample_list)
-#polygons = mp.map_layoutsamples_to_geometricobjects(sample_list,"shape")
+
+polygons = mp.map_layoutsamples_to_geometricobjects(sample_list,"shape")
 ##colors = ut.extract_samples_attributes(result,attr_name="color")
-#vis.init()
-#ax=vis.plt.gca()
-#(xrange,yrange) = ut.range_from_polygons(polygons,size=1.3)
-#step=ut.nr_of_steps_from_range(xrange,yrange,step_size=0.5)
-##
-#vis.draw_polygons(ax,polygons,set_range=False)
-##
-##test visualisation of search space mapping
-#graph = mp.map_polygons_to_neighbourhoud_graph(polygons,[xrange,yrange],step=step)
-##vis.draw_graph(ax,graph)
-#children =[v for v in sample_list if v.name.startswith("child")]
-#chairs = [polygons[i]  for i in range(len(sample_list)) if sample_list[i].name.startswith("child")]
-#table = [polygons[i]  for i in range(len(sample_list)) if sample_list[i].name.startswith("parent")][0]
-#chair_paths = fn.polygon_path_sequence(graph,chairs)
-##vis.draw_graph_path(ax,graph,chair_paths)
-##for child in chairs:
-##    print(child)
-##    print("alignment angle:",fn.pairwise_closest_line_alignment(child,table))
-#for childpair in combinations(children,2):
-#    print("dist",fn.pairwise_min_dist(childpair[0].independent_vars["position"],childpair[1].independent_vars["position"],2))
+vis.init()
+ax=vis.plt.gca()
+(xrange,yrange) = ut.range_from_polygons(polygons,size=1.3)
+step=ut.nr_of_steps_from_range(xrange,yrange,step_size=0.5)
 #
-#centroids=[np.array(p.centroid) for p in polygons]
-#points=ut.extract_samples_vars(sample_list,var_name="position",independent=False)
-#x,y=zip(*points)
-#ax.scatter(x,y,color="g")
-#ax.scatter(*zip(*centroids),color="r")
-#vis.plt.show()
+vis.draw_polygons(ax,polygons,set_range=False)
+#
+#test visualisation of search space mapping
+graph = mp.map_polygons_to_neighbourhoud_graph(polygons,[xrange,yrange],step=step)
+#vis.draw_graph(ax,graph)
+children =[v for v in sample_list if v.name.startswith("child")]
+chairs = [polygons[i]  for i in range(len(sample_list)) if sample_list[i].name.startswith("child")]
+table = [polygons[i]  for i in range(len(sample_list)) if sample_list[i].name.startswith("parent")][0]
+chair_paths = fn.polygon_path_sequence(graph,chairs)
+#vis.draw_graph_path(ax,graph,chair_paths)
+#for child in chairs:
+#    print(child)
+#    print("alignment angle:",fn.pairwise_closest_line_alignment(child,table))
+for childpair in combinations(children,2):
+    print("dist",fn.pairwise_min_dist(childpair[0].independent_vars["position"],childpair[1].independent_vars["position"],2))
+
+centroids=[np.array(p.centroid) for p in polygons]
+points=ut.extract_samples_vars(sample_list,var_name="position",independent=False)
+x,y=zip(*points)
+ax.scatter(x,y,color="g")
+ax.scatter(*zip(*centroids),color="r")
+vis.plt.show()
