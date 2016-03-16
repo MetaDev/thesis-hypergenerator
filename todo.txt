@@ -1,9 +1,10 @@
 refactor gmm variable to work with siblings
 
-stochastic number of children bug
+and factory method to visualise fitness functions
+
 set method for set_learned variables in sample node
 
-implement sibling conditionaliity in search space, together with sample(n)
+implement sibling conditionaliity in search space
 ->make it possible to swap learned distr with order of conditionality
 ->apply some metrics
 
@@ -15,9 +16,18 @@ implement the training for this by using an array that defines the order of sibl
 which means that child 1 and 2 depend on their predecessor respectively child0 and child1 and child 3 on 2 predecessors (child2 and child1)
 the predecessors define both the data and the fitness values
 
+research:
 
 research question: How to intelligently reduce the search space of procedural content generator using top-down and bottom-up constraints without negatively impacting expressiveness?
 
+Neufert/pattern language constraints
+
+mail alexander about P(x|y>t) math
+and try to implement it
+
+quasi deterministic sampling implementation for gmm's, can be done by quasi deterministic sampling over uniform
+that decide which component to take (in accordance to the weights). however this can not be extendend easily to multivariate
+gaussians as the cdf doesn't exist.
 
 stochastic grid sampling-> grid should stay unifrom to avoid clustering
 this means that sampling needs to define the number of samples desired
@@ -37,8 +47,21 @@ the fitness values and according data used to calculate it
 also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
 
 
+visualisation is part of the model, the mapping
+add visualisation to fitness model as well
+
 learning optimisation
 -------------------------
+
+In learning not only the finding of optimum should be encouraged (by the log likelihood) but also expressiveness
+should be promoted in the learning algorithm, that's why an important optimisation would be to additionally reward
+data points based on their difference from previously used data points in the learning algorithm
+any distance metric could be used for this
+
+increase learning and sampling robustness by using k-fold cross validation.
+wich would result in a mixture of GMM's with uniform weights to sample from.
+this would increase the sampling time, but reduce the accidental bias
+
 instead of modelling the curve fitting using density estimation (extra likelihood layer), I could do regression on the fitness
 p(p,c0,c1,...ck,f)-> integral (f^1_lowerthreshold)(p(ck|p,c0,...,f))
 and integrate (http://docs.scipy.org/doc/scipy/reference/tutorial/integrate.html)
@@ -84,6 +107,8 @@ train gaussian mixture using pomegranate (mixture of multivariate gaussian) (add
 
 sampling optimisation
 ----------------------------
+
+conditioning is at the core of the sampling algorithm so that should be optimised
 
 remove deterministic affine transformation chain from the nodesample class,
 just sample the nodes and use the original node to calculate the relative values needed for the mapping

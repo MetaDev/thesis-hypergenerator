@@ -19,6 +19,7 @@ import rx
 from rx import Observable, Observer
 from itertools import combinations
 from rx.subjects import Subject
+from copy import deepcopy
 
 class Variable():
     #name can be either a string or a list of string
@@ -135,7 +136,8 @@ class GMMVariable(StochasticVariable):
     #the GMM should be trained on vector [non_cond_vars,cond_vars]
     #for the GMM the names are a list names of each variable it generates when sampled
     #the lengths are an array of ints indicating the non_cond var length
-    def __init__(self,name,gmm: GMM,X_vars:List[DummyStochasticVariable], Y_vars_parent:List[Variable],Y_vars_siblings):
+    #TODO check validity of GMM, its dimension against the given X and Y vars
+    def __init__(self,name,gmm: GMM,X_vars:List[DummyStochasticVariable], Y_vars_parent:List[Variable],Y_vars_siblings,sibling_order):
         #non_cond_vars are save in attribute variables of VectorVariable
         Variable.__init__(self,name)
         self.unpack_names=[v.name for v in X_vars]
@@ -148,7 +150,9 @@ class GMMVariable(StochasticVariable):
         #this is for calculating the edges of the vector to be return in relative value
         self.X_lengths.insert(0,0)
         self.size=sum(self.X_lengths)
-        self.gmm_size=sum([v.size for v in Y_vars_parent])+sum(self.X_lengths)+sum([v.size for v in Y_vars_siblings])
+        self.sibling_order=sibling_order
+        self.gmm_size=len(gmm._means[0])
+
         #create dummy variable list
 
     #when sampling, sample from a the distribution completely conditioned on the parent independent variable values
@@ -164,10 +168,11 @@ class GMMVariable(StochasticVariable):
         Y_sibling_values=[]
         for sibling in sibling_samples:
             Y_sibling_values.extend(np.array([sibling.independent_vars[var.name] for var in self.Y_vars_siblings]).flatten())
-        Y_values=np.hstack(Y_sibling_values,Y_parent_values)
+        Y_values=np.hstack((Y_sibling_values,Y_parent_values))
         #the last X are cond attributes
         Y_indices=np.arange(self.size,self.gmm_size)
         #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
+        print(Y_indices,Y_values,self.sibling_order)
         X_values=self.gmm.condition(Y_indices,Y_values).sample(1)[0]
         return [X_values[l1:l2] for l1,l2 in ut.pairwise(self.X_lengths)]
 
@@ -179,27 +184,44 @@ class GMMVariable(StochasticVariable):
 class DefinitionNode:
 
     class SampleNode:
-        def get_flat_list(self,sample_list=[]):
+        def set_learned_variable(self, gmmvar: GMMVariable):
+            #set variables that will be replaced to unactive
+            for name in gmmvar.unpack_names:
+                self.variable_assignment[name]=gmmvar
+            self.variables.append(gmmvar)
+            #update set of unique variables
+            self.sample_variables=frozenset(self.variable_assignment.values())
+
+        def get_variable(self,name):
+            var=self.variable_assignment[name]
+            if var.unpack:
+                 warnings.warn("The variable "+ var.name + "assigned to " + name+
+                 " is packed, possibly used to sample multiple variables",RuntimeWarning)
+            return var
+
+
+        def get_flat_list(self,sample_list=None):
+            if not sample_list:
+                sample_list=[]
             sample_list.append(self)
             for child_name in self.children.keys():
-                for child in self.get_active_children(child_name):
+                for child in self.get_children(child_name,activity=True):
                     child.get_flat_list(sample_list)
             return sample_list
         def sample(self):
             #check if index not larger than sampled number of childre
             if self.parent_sample and self.index>=self.parent_sample.relative_vars[self.name]:
+                print(self.index)
                 self.active=False
                 return
             self.active=True
-            self.independent_vars={}
-            self.relative_vars={}
-            self.stochastic_vars={}
+
             if self.parent_sample:
                 self.id=self.parent_sample.id + str(self.index)
             else:
                 self.id=str(self.index)
              #first sample the packed variables
-            for var in self.variables:
+            for var in self.sample_variables:
                 if var.unpack:
                     value=var.sample(self.parent_sample,self.sibling_samples)
                     rel_value=var.relative_sample(value,self.parent_sample)
@@ -210,7 +232,7 @@ class DefinitionNode:
                         self.stochastic_vars[name]=v
             #than iterate unpacked variables, which possibly override previous variables
             #from a packed variable
-            for var in self.variables:
+            for var in self.sample_variables:
                 if not var.unpack:
                     value=var.sample(self.parent_sample,self.sibling_samples)
                     rel_value=var.relative_sample(value,self.parent_sample)
@@ -227,38 +249,46 @@ class DefinitionNode:
             #necessary to be able to retrieve stochastic vars
             #properties are saved independent from the parent, for later use of its values in machine learning
             self.name=node.name
-            self.variables=node.sample_variables
+            #variables is a list of all variables, like an archive
+            self.variables=[v for v in node.variables.values()]
+
+            #keep track which variable is assigned in the node
+            #when constructing the assignment is 1-1
+            self.variable_assignment=dict(node.variables)
+            #set from which can be sampled
+            self.sample_variables=frozenset(self.variable_assignment.values())
+
             self.children={}
             self.parent_sample=parent_sample
             self.sibling_samples=sibling_samples
             self.index=index
+            #variable value dictionaries
+            self.independent_vars={}
+            self.relative_vars={}
+            self.stochastic_vars={}
             self.active=False
         #returns iterator not list
-        def get_active_children(self,name):
+        #activity set to true returns only active children activity to false all children
+        def get_children(self,name,activity=False,as_list=False):
             #only return active children
-            return filter(lambda child: child.active is True, self.children[name])
+            iterator = filter(lambda child: child.active is True or not activity, self.children[name])
+            if as_list:
+                return list(iterator)
+            return iterator
 
         def add_children(self,children):
-            self.children[children[0].name]=children
+            #add children based on index
+            self.children[children[0].name]=[None]*len(children)
+            for child in children:
+                self.children[children[0].name][child.index]=child
 
         def __str__(self):
             #TODO
             return "\n".join(key + ": " + str(value) for key, value in vars(self).items())
 
 
-    def set_learned_variable(self, gmmvar: GMMVariable):
-        #set variables that will be replaced to unactive
-        for name in gmmvar.unpack_names:
-            self.variable_assignment[name]=gmmvar
-        self.variables.append(gmmvar)
-        #update set of unique variables
-        self.sample_variables=frozenset(self.variable_assignment.values())
 
-    def get_variable(self,name):
-        var=self.variable_assignment[name]
-        if var.unpack:
-             warnings.warn("The variable "+ var.name + "assigned to " + name+ " is packed, possibly used to sample multiple variables",RuntimeWarning)
-        return var
+
 
     def get_child(self,name):
         if name in self.children:
@@ -267,11 +297,12 @@ class DefinitionNode:
         node_sample = DefinitionNode.SampleNode(self,index,parent_sample,sibling_samples)
         for distr_name,child_node in self.children.items():
             child_samples=[]
-            n_child_var=self.variable_assignment[child_node.name]
-            max_child = n_child_var.high
+            max_child=self.variables[child_node.name].high
             for i in range(max_child):
+                print(i,child_samples)
+                #give a copy of the sibling list, because it is different for each child
                 child_samples.append(child_node.build_tree(i,
-                                                           node_sample,child_samples))
+                                                           node_sample,list(child_samples)))
             node_sample.add_children(child_samples)
         return node_sample
 
@@ -294,15 +325,11 @@ class DefinitionNode:
         for c in children:
             c[0].name=c[1].name
             self.variables.append(c[0])
+        self.variables=dict([(var.name,var) for var in variables])
         #the children keep the variable as key
         self.children=dict([(c[1].name,c[1])for c in children])
 
-        self.variable_assignment={}
-        #when constructing the assignment is 1-1
-        for var in self.variables:
-            self.variable_assignment[var.name]=var
-        #set from which can be sampled
-        self.sample_variables=frozenset(self.variable_assignment.values())
+
 
 
 

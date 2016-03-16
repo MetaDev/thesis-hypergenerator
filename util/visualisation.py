@@ -10,6 +10,7 @@ import numpy as np
 from scipy.stats import binned_statistic
 
 import scipy.stats as ss
+import model.mapping as mp
 
 
 from gmr import MVN,GMM
@@ -29,8 +30,21 @@ def draw_graph_path(ax,graph,path,color='b',with_labels=False,node_size=50,node_
     pos=dict([ (n, n) for n in graph.nodes() ])
     nx.draw_networkx_nodes(graph, nodelist=path,node_color=color,node_shape=node_shape,
                            pos=pos,with_labels=with_labels,ax=ax,node_size=node_size)
+def draw_node_sample_tree(root,ax=None):
+    samples=root.get_flat_list()
+    polygons = mp.map_layoutsamples_to_geometricobjects(samples,"shape")
+    colors = [s.relative_vars["color"] for s in samples]
+    print(polygons)
+    print(ax)
+    draw_polygons(polygons=polygons,ax=ax,colors=colors,size=1.3,set_range=True)
 
-def draw_polygons(ax,polygons,colors=[],size=1.2,show_edges=False,set_range=False):
+def get_ax(ax):
+    if ax is None:
+        return plt.gca()
+    else:
+        return ax
+def draw_polygons(polygons,ax=None,colors=[],size=1.2,show_edges=False,set_range=False):
+    ax=get_ax(ax)
     color="b"
     for i in range(len(polygons)):
         polygon=polygons[i]

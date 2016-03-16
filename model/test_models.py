@@ -8,7 +8,8 @@ from model.search_space import LayoutDefinitionNode as LN
 def test_model_var_child_position_parent_shape():
     #test Distribution
     child_position = SV("position",size=2,low=-1.5,high=1.5)
-    colors = DV("color",(0,0,0))
+
+    colors = DV("color",(0,1,0))
 
 
     child_size = DV("size",(0.2,0.2))
@@ -21,8 +22,9 @@ def test_model_var_child_position_parent_shape():
                        [DV("p0",(0, 0)), DV("p1",(0, 1)),DV("p2",(0.5,1)),
                         var_p3,DV("p4",(1, 0.5)),DV("p5",(1,0))])
     parent_pos=DV("position",(1,2))
-    n_children=SV("child",low=4,high=6,step=2)
+    n_children=DV("child",5)
     parent_size=DV("size",(1,1))
+    colors = DV("color",(0,0,1))
     table = LN(size=parent_size,name="parent",rotation=DV("rotation",0),
                                     position=parent_pos,
                                     shape=parent_shapes,children=[(n_children,chair)],color=colors)

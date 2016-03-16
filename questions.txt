@@ -1,2 +1,6 @@
 mention the affine transformation of gaussian mixtures as a way to reuse previously trained distributions
 
+In learning not only the finding of optimum should be encouraged (by the log likelihood) but also expressiveness
+should be promoted in the learning algorithm, that's why an important optimisation would be to additionally reward
+data points based on their difference from previously used data points in the learning algorithm
+any distance metric could be used for this

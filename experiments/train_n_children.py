@@ -36,7 +36,7 @@ data=[]
 fitness_values=[]
 polygons_vis=[]
 
-model_root=tm.test_model_var_child_position_parent_shape()
+root_sample=tm.test_model_var_child_position_parent_shape()
 
 X_var_names=["position"]
 Y_var_names=["shape3"]
@@ -46,19 +46,19 @@ parent_child_fitness_funcs=[tr.fitness_polygon_overl]
 
 #TODO
 #train model P(C0|C1,P)
-ndata=500
+ndata=100
 
 #repeat sampling
 data=[]
 fitness_values=[]
 #n_children=model_root.get_child("child")[0].sample(None)
-n_children=3
 #get size of vars
-X_var_length=np.sum([model_root.get_child("child")[1].get_variable(name).size for name in X_var_names])
-Y_var_length=np.sum([model_root.get_variable(name).size for name in Y_var_names])
+X_var_length=np.sum([root_sample.get_children("child",as_list=True)[1].get_variable(name).size for name in X_var_names])
+Y_var_length=np.sum([root_sample.get_variable(name).size for name in Y_var_names])
+n_children=len(root_sample.get_children("child",as_list=True))
 
-data_length=n_children*X_var_length+Y_var_length
 
+n_children=len(root_sample.get_children("child",as_list=True))
 
 
 #use root
@@ -94,7 +94,8 @@ def feauture_fitness_child_child(root,child_child_fitness_funcs,parent_child_fit
 
 for i in range(ndata):
     #train per child
-    s_data,s_fitness=feauture_fitness_child_child(model_root.sample(),
+    root_sample.sample()
+    s_data,s_fitness=feauture_fitness_child_child(root_sample,
                                                                child_child_fitness_funcs,
                                                                parent_child_fitness_funcs,
                                                                X_var_names,Y_var_names)
@@ -104,7 +105,7 @@ for i in range(ndata):
 
 #cap the data
 
-data, fitness_values= zip(*[(d,f) for d,f in zip(data,fitness_values) if f>0.3])
+data, fitness_values= zip(*[(d,f) for d,f in zip(data,fitness_values) if f>0.0001])
 
 
 #vis.print_fitness_statistics(fitness_values)
@@ -167,6 +168,30 @@ for p_shape in zip(p_shape_points,p_shape_points):
         gmm_show._set_gmms()
         vis.visualise_gmm_marg_2D_density(ax,gmm=gmm_show,colors=["g"])
 
-        vis.draw_polygons(ax,[polygon])
+        vis.draw_polygons([polygon],ax)
         plt.show()
+
+#construct new model
+from model.search_space import GMMVariable,DummyStochasticVariable
+first_child=root_sample.get_children("child",as_list=True)[0]
+
+X_dummy_vars=[DummyStochasticVariable(first_child.get_variable("position"))]
+Y_sibling_vars=[first_child.get_variable(name) for name in X_var_names]
+Y_vars=[root_sample.get_variable(name) for name in Y_var_names]
+
+gmm_vars=[GMMVariable("test",gmm,X_dummy_vars,Y_vars,Y_sibling_vars,i) for gmm,i in zip(gmms,range(len(gmms)))]
+for var in gmm_vars:
+    print(var.size,var.sibling_order,var.gmm_size)
+children = root_sample.get_children("child")
+#the gmms are ordered the same as the children
+for child,gmm in zip(children,gmm_vars):
+    print(child.index,gmm.sibling_order)
+    child.set_learned_variable(gmm)
+import util.visualisation as vis
+#sample from it
+for i in range(10):
+    root_sample.sample()
+    vis.draw_node_sample_tree(root_sample)
+    plt.show()
+
 
