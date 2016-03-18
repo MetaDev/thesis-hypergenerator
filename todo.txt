@@ -1,30 +1,15 @@
-refactor gmm variable to work with siblings
-
-and factory method to visualise fitness functions
-
-set method for set_learned variables in sample node
-
-implement sibling conditionaliity in search space
-->make it possible to swap learned distr with order of conditionality
-->apply some metrics
-
-it could be that marginalising degrades the result, thus the joint could be partitioned
-each part would be calculated directly and marginalised to get all children
-e.g. 7 children, train on 3, 5,7 ->get 1,2 from marginalising 3; get 4 from marg 5 and 6 from marg 7
-
-implement the training for this by using an array that defines the order of sibling relations e.g. [1,1,2]
-which means that child 1 and 2 depend on their predecessor respectively child0 and child1 and child 3 on 2 predecessors (child2 and child1)
-the predecessors define both the data and the fitness values
+refactor old experiments
+weir difference between fitness of code in new training module, see github for old implementation and find the bug
+refactor learning experiments to put as much common code as possible in the trainging module
 
 research:
 
+Neufert constraints
+
 research question: How to intelligently reduce the search space of procedural content generator using top-down and bottom-up constraints without negatively impacting expressiveness?
 
-Neufert/pattern language constraints
 
-mail alexander about P(x|y>t) math
-and try to implement it
-
+implement n-dim poisson disk sampling
 quasi deterministic sampling implementation for gmm's, can be done by quasi deterministic sampling over uniform
 that decide which component to take (in accordance to the weights). however this can not be extendend easily to multivariate
 gaussians as the cdf doesn't exist.
@@ -35,11 +20,12 @@ this will define the resolution of the grid, implement for stochastic var
 initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
 use standard sk init for this, maybe only updating the covars and setting the means on a grid and weights uniform
 
-new fitness function
+factory method to visualise fitness functions
 
 learn to fit surface according to surface ratio in a polygon
 
 find out why alignment is so hard to learn in gmm2
+
 plot fitness seperately, fitness func is maybe not correct, try to visualise it
 
 in training utility, a method sould receive the samples, and the fitness function and return
@@ -47,11 +33,20 @@ the fitness values and according data used to calculate it
 also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
 
 
+
 visualisation is part of the model, the mapping
 add visualisation to fitness model as well
 
+seperate idea, intuitive visualisation of dimensionality of each vector would be really handy
+this can be done by setting the dimensionality of the input and other necessary variables
+
 learning optimisation
 -------------------------
+
+only assign sibling conditionallity if the found distribution is above a certain order of quality (in expressiveness)
+or if higher order distribution is of lower quality, only train until n children and assign variables
+
+evaluate quality of learned model, MSE form random points with high fitness
 
 In learning not only the finding of optimum should be encouraged (by the log likelihood) but also expressiveness
 should be promoted in the learning algorithm, that's why an important optimisation would be to additionally reward
@@ -107,6 +102,11 @@ train gaussian mixture using pomegranate (mixture of multivariate gaussian) (add
 
 sampling optimisation
 ----------------------------
+
+to sample from learned distribution using truncuated normal sampling
+
+in your initial sampling you can always make the trade-off between expressiveness or exploration (search for diverse points)
+and fitness or exploitation (search for best points)
 
 conditioning is at the core of the sampling algorithm so that should be optimised
 
@@ -234,40 +234,32 @@ likelihood of handmade examples in learned distribution
 the fitted gaussian mixture model can be evaluated by estimating the fitness of a point and plotting
 the MSE, a metric proposed in thesis about gmm regression
 
+calculate expressivenes as the weighted average of the distance between samples, where the weight is based on the
+fitness of the samples
+
+could maybe the entropy of the gaussian as a measure of information give some form of expressiveness?
 
 
 sibling fitness
 ---------------
 1. order siblings based on pair-wise fitness (weight function for samples)
 
-2. train HMM on sequence of (parent,child1),(parent,child2), to be able to calculate conditional distr
-afterwards
 
 2.
 construct seperate models for each number of children if trained on (ordered) sibling data and their fitness that is calculated between siblings (tree structure)
 
 and train a model seperately on the structure of the network, using only (parent_n_siblings, n_siblings)->fitness to generate (conditional) n_siblings, than use training data to estimate optimal distribution for the number of children ()
 
-3.
-or train model on the joint of (nr_siblings, index (fixed order, not index from samples)) and parent  using pomegranata (use rejection sampling for sampling, or better MCMC (PyMC!))
 
 4. for a large range in the number of children (for example a large area where trees are placed but the area can be both dense or open)-> seperate models unfeasible, fit distribution for a markov chain between ordered siblings (using gmm)
 
-or better with a Hidden markov model using the children attributes as sequences
-the hmm library is either hmmlearn or bnpy (use weighted sampels), propably won't integrate well with hierarchical model, set number of states the max(n_children) initialise transation distr according to specification in search space if the distr of n_children should not be learned
+for larger number of children , the search space parent=>child should be specified implicitly
+this would also allow the ordering of children to be according to fitness (implicitly)
 
-how do we condition on the parent state, convert the model to pymc and set the first state to observed. we could add the parent to the start of the sequence, but this would reduce our hierarchical model to a single long chain, not if we can condition on the first state
+best is to have seperate model for each number of children but to share some paremeters between the models
+one such thing that I can think of is expressiveness, you want each model to be as expressive as the other
+this could maybe be done by sharing the sum of covariances as parameter?
 
-
-
-
-all papers in downloads->put in mendeley
-
-
-
-2) model pokemon world probabilistically
-    find top down constraints
-find conditional distributions reflecting the number of children in the hierarchy conditional on the fitness
 
 
 

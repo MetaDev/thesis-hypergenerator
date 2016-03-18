@@ -164,15 +164,14 @@ class GMMVariable(StochasticVariable):
         #parent condition variable
         Y_parent_values=np.array([parent_sample.independent_vars[var.name] for var in self.Y_vars_parent]).flatten()
         #sibling condition variable
-        #TODO
         Y_sibling_values=[]
-        for sibling in sibling_samples:
+        #only retrieve values of necessary siblings
+        for sibling in sibling_samples[-self.sibling_order:]:
             Y_sibling_values.extend(np.array([sibling.independent_vars[var.name] for var in self.Y_vars_siblings]).flatten())
         Y_values=np.hstack((Y_sibling_values,Y_parent_values))
         #the last X are cond attributes
         Y_indices=np.arange(self.size,self.gmm_size)
         #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
-        print(Y_indices,Y_values,self.sibling_order)
         X_values=self.gmm.condition(Y_indices,Y_values).sample(1)[0]
         return [X_values[l1:l2] for l1,l2 in ut.pairwise(self.X_lengths)]
 
@@ -211,7 +210,6 @@ class DefinitionNode:
         def sample(self):
             #check if index not larger than sampled number of childre
             if self.parent_sample and self.index>=self.parent_sample.relative_vars[self.name]:
-                print(self.index)
                 self.active=False
                 return
             self.active=True
@@ -299,7 +297,6 @@ class DefinitionNode:
             child_samples=[]
             max_child=self.variables[child_node.name].high
             for i in range(max_child):
-                print(i,child_samples)
                 #give a copy of the sibling list, because it is different for each child
                 child_samples.append(child_node.build_tree(i,
                                                            node_sample,list(child_samples)))

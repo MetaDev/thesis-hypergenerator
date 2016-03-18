@@ -4,3 +4,15 @@ In learning not only the finding of optimum should be encouraged (by the log lik
 should be promoted in the learning algorithm, that's why an important optimisation would be to additionally reward
 data points based on their difference from previously used data points in the learning algorithm
 any distance metric could be used for this
+
+I will not optimise the expressiveness in the learning algorithm (next step maybe, other approach)
+I will encourage it in the initial sampling by using poisson disk sampling
+
+I found a lot of great examples of functional constraint in a pattern language
+It would make for a very intersting generator to encode some of the patterns from the book
+probabilistically in my generator
+
+Slight change in orientation to defend the fact that sampling can take longer
+very expensive fitness functions (which I don't incorporate in the learning process)
+like an AI playing a level (very high cost in terms of O notation) will need less evaluations if trivial faulty scene instances
+are no longer samples

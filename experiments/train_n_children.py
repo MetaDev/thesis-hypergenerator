@@ -29,99 +29,65 @@ import learning.training as tr
 
 from itertools import combinations
 
-from itertools import product
+#experiment hyperparameters: sibling_order,
+sibling_order=3
+ndata=100
+n_components=15
+
+#training variables and fitness functions
+vars_children=["position"]
+vars_parent=["shape3"]
+sibling_fitness_funcs={tr.fitness_min_dist:2}
+parent_child_fitness_funcs={tr.fitness_polygon_overl:32}
+
+#model to train on
+root_sample=tm.test_model_var_child_position_parent_shape()
+
+
+#a model trained on 4 children can also be used for 5 children of the fifth no longer conditions on the first
+#These models can be reused because there's no difference in the markov chain of order n between the n+1 and n+2 state
+repeat_trained_model=True
+
+
 #train parent-child
 
 data=[]
 fitness_values=[]
 polygons_vis=[]
 
-root_sample=tm.test_model_var_child_position_parent_shape()
-
-X_var_names=["position"]
-Y_var_names=["shape3"]
-child_child_fitness_funcs=[tr.fitness_min_dist]
-parent_child_fitness_funcs=[tr.fitness_polygon_overl]
 
 
-#TODO
-#train model P(C0|C1,P)
-ndata=100
 
-#repeat sampling
-data=[]
-fitness_values=[]
-#n_children=model_root.get_child("child")[0].sample(None)
+
 #get size of vars
-X_var_length=np.sum([root_sample.get_children("child",as_list=True)[1].get_variable(name).size for name in X_var_names])
-Y_var_length=np.sum([root_sample.get_variable(name).size for name in Y_var_names])
-n_children=len(root_sample.get_children("child",as_list=True))
+X_var_length=np.sum([root_sample.get_children("child",as_list=True)[1].get_variable(name).size for name in vars_children])
+Y_var_length=np.sum([root_sample.get_variable(name).size for name in vars_parent])
 
 
-n_children=len(root_sample.get_children("child",as_list=True))
+data,fitness=tr.parent_child_variable_training(ndata,root_sample,parent_child_fitness_funcs,
+sibling_fitness_funcs,vars_parent,vars_children,sibling_order)
 
-
-#use root
-def feauture_fitness_child_child(root,child_child_fitness_funcs,parent_child_fitness_funcs,
-                                 X_var_names,Y_var_names):
-    #only get children of a certain name
-
-    data=[]
-    fitness=[]
-    parent_Y_vars=[root.independent_vars[name] for name in Y_var_names]
-    for children in combinations(root.get_children("child"),n_children):
-
-        child_vars=[]
-        fitness_prod=1
-
-        #calculate fitness of each child to parent
-        for child in children:
-            child_vars.extend([child.independent_vars[name] for name in X_var_names])
-            fitness_prod*=sum([f(child,root)**32 for f in  parent_child_fitness_funcs])
-        #the independent variable is
-        child_vars=np.array(child_vars).flatten()
-        parent_Y_vars=np.array(parent_Y_vars).flatten()
-        data.append(np.hstack((child_vars,parent_Y_vars)))
-
-        #calculate pairwise fitness between children
-        for child0,child1 in combinations(children,2):
-            fitness_prod*= sum([f(child0,child1)**2 for f in  child_child_fitness_funcs])
-
-        fitness.append(fitness_prod)
-    return data,fitness
-
-
-
-for i in range(ndata):
-    #train per child
-    root_sample.sample()
-    s_data,s_fitness=feauture_fitness_child_child(root_sample,
-                                                               child_child_fitness_funcs,
-                                                               parent_child_fitness_funcs,
-                                                               X_var_names,Y_var_names)
-    data.extend(s_data)
-    fitness_values.extend(s_fitness)
-
-
+print(len(data))
 #cap the data
 
-data, fitness_values= zip(*[(d,f) for d,f in zip(data,fitness_values) if f>0.0001])
 
 
-#vis.print_fitness_statistics(fitness_values)
+vis.print_fitness_statistics(fitness["parent"])
+vis.print_fitness_statistics(fitness["children"])
+vis.print_fitness_statistics(fitness["all"],print_hist=True)
 
-n_components=15
+data_cap, fitness_prod_cap= zip(*[(d,f) for d,f in zip(data,fitness["all"]) if f>0.001])
+
 
 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
-gmm.fit(data,fitness_values,min_covar=0.01)
+gmm.fit(data_cap,fitness_prod_cap,min_covar=0.01)
 
-gmms=[None]*n_children
-gmms[n_children-1]=gmm
+gmms=[None]*sibling_order
+gmms[sibling_order-1]=gmm
 #marginalise for each child
 #P(c_n,c_n-1,..,c0,p)->P(c_i,c_i+1,..,c_0,p)
-for i in range(n_children-1):
-    indices=np.arange((n_children-(i+1))*X_var_length,n_children*X_var_length+Y_var_length)
-    print(indices)
+for i in range(sibling_order-1):
+    indices=np.arange((sibling_order-(i+1))*X_var_length,sibling_order*X_var_length+Y_var_length)
     gmms[i]=gmm.marginalise(indices)
 
 (xrange,yrange)=((-2,2),(-2,2))
@@ -130,6 +96,8 @@ parent_position=np.array([1,2])
 
 (xrange,yrange)=((-2,4),(-1,5))
 p_shape_points=[0.5,1,1.5]
+#TODO
+#visualisation code needs cleaning up
 for p_shape in zip(p_shape_points,p_shape_points):
     shape=[(0, 0), (0, 1),(0.5,1),p_shape,(1, 0.5),(1,0)]
 
@@ -141,7 +109,7 @@ for p_shape in zip(p_shape_points,p_shape_points):
     #P(c_i,c_i-1,..,c_0,p) -> P(c_i|c_i-1,..,c_0,p)
     values=p_shape
     points=[]
-    for i in range(0,n_children):
+    for i in range(0,sibling_order):
 
         ax = plt.gca()
         ax.set_aspect(1)
@@ -159,7 +127,6 @@ for p_shape in zip(p_shape_points,p_shape_points):
             ax.scatter(x,y,color="r")
 
         values=np.array(values).flatten()
-        print(indices,values)
         gmm_cond=gmms[i].condition(indices,values)
         previous_gmm_cond=gmm_cond
 
@@ -176,22 +143,30 @@ from model.search_space import GMMVariable,DummyStochasticVariable
 first_child=root_sample.get_children("child",as_list=True)[0]
 
 X_dummy_vars=[DummyStochasticVariable(first_child.get_variable("position"))]
-Y_sibling_vars=[first_child.get_variable(name) for name in X_var_names]
-Y_vars=[root_sample.get_variable(name) for name in Y_var_names]
+Y_sibling_vars=[first_child.get_variable(name) for name in vars_children]
+Y_vars=[root_sample.get_variable(name) for name in vars_parent]
+#the sibling order of the gmm is maximum the sibling order of the trained gmm
+gmm_vars=[GMMVariable("test",gmm,X_dummy_vars,Y_vars,Y_sibling_vars,sibling_order=i) for gmm,i in zip(gmms,range(len(gmms)))]
 
-gmm_vars=[GMMVariable("test",gmm,X_dummy_vars,Y_vars,Y_sibling_vars,i) for gmm,i in zip(gmms,range(len(gmms)))]
-for var in gmm_vars:
-    print(var.size,var.sibling_order,var.gmm_size)
-children = root_sample.get_children("child")
+children = root_sample.get_children("child",as_list=True)
 #the gmms are ordered the same as the children
-for child,gmm in zip(children,gmm_vars):
-    print(child.index,gmm.sibling_order)
-    child.set_learned_variable(gmm)
-import util.visualisation as vis
-#sample from it
-for i in range(10):
-    root_sample.sample()
-    vis.draw_node_sample_tree(root_sample)
-    plt.show()
+
+#assign variable child i with gmm min(i,sibling_order)
+if repeat_trained_model:
+    learned_var_range=len(children)
+else:
+    learned_var_range=len(gmms)
+for i in range(learned_var_range):
+    children[i].set_learned_variable(gmm_vars[min(i,sibling_order-1)])
+
+#re-estimate average fitness
+#repeat sampling
+data,fitness=tr.parent_child_variable_training(ndata,root_sample,parent_child_fitness_funcs,
+sibling_fitness_funcs,vars_parent,vars_children,sibling_order)
 
 
+#cap the data
+
+
+vis.print_fitness_statistics(fitness["parent"])
+vis.print_fitness_statistics(fitness["children"])

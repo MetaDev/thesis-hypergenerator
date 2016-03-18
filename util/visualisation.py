@@ -34,8 +34,6 @@ def draw_node_sample_tree(root,ax=None):
     samples=root.get_flat_list()
     polygons = mp.map_layoutsamples_to_geometricobjects(samples,"shape")
     colors = [s.relative_vars["color"] for s in samples]
-    print(polygons)
-    print(ax)
     draw_polygons(polygons=polygons,ax=ax,colors=colors,size=1.3,set_range=True)
 
 def get_ax(ax):
@@ -119,18 +117,19 @@ def visualise_gmm_marg_2D_density(ax,gmm,
             if colors is not None:
                 ell.set_color(next(colors))
             ax.add_artist(ell)
-def print_fitness_statistics(fitness_values):
+def print_fitness_statistics(fitness_values,print_hist=False):
     fitness_statistics_count, fitness_bin_edges,_ = binned_statistic(fitness_values, fitness_values,
                                                                      statistic='count', bins=20)
-    fitness_statistics_mean = binned_statistic(fitness_values, fitness_values,  statistic='mean'
-    , bins=20)[0]
-    for edges,count,mean,i in zip(ut.pairwise(fitness_bin_edges),fitness_statistics_count,
-        fitness_statistics_mean,range(len(fitness_statistics_count))):
+    if print_hist:
+        fitness_statistics_mean = binned_statistic(fitness_values, fitness_values,  statistic='mean'
+        , bins=20)[0]
+        for edges,count,mean,i in zip(ut.pairwise(fitness_bin_edges),fitness_statistics_count,
+            fitness_statistics_mean,range(len(fitness_statistics_count))):
 
-        edges ="bin nr. "+ str(i) + ": "+format(edges[0], '.5g') + " - "+format(edges[1], '.5g')
-        count = ": count= " + str(count)
-        mean=": mean= "+ format(mean, '.5g')
-        print(edges + count + mean)
+            edges ="bin nr. "+ str(i) + ": "+format(edges[0], '.5g') + " - "+format(edges[1], '.5g')
+            count = ": count= " + str(count)
+            mean=": mean= "+ format(mean, '.5g')
+            print(edges + count + mean)
 
     print("total mean= {0:f}: variance= {1:f}".format(np.mean(fitness_values),np.var(fitness_values),'.5g'))
 
