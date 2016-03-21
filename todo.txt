@@ -1,6 +1,4 @@
 refactor old experiments
-weir difference between fitness of code in new training module, see github for old implementation and find the bug
-refactor learning experiments to put as much common code as possible in the trainging module
 
 research:
 
@@ -8,19 +6,19 @@ Neufert constraints
 
 research question: How to intelligently reduce the search space of procedural content generator using top-down and bottom-up constraints without negatively impacting expressiveness?
 
+implement regression instead of weighted sampling, use 1-dim for fitness
+the regressionan
 
 implement n-dim poisson disk sampling
 quasi deterministic sampling implementation for gmm's, can be done by quasi deterministic sampling over uniform
 that decide which component to take (in accordance to the weights). however this can not be extendend easily to multivariate
 gaussians as the cdf doesn't exist.
 
-stochastic grid sampling-> grid should stay unifrom to avoid clustering
-this means that sampling needs to define the number of samples desired
-this will define the resolution of the grid, implement for stochastic var
-initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
-use standard sk init for this, maybe only updating the covars and setting the means on a grid and weights uniform
+if regression works as good, use different library for learning that support DPGMM
 
 factory method to visualise fitness functions
+
+more variables and fitness functions
 
 learn to fit surface according to surface ratio in a polygon
 
@@ -37,11 +35,13 @@ also an argument for fitness threshold, fitness target and whether you're lookin
 visualisation is part of the model, the mapping
 add visualisation to fitness model as well
 
-seperate idea, intuitive visualisation of dimensionality of each vector would be really handy
-this can be done by setting the dimensionality of the input and other necessary variables
+
 
 learning optimisation
 -------------------------
+
+initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
+use standard sk init for this, maybe only updating the covars and setting the means on a grid and weights uniform
 
 only assign sibling conditionallity if the found distribution is above a certain order of quality (in expressiveness)
 or if higher order distribution is of lower quality, only train until n children and assign variables
@@ -55,6 +55,7 @@ any distance metric could be used for this
 
 increase learning and sampling robustness by using k-fold cross validation.
 wich would result in a mixture of GMM's with uniform weights to sample from.
+or blend different mixtures together
 this would increase the sampling time, but reduce the accidental bias
 
 instead of modelling the curve fitting using density estimation (extra likelihood layer), I could do regression on the fitness
@@ -98,6 +99,13 @@ e.g. tables far apart will not likely collide
 and train in a hierachical divided search space (naive bayes?, divide search space in n clusters)
 
 train gaussian mixture using pomegranate (mixture of multivariate gaussian) (added benefit of decay, priority based multi-objective) also faster, correct see http://homes.cs.washington.edu/~jmschr/lectures/pomegranate.html
+
+for larger number of children , the search space parent=>child should be specified implicitly
+this would also allow the ordering of children to be according to fitness (implicitly)
+
+best is to have seperate model for each number of children but to share some paremeters between the models
+one such thing that I can think of is expressiveness, you want each model to be as expressive as the other
+this could maybe be done by sharing the sum of covariances as parameter?
 
 
 sampling optimisation
@@ -253,13 +261,12 @@ and train a model seperately on the structure of the network, using only (parent
 
 4. for a large range in the number of children (for example a large area where trees are placed but the area can be both dense or open)-> seperate models unfeasible, fit distribution for a markov chain between ordered siblings (using gmm)
 
-for larger number of children , the search space parent=>child should be specified implicitly
-this would also allow the ordering of children to be according to fitness (implicitly)
 
-best is to have seperate model for each number of children but to share some paremeters between the models
-one such thing that I can think of is expressiveness, you want each model to be as expressive as the other
-this could maybe be done by sharing the sum of covariances as parameter?
 
+
+
+seperate idea, intuitive visualisation of dimensionality of each vector would be really handy
+this can be done by setting the dimensionality of the input and other necessary variables
 
 
 

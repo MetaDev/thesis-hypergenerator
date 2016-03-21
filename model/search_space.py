@@ -171,6 +171,7 @@ class GMMVariable(StochasticVariable):
         Y_values=np.hstack((Y_sibling_values,Y_parent_values))
         #the last X are cond attributes
         Y_indices=np.arange(self.size,self.gmm_size)
+        print(Y_indices)
         #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
         X_values=self.gmm.condition(Y_indices,Y_values).sample(1)[0]
         return [X_values[l1:l2] for l1,l2 in ut.pairwise(self.X_lengths)]

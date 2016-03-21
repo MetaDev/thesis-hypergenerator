@@ -13,7 +13,7 @@ from itertools import combinations
 #sibling order 1 is child-parent relation only
 #the fitness funcs should include their order
 def parent_child_variable_training(n_samples,root_sample,parental_fitness_funcs,sibling_fitness_funcs,
-                                vars_parent,vars_children, sibling_order=1):
+                                vars_parent,vars_children, sibling_order=0):
     data=[]
     fitness={}
     fitness["all"]=[]
@@ -25,7 +25,7 @@ def parent_child_variable_training(n_samples,root_sample,parental_fitness_funcs,
         root_sample.sample()
 
         parent_Y_vars=[root_sample.independent_vars[name] for name in vars_parent]
-        for children in combinations(root_sample.get_children("child"),sibling_order):
+        for children in combinations(root_sample.get_children("child"),sibling_order+1):
             child_vars=[]
             parent_fitness=1
             #calculate fitness of next child to parent
@@ -38,10 +38,11 @@ def parent_child_variable_training(n_samples,root_sample,parental_fitness_funcs,
             parent_Y_vars=np.array(parent_Y_vars).flatten()
             data.append(np.hstack((child_vars,parent_Y_vars)))
             child_fitness=1
-            #calculate pairwise fitness between children
-            for child0,child1 in combinations(children,2):
-                child_fitness*=sum([func(child0,child1)**order for func,order in  sibling_fitness_funcs.items()])
-            fitness["children"].append(child_fitness)
+            if sibling_order>0:
+                #calculate pairwise fitness between children
+                for child0,child1 in combinations(children,2):
+                    child_fitness*=sum([func(child0,child1)**order for func,order in  sibling_fitness_funcs.items()])
+                fitness["children"].append(child_fitness)
             fitness["all"].append(child_fitness * parent_fitness)
 
     return data,fitness

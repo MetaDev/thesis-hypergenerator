@@ -1,12 +1,21 @@
+mention the move from weighted density estimation to regression, is mathematically more correct because the EM will try
+to find a GMM that exactly crosses the fitness values, this also allows to use the DPGMM
+
+regression also allows tree search sampling
+
+values isntead of implicitly
+->possibility for more finegrained sampling of multiple objectives (each can have different interval)
+
+would require multi-dimensional sampling of truncuated gmm, can also be used to sample more efficiently from learned distr
+-> requires mcmc
+-> or inverse transform sampling with interpolation
+
+or I could simpy sample from the empirical distribution of the fitness values
+
+use poisson disk sampling
+
 mention the affine transformation of gaussian mixtures as a way to reuse previously trained distributions
 
-In learning not only the finding of optimum should be encouraged (by the log likelihood) but also expressiveness
-should be promoted in the learning algorithm, that's why an important optimisation would be to additionally reward
-data points based on their difference from previously used data points in the learning algorithm
-any distance metric could be used for this
-
-I will not optimise the expressiveness in the learning algorithm (next step maybe, other approach)
-I will encourage it in the initial sampling by using poisson disk sampling
 
 I found a lot of great examples of functional constraint in a pattern language
 It would make for a very intersting generator to encode some of the patterns from the book

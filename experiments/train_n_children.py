@@ -27,10 +27,8 @@ from learning.gmm import GMM
 
 import learning.training as tr
 
-from itertools import combinations
-
 #experiment hyperparameters: sibling_order,
-sibling_order=3
+sibling_order=0
 ndata=100
 n_components=15
 
@@ -51,8 +49,6 @@ repeat_trained_model=True
 
 #train parent-child
 
-data=[]
-fitness_values=[]
 polygons_vis=[]
 
 
@@ -73,7 +69,8 @@ print(len(data))
 
 
 vis.print_fitness_statistics(fitness["parent"])
-vis.print_fitness_statistics(fitness["children"])
+if sibling_order>0:
+    vis.print_fitness_statistics(fitness["children"])
 vis.print_fitness_statistics(fitness["all"],print_hist=True)
 
 data_cap, fitness_prod_cap= zip(*[(d,f) for d,f in zip(data,fitness["all"]) if f>0.001])
@@ -81,13 +78,13 @@ data_cap, fitness_prod_cap= zip(*[(d,f) for d,f in zip(data,fitness["all"]) if f
 
 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
 gmm.fit(data_cap,fitness_prod_cap,min_covar=0.01)
-
-gmms=[None]*sibling_order
-gmms[sibling_order-1]=gmm
+#if sibling order is 0 you have only a single gmm
+gmms=[None]*(sibling_order+1)
+gmms[sibling_order]=gmm
 #marginalise for each child
 #P(c_n,c_n-1,..,c0,p)->P(c_i,c_i+1,..,c_0,p)
-for i in range(sibling_order-1):
-    indices=np.arange((sibling_order-(i+1))*X_var_length,sibling_order*X_var_length+Y_var_length)
+for i in range(sibling_order):
+    indices=np.arange((sibling_order-(i))*X_var_length,(sibling_order+1)*X_var_length+Y_var_length)
     gmms[i]=gmm.marginalise(indices)
 
 (xrange,yrange)=((-2,2),(-2,2))
@@ -109,7 +106,7 @@ for p_shape in zip(p_shape_points,p_shape_points):
     #P(c_i,c_i-1,..,c_0,p) -> P(c_i|c_i-1,..,c_0,p)
     values=p_shape
     points=[]
-    for i in range(0,sibling_order):
+    for i in range(sibling_order+1):
 
         ax = plt.gca()
         ax.set_aspect(1)
@@ -157,7 +154,7 @@ if repeat_trained_model:
 else:
     learned_var_range=len(gmms)
 for i in range(learned_var_range):
-    children[i].set_learned_variable(gmm_vars[min(i,sibling_order-1)])
+    children[i].set_learned_variable(gmm_vars[min(i,sibling_order)])
 
 #re-estimate average fitness
 #repeat sampling
@@ -169,4 +166,5 @@ sibling_fitness_funcs,vars_parent,vars_children,sibling_order)
 
 
 vis.print_fitness_statistics(fitness["parent"])
-vis.print_fitness_statistics(fitness["children"])
+if sibling_order>0:
+    vis.print_fitness_statistics(fitness["children"])
