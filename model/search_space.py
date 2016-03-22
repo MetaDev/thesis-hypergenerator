@@ -61,18 +61,16 @@ class StochasticVariable(Variable):
         self.low=np.array(low)
         if len(low) is not len(high):
             raise ValueError("Dimensions of bounds are not equal.")
-
-        #Discrete
+        self.poisson=poisson
+        #create possible discrete values
         if step is not None:
             self.choices=np.arange(low,high,step)
-        else:
-            #continuous
-            self.poisson=poisson
-            if poisson and self.size>3:
-                raise ValueError("Poisson disk sampling is only supported up to 3 dimensions")
-            self.distr=scipy.stats.uniform()
+        elif poisson and self.size>3:
+            raise ValueError("Poisson disk sampling is only supported up to 3 dimensions")
+
 
     def init_poisson(self,n_samples):
+        print("kak")
         import model.sampling.poisson as poisson
         poisson_generator = poisson.PoissonGenerator(self.size)
         self.points = poisson_generator.find_point_set(n_samples)
@@ -86,7 +84,7 @@ class StochasticVariable(Variable):
                     self.init_poisson(n_samples)
                 point=self.points[i]
             else:
-                point=self.distr.rvs(size=self.size)
+                point=scipy.stats.uniform.rvs(size=self.size)
             return self.low + point*(self.high-self.low)
 
     def stochastic(self):

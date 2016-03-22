@@ -7,6 +7,8 @@ than implement regression
 
 if regression works as good, use different library for learning that support DPGMM
 
+truncuated gmm with MCMC
+
 factory method to visualise fitness functions
 
 more variables and fitness functions
@@ -219,6 +221,9 @@ do an example of room generation, where the fitness can be the validity of a pol
 
 evaluation and tests
 ------------------
+evaluate with and without poisson sampling, change the search space size and number of dimensions and
+compare expressiveness and mse
+
 model 3 different scenec to do the tests on
 
 influence of model prior (hierachical relations) on learning and fitness (hierachical relations)

@@ -77,7 +77,6 @@ print("total fitness")
 vis.print_fitness_statistics(fitness["all"],print_hist=True)
 #TODO use PCA to reduce child parent fitness to single fitness
 
-
 data_cap, fitness_prod_cap= zip(*[(d,f) for d,f in zip(data,fitness["all"]) if f>0.001])
 
 
