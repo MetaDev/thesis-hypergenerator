@@ -4,16 +4,8 @@ import math
 import scipy.spatial.distance
 
 
-# # user defined options
-#    disk = False                # this parameter defines if we look for Poisson-like distribution on a disk/sphere (center at 0, radius 1) or in a square/box (0-1 on x and y)
-#    repeatPattern = True        # this parameter defines if we look for "repeating" pattern so if we should maximize distances also with pattern repetitions
-#    num_points = 8              # number of points we are looking for
-#    num_iterations = 4          # number of iterations in which we take average minimum squared distances between points and try to maximize them
-#    first_point_zero = disk     # should be first point zero (useful if we already have such sample) or random
-#    iterations_per_point = 128  # iterations per point trying to look for a new point with larger distance
-#    sorting_buckets = 0         # if this option is > 0, then sequence will be optimized for tiled cache locality in n x n tiles (x followed by y)
-#    num_dim = 2                 # 1, 2, 3 dimensional version
-#    num_rotations = 1           # number of rotations of pattern to check against
+
+
 
 
 def random_point_disk(num_points = 1):
@@ -53,24 +45,29 @@ def min_dist_squared(points, point):
     return np.min(np.einsum('ij,ij->i',diff,diff))
 
 class PoissonGenerator:
-    def __init__(self, num_dim, lower, upper, disk, repeatPattern, first_point_zero):
+    # 1, 2, 3 dimensional version
+    #    num_dim = 2
+ # this parameter defines if we look for Poisson-like distribution on a disk/sphere (center at 0, radius 1) or in a square/box (0-1 on x and y)
+#    disk = False
+# this parameter defines if we look for "repeating" pattern so if we should maximize distances also with pattern repetitions
+#    repeatPattern = True
+# should be first point zero (useful if we already have such sample) or random
+#    first_point_zero = disk
+
+    def __init__(self,num_dim, disk=False, repeatPattern=False, first_point_zero=False):
         self.first_point_zero = first_point_zero
         self.disk = disk
         self.num_dim = num_dim
         self.repeatPattern = repeatPattern and disk == False
         self.num_perms = (3 ** self.num_dim) if self.repeatPattern else 1
-        if len(upper) is not num_dim or len(lower) is not num_dim:
-            raise ValueError("Dimension of bounds doesn't match dimension of poisson generator.")
-        self.upper=np.array(upper)
-        self.lower=np.array(lower)
-        #TODO check if lower is always lower than upper
-        if num_dim == 3:
+
+        if self.num_dim == 3:
             self.zero_point = [0,0,0]
             if disk == True:
                 self.random_point = random_point_sphere
             else:
                 self.random_point = random_point_box
-        elif num_dim == 2:
+        elif self.num_dim == 2:
             self.zero_point = [0,0]
             if disk == True:
                 self.random_point = random_point_disk
@@ -121,13 +118,16 @@ class PoissonGenerator:
                     out_array = np.append(out_array, np.array(perm_point,ndmin = 2), axis = 0 )
 
         return out_array
-    def find_point_set(self,num_points, num_iter, iterations_per_point, rotations, progress_notification = None ):
-        points = self._find_point_set(num_points, num_iter, iterations_per_point, rotations, progress_notification)
-        #normalise to 0-1, range is originally -1,1
-        points = ((points+1)/2 + self.lower)*(self.upper-self.lower)
-        return points
 
-    def _find_point_set(self, num_points, num_iter, iterations_per_point, rotations, progress_notification = None):
+
+#    num_points = 8              # number of points we are looking for
+#    num_iterations = 4          # number of iterations in which we take average minimum squared distances between points and try to maximize them
+#    iterations_per_point = 128  # iterations per point trying to look for a new point with larger distance
+
+#    rotations = 1           # number of rotations of pattern to check against
+    def find_point_set(self, num_points, num_iter=4, iterations_per_point=128, rotations=1, progress_notification = None):
+        if not num_points > 1:
+            raise ValueError("The number of points needs to be higher than 1.")
         best_point_set = []
         best_dist_avg = 0
         self.rotations = 1

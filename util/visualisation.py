@@ -33,7 +33,7 @@ def draw_graph_path(ax,graph,path,color='b',with_labels=False,node_size=50,node_
 def draw_node_sample_tree(root,ax=None):
     samples=root.get_flat_list()
     polygons = mp.map_layoutsamples_to_geometricobjects(samples,"shape")
-    colors = [s.relative_vars["color"] for s in samples]
+    colors = [s.values["rel"]["color"] for s in samples]
     draw_polygons(polygons=polygons,ax=ax,colors=colors,size=1.3,set_range=True)
 
 def get_ax(ax):

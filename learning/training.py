@@ -12,7 +12,9 @@ from itertools import combinations
 #the use of combinations instead of more data still needs to be validated
 #sibling order 1 is child-parent relation only
 #the fitness funcs should include their order
-def parent_child_variable_training(n_samples,root_sample,parental_fitness_funcs,sibling_fitness_funcs,
+
+#TODO add child name as argument
+def parent_child_variable_training(n_samples,root,parental_fitness_funcs,sibling_fitness_funcs,
                                 vars_parent,vars_children, sibling_order=0):
     data=[]
     fitness={}
@@ -20,17 +22,18 @@ def parent_child_variable_training(n_samples,root_sample,parental_fitness_funcs,
     fitness["parent"]=[]
     fitness["children"]=[]
     fitness["test"]=[]
+    root_samples=root.sample(n_samples)
+    print(len(root_samples))
     #only get children of a certain name
     for i in range(n_samples):
-        root_sample.sample()
-
-        parent_Y_vars=[root_sample.independent_vars[name] for name in vars_parent]
-        for children in combinations(root_sample.get_children("child"),sibling_order+1):
+        root_sample=root_samples[i]
+        parent_Y_vars=[root_sample.values["ind"][name] for name in vars_parent]
+        for children in combinations(root_sample.children["child"],sibling_order+1):
             child_vars=[]
             parent_fitness=1
             #calculate fitness of next child to parent
             for child in children:
-                child_vars.extend([child.independent_vars[name] for name in vars_children])
+                child_vars.extend([child.values["ind"][name] for name in vars_children])
                 parent_fitness*=sum([func(child,root_sample)**order for func,order in  parental_fitness_funcs.items()])
             fitness["parent"].append(parent_fitness)
             #the independent variable is
@@ -57,6 +60,6 @@ def fitness_polygon_alignment(sample0,sample1):
     polygons=mp.map_layoutsamples_to_geometricobjects([sample0,sample1],shape_name="shape")
     return fn.pairwise_closest_line_alignment(polygons[0],polygons[1],threshold=30)
 def fitness_min_dist(sample0,sample1):
-    pos0=sample0.independent_vars["position"]
-    pos1=sample1.independent_vars["position"]
+    pos0=sample0.values["ind"]["position"]
+    pos1=sample1.values["ind"]["position"]
     return fn.pairwise_min_dist(pos0,pos1,threshold=1)

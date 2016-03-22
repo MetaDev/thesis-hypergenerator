@@ -4,10 +4,10 @@ from model.search_space import StochasticVariable as SV
 from model.search_space import VectorVariableUtility as VVU
 from model.search_space import DeterministicVariable as DV
 
-from model.search_space import LayoutDefinitionNode as LN
+from model.search_space import LayoutTreeDefNode as LN
 def test_model_var_child_position_parent_shape():
     #test Distribution
-    child_position = SV("position",size=2,low=-1.5,high=1.5)
+    child_position = SV("position",low=[-1.5]*2,high=[1.5]*2)
 
     colors = DV("color",(0,1,0))
 
@@ -17,7 +17,7 @@ def test_model_var_child_position_parent_shape():
                                     rotation=DV("rotation",0),shape=LN.shape_exteriors["square"], color=colors)
 
     #var_p3= SV("p3",size=2,choices=SV.standard_choices(0.5,2,4))
-    var_p3= SV("p3",size=2,low=0.5,high=2)
+    var_p3= SV("p3",low=[0.5]*2,high=[2]*2)
     parent_shapes = VVU.from_variable_list("shape",
                        [DV("p0",(0, 0)), DV("p1",(0, 1)),DV("p2",(0.5,1)),
                         var_p3,DV("p4",(1, 0.5)),DV("p5",(1,0))])
@@ -34,7 +34,7 @@ def test_model_var_child_position_parent_shape():
 
 def test_samples_var_child_pos_size_rot_parent_shape():
     #test Distribution
-    child_position = SV("position",size=2,distr=SV.standard_distr(-1.5,1.5),func=LN.position_rel)
+    child_position = SV("position",low=[-1.5]*2,high=[1.5]*2)
     colors = DV("color",(0,0,0))
     child_size = SV("size",size=2,distr=SV.standard_distr(0.1,0.4))
     child_rotation=SV("rotation",distr=SV.standard_distr(0,359))

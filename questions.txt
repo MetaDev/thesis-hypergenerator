@@ -1,7 +1,17 @@
-mention the move from weighted density estimation to regression, is mathematically more correct because the EM will try
-to find a GMM that exactly crosses the fitness values, this also allows to use the DPGMM
+use poisson disk sampling
 
-regression also allows tree search sampling
+I found a lot of great examples of functional constraint in a pattern language
+It would make for a very intersting generator to encode some of the patterns from the book
+probabilistically in my generator
+
+
+Slight change in orientation to defend the fact that sampling can take longer
+very expensive fitness functions (which I don't incorporate in the learning process)
+like an AI playing a level (very high cost in terms of O notation) will need less evaluations if trivial faulty scene instances
+are no longer samples
+
+mention to try and move from weighted density estimation to regression, is mathematically more correct because the EM will try
+to find a GMM that exactly crosses the fitness values, this also allows to use other GMM (like DPGMM) with standard EM
 
 values isntead of implicitly
 ->possibility for more finegrained sampling of multiple objectives (each can have different interval)
@@ -12,16 +22,5 @@ would require multi-dimensional sampling of truncuated gmm, can also be used to 
 
 or I could simpy sample from the empirical distribution of the fitness values
 
-use poisson disk sampling
-
 mention the affine transformation of gaussian mixtures as a way to reuse previously trained distributions
 
-
-I found a lot of great examples of functional constraint in a pattern language
-It would make for a very intersting generator to encode some of the patterns from the book
-probabilistically in my generator
-
-Slight change in orientation to defend the fact that sampling can take longer
-very expensive fitness functions (which I don't incorporate in the learning process)
-like an AI playing a level (very high cost in terms of O notation) will need less evaluations if trivial faulty scene instances
-are no longer samples

@@ -28,7 +28,8 @@ from learning.gmm import GMM
 import learning.training as tr
 
 #experiment hyperparameters: sibling_order,
-sibling_order=0
+#sibling order 0 is
+sibling_order=2
 ndata=100
 n_components=15
 
@@ -39,7 +40,7 @@ sibling_fitness_funcs={tr.fitness_min_dist:2}
 parent_child_fitness_funcs={tr.fitness_polygon_overl:32}
 
 #model to train on
-root_sample=tm.test_model_var_child_position_parent_shape()
+root=tm.test_model_var_child_position_parent_shape()
 
 
 #a model trained on 4 children can also be used for 5 children of the fifth no longer conditions on the first
@@ -56,22 +57,26 @@ polygons_vis=[]
 
 
 #get size of vars
-X_var_length=np.sum([root_sample.get_children("child",as_list=True)[1].get_variable(name).size for name in vars_children])
-Y_var_length=np.sum([root_sample.get_variable(name).size for name in vars_parent])
+X_var_length=np.sum([root.children["child"][1].get_variable(name).size for name in vars_children])
+Y_var_length=np.sum([root.get_variable(name).size for name in vars_parent])
 
 
-data,fitness=tr.parent_child_variable_training(ndata,root_sample,parent_child_fitness_funcs,
+data,fitness=tr.parent_child_variable_training(ndata,root,parent_child_fitness_funcs,
 sibling_fitness_funcs,vars_parent,vars_children,sibling_order)
 
 print(len(data))
 #cap the data
 
 
-
+print("parent fitness")
 vis.print_fitness_statistics(fitness["parent"])
 if sibling_order>0:
+    print("child fitness")
     vis.print_fitness_statistics(fitness["children"])
+print("total fitness")
 vis.print_fitness_statistics(fitness["all"],print_hist=True)
+#TODO use PCA to reduce child parent fitness to single fitness
+
 
 data_cap, fitness_prod_cap= zip(*[(d,f) for d,f in zip(data,fitness["all"]) if f>0.001])
 
@@ -137,15 +142,15 @@ for p_shape in zip(p_shape_points,p_shape_points):
 
 #construct new model
 from model.search_space import GMMVariable,DummyStochasticVariable
-first_child=root_sample.get_children("child",as_list=True)[0]
+first_child=root.children["child"][0]
 
 X_dummy_vars=[DummyStochasticVariable(first_child.get_variable("position"))]
 Y_sibling_vars=[first_child.get_variable(name) for name in vars_children]
-Y_vars=[root_sample.get_variable(name) for name in vars_parent]
+Y_vars=[root.get_variable(name) for name in vars_parent]
 #the sibling order of the gmm is maximum the sibling order of the trained gmm
 gmm_vars=[GMMVariable("test",gmm,X_dummy_vars,Y_vars,Y_sibling_vars,sibling_order=i) for gmm,i in zip(gmms,range(len(gmms)))]
 
-children = root_sample.get_children("child",as_list=True)
+children = root.children["child"]
 #the gmms are ordered the same as the children
 
 #assign variable child i with gmm min(i,sibling_order)
@@ -158,7 +163,7 @@ for i in range(learned_var_range):
 
 #re-estimate average fitness
 #repeat sampling
-data,fitness=tr.parent_child_variable_training(ndata,root_sample,parent_child_fitness_funcs,
+data,fitness=tr.parent_child_variable_training(ndata,root,parent_child_fitness_funcs,
 sibling_fitness_funcs,vars_parent,vars_children,sibling_order)
 
 

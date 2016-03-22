@@ -66,9 +66,9 @@ def extract_samples_vars(samples,sample_name:str=None,var_name:str=None,independ
         for sample in samples:
             if not sample_name or sample.name.startswith(sample_name):
                 if independent:
-                    variables=sample.independent_vars
+                    variables=sample.values["ind"]
                 else:
-                    variables=sample.relative_vars
+                    variables=sample.values["rel"]
                 samples_variables.extend([v for k,v in variables.items() if k.startswith(var_name)])
         return samples_variables
     else:

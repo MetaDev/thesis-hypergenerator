@@ -1,18 +1,9 @@
 refactor old experiments
 
-research:
+leran different gmm if other number of children
 
-Neufert constraints
-
-research question: How to intelligently reduce the search space of procedural content generator using top-down and bottom-up constraints without negatively impacting expressiveness?
-
-implement regression instead of weighted sampling, use 1-dim for fitness
-the regressionan
-
-implement n-dim poisson disk sampling
-quasi deterministic sampling implementation for gmm's, can be done by quasi deterministic sampling over uniform
-that decide which component to take (in accordance to the weights). however this can not be extendend easily to multivariate
-gaussians as the cdf doesn't exist.
+do some reading on gmm regression
+than implement regression
 
 if regression works as good, use different library for learning that support DPGMM
 
@@ -31,14 +22,27 @@ the fitness values and according data used to calculate it
 also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
 
 
-
 visualisation is part of the model, the mapping
 add visualisation to fitness model as well
 
+research:
+
+Neufert constraints
+
+research question: How to optimise the search space of a procedural content generator, a priori defined by bottom up constraints and a posteriori by its top-down constraints, without negatively impacting its expressiveness?
+
+evaluation, the type of metrics and parameters that will be varied
+3 models for scenes, constraints and search space
 
 
 learning optimisation
 -------------------------
+
+instead of multiplying the multiple fitness functions -> dim reduction
+
+test learning with and without threshold on the fitness
+
+penalise gmm that strongly exceeds search space bounds (using likelyhood)
 
 initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
 use standard sk init for this, maybe only updating the covars and setting the means on a grid and weights uniform
@@ -213,8 +217,10 @@ do the plates on a table example for multiple fitness
 
 do an example of room generation, where the fitness can be the validity of a polygon (non-convex)
 
-evaluation
+evaluation and tests
 ------------------
+model 3 different scenec to do the tests on
+
 influence of model prior (hierachical relations) on learning and fitness (hierachical relations)
 compare learning performance with and withour hierarchical relations (additive for pos and rot and scale for size)
 
@@ -246,6 +252,14 @@ calculate expressivenes as the weighted average of the distance between samples,
 fitness of the samples
 
 could maybe the entropy of the gaussian as a measure of information give some form of expressiveness?
+
+
+writing
+---------------------
+
+argument taxonomy of constraints based on examples found in architectural books
+
+discuss truncuatedsampling vs truncuated learning, performance vs precision (overfitting)
 
 
 sibling fitness
