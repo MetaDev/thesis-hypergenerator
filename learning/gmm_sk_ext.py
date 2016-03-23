@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import numpy.linalg as linalg
 import numpy as np
-from copy import deepcopy
 from sklearn import mixture
 
 
@@ -10,11 +8,10 @@ from sklearn import cluster
 from time import time
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils import  check_array
+from scipy.misc import logsumexp as bayes_logsumexp
+
 from sklearn.utils.extmath import logsumexp
 class GMM(mixture.gmm.GMM):
-
-
-
     def weighted_fit(self, X, Xweights, y=None, do_prediction=False):
 
             #sample weight need to be normalised
@@ -148,6 +145,8 @@ class GMM(mixture.gmm.GMM):
                 responsibilities = np.zeros((X.shape[0], self.n_components))
 
             return responsibilities
+
+
     def score_weighted_samples(self, X,Xweights):
         """Return the per-sample likelihood of the data under the model.
         Compute the log probability of X under the model and
@@ -183,3 +182,104 @@ class GMM(mixture.gmm.GMM):
         logprob=np.array([l*w for l,w in zip(logprob,Xweights)])
         responsibilities = np.exp(lpr - logprob[:, np.newaxis])
         return logprob, responsibilities
+
+import sklearn_bayes
+from scipy.linalg import pinvh
+
+class VBGMMARD(sklearn_bayes.mixture.VBGMMARD):
+    def fit_weighted(self, X,Xweights):
+        '''
+        Fits Variational Bayesian GMM with ARD, automatically determines number
+        of mixtures component.
+
+        Parameters
+        -----------
+        X: numpy array [n_samples,n_features]
+           Data matrix
+
+        Returns
+        -------
+        self: object
+           self
+        '''
+        if not Xweights:
+                return self.fit(X)
+            #check the weights between [0,1]
+        if np.min(Xweights)<0 or np.max(Xweights)>1:
+            raise ValueError("The sample weights should be in the interval [0,1]")
+        X                     =  self._check_X(X)
+        n_samples, n_features =  X.shape
+        init_, iter_          =  self._init_params(X)
+
+        if self.verbose:
+            print('Parameters are initialise ...')
+        means0, scale0, scale_inv0, beta0, dof0, weights0  =  init_
+        means, scale, scale_inv, beta, dof, weights        =  iter_
+        # all clusters are active initially
+        active = np.ones(self.n_components, dtype = np.bool)
+        self.n_active = np.sum(active)
+
+        for j in range(self.n_iter):
+
+            means_before = np.copy(means)
+
+            # Approximate lower bound with Mean Field Approximation
+            for i in range(self.n_mfa_iter):
+
+                # Update approx. posterior of latent distribution
+                resps, delta_ll = self._update_resps_parametric_weighted(X,Xweights, weights, self.n_active,
+                                                                dof, means, scale, beta)
+
+                # Update approx. posterior of means & pecision matrices
+                Nk     = np.sum(resps,axis = 0)
+                Xk     = [np.sum(resps[:,k:k+1]*X,0) for k in range(self.n_active)]
+                Sk     = [np.dot(resps[:,k]*X.T,X) for k in range(self.n_active)]
+                beta, means, dof, scale = self._update_params(Nk, Xk, Sk, beta0,
+                                                              means0, dof0, scale_inv0,
+                                                              beta,  means,  dof, scale)
+
+
+            # Maximize lower bound with respect to weights
+
+            # update weights to maximize lower bound
+            weights      = Nk / n_samples
+
+            # prune all irelevant weights
+            active            = weights > self.prune_thresh
+            means0            = means0[active,:]
+            scale             = scale[active,:,:]
+            weights           = weights[active]
+            weights          /= np.sum(weights)
+            dof               = dof[active]
+            beta              = beta[active]
+            n_comps_before    = self.n_active
+            means             = means[active,:]
+            self.n_active     = np.sum(active)
+            if self.verbose:
+                print(('Iteration {0} completed, number of active clusters '
+                       ' is {1}'.format(j,self.n_active)))
+
+            # check convergence
+            if n_comps_before == self.n_active:
+                if self._check_convergence(n_comps_before,means_before,means):
+                    if self.verbose:
+                        print("Algorithm converged")
+                    break
+
+        self.means_   = means
+        self.weights_ = weights
+        self.covars_  = np.asarray([1./df * pinvh(sc) for sc,df in zip(scale,dof)])
+        # calculate parameters for predictive distribution
+        self.predictors_ = self._predict_dist_params(dof,beta,means,scale)
+        return self
+    def _update_resps_parametric_weighted(self, X, Xweights, log_weights, clusters, *args):
+        ''' Updates distribution of latent variable with parametric weights'''
+        log_resps  = np.asarray([self._update_logresp_cluster(X,k,log_weights,*args)
+                                for k in range(clusters)]).T
+        log_like       = np.copy(log_resps)
+        logprob = bayes_logsumexp(log_resps, axis = 1, keepdims = True)
+        logprob=np.array([l*w for l,w in zip(logprob,Xweights)])
+        log_resps     = log_resps - logprob
+        resps          = np.exp(log_resps)
+        delta_log_like = np.sum(resps*log_like) - np.sum(resps*log_resps)
+        return resps, delta_log_like

@@ -1,11 +1,21 @@
-refactor old experiments
+set up tests to compare with weighted samples
 
-leran different gmm if other number of children
+calculate MSE of GMM
+
+add k fold cross validation to find best best fitted model due to stochastic EM
+use different metrics, fitness MSE, fit and weighted variance of n generated samples
+
+add gridsearch on parameters to find best parameters
+
+
+reachability
+
+leran different gmm if stochastic number of children
+
+implicit children
 
 do some reading on gmm regression
 than implement regression
-
-if regression works as good, use different library for learning that support DPGMM
 
 truncuated gmm with MCMC
 
@@ -221,6 +231,14 @@ do an example of room generation, where the fitness can be the validity of a pol
 
 evaluation and tests
 ------------------
+compare different values of capping the fitness
+compare different values of conditions for the fitness
+
+compare weighted samples with regression
+
+try dimensionality reduction to convert multi-objective in single-objective (PCA)
+also try weighted and multiplied fitness functions.
+
 evaluate with and without poisson sampling, change the search space size and number of dimensions and
 compare expressiveness and mse
 
@@ -257,6 +275,13 @@ calculate expressivenes as the weighted average of the distance between samples,
 fitness of the samples
 
 could maybe the entropy of the gaussian as a measure of information give some form of expressiveness?
+
+
+metrics
+---------------------
+MSE with fitness
+fitness mean and variance
+weighted data diversity (distance between points) weighted with fitness-> Measures of statistical dispersion
 
 
 writing

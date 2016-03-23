@@ -70,7 +70,6 @@ class StochasticVariable(Variable):
 
 
     def init_poisson(self,n_samples):
-        print("kak")
         import model.sampling.poisson as poisson
         poisson_generator = poisson.PoissonGenerator(self.size)
         self.points = poisson_generator.find_point_set(n_samples)

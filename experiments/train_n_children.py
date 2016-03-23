@@ -53,9 +53,6 @@ repeat_trained_model=True
 polygons_vis=[]
 
 
-
-
-
 #get size of vars
 X_var_length=np.sum([root.children["child"][1].get_variable(name).size for name in vars_children])
 Y_var_length=np.sum([root.get_variable(name).size for name in vars_parent])
@@ -75,13 +72,12 @@ if sibling_order>0:
     vis.print_fitness_statistics(fitness["children"])
 print("total fitness")
 vis.print_fitness_statistics(fitness["all"],print_hist=True)
-#TODO use PCA to reduce child parent fitness to single fitness
 
-data_cap, fitness_prod_cap= zip(*[(d,f) for d,f in zip(data,fitness["all"]) if f>0.001])
+data, fitness_all= zip(*[(d,f) for d,f in zip(data,fitness["all"]) if f>0.001])
 
 
 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
-gmm.fit(data_cap,fitness_prod_cap,min_covar=0.01)
+gmm.fit(data,fitness_all,min_covar=0.01)
 #if sibling order is 0 you have only a single gmm
 gmms=[None]*(sibling_order+1)
 gmms[sibling_order]=gmm
