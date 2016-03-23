@@ -1,5 +1,7 @@
 set up tests to compare with weighted samples
 
+integrate DPGMM in GMM
+
 calculate MSE of GMM
 
 add k fold cross validation to find best best fitted model due to stochastic EM
@@ -7,12 +9,10 @@ use different metrics, fitness MSE, fit and weighted variance of n generated sam
 
 add gridsearch on parameters to find best parameters
 
-
 reachability
 
-leran different gmm if stochastic number of children
+learn different gmm if stochastic number of children
 
-implicit children
 
 do some reading on gmm regression
 than implement regression

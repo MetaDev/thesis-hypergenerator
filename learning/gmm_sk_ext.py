@@ -187,7 +187,7 @@ import sklearn_bayes
 from scipy.linalg import pinvh
 
 class VBGMMARD(sklearn_bayes.mixture.VBGMMARD):
-    def fit_weighted(self, X,Xweights):
+    def weighted_fit(self, X,Xweights):
         '''
         Fits Variational Bayesian GMM with ARD, automatically determines number
         of mixtures component.

@@ -18,10 +18,8 @@ def parent_child_variable_training(n_samples,root,parental_fitness_funcs,sibling
                                 vars_parent,vars_children, sibling_order=0):
     data=[]
     fitness={}
-    fitness["all"]=[]
     fitness["parent"]=[]
     fitness["children"]=[]
-    fitness["test"]=[]
     root_samples=root.sample(n_samples)
     print(len(root_samples))
     #only get children of a certain name
@@ -46,7 +44,6 @@ def parent_child_variable_training(n_samples,root,parental_fitness_funcs,sibling
                 for child0,child1 in combinations(children,2):
                     child_fitness*=sum([func(child0,child1)**order for func,order in  sibling_fitness_funcs.items()])
                 fitness["children"].append(child_fitness)
-            fitness["all"].append(child_fitness * parent_fitness)
 
     return data,fitness
 

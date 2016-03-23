@@ -160,7 +160,7 @@ class GMMVariable(StochasticVariable):
         self.X_lengths.insert(0,0)
         self.size=sum(self.X_lengths)
         self.sibling_order=sibling_order
-        self.gmm_size=len(gmm._means[0])
+        self.gmm_size=len(gmm.means_[0])
 
         #create dummy variable list
 

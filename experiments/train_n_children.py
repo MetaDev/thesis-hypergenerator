@@ -32,6 +32,7 @@ import learning.training as tr
 sibling_order=2
 ndata=100
 n_components=15
+infinite=True
 
 #training variables and fitness functions
 vars_children=["position"]
@@ -70,14 +71,12 @@ vis.print_fitness_statistics(fitness["parent"])
 if sibling_order>0:
     print("child fitness")
     vis.print_fitness_statistics(fitness["children"])
-print("total fitness")
-vis.print_fitness_statistics(fitness["all"],print_hist=True)
-
-data, fitness_all= zip(*[(d,f) for d,f in zip(data,fitness["all"]) if f>0.001])
+fitness_all = np.array(fitness["children"])*fitness["parent"]
+data, fitness_all= zip(*[(d,f) for d,f in zip(data,fitness_all) if f>0.001])
 
 
 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
-gmm.fit(data,fitness_all,min_covar=0.01)
+gmm.fit(data,fitness_all,infinite=infinite,min_covar=0.01)
 #if sibling order is 0 you have only a single gmm
 gmms=[None]*(sibling_order+1)
 gmms[sibling_order]=gmm
@@ -95,45 +94,45 @@ parent_position=np.array([1,2])
 p_shape_points=[0.5,1,1.5]
 #TODO
 #visualisation code needs cleaning up
-for p_shape in zip(p_shape_points,p_shape_points):
-    shape=[(0, 0), (0, 1),(0.5,1),p_shape,(1, 0.5),(1,0)]
-
-    polygon = mp.map_to_polygon(shape,[0.5,0.5],parent_position,0,(1,1))
-
-    previous_gmm_cond=None
-    from copy import deepcopy
-    #visualise the conditional distribution of children
-    #P(c_i,c_i-1,..,c_0,p) -> P(c_i|c_i-1,..,c_0,p)
-    values=p_shape
-    points=[]
-    for i in range(sibling_order+1):
-
-        ax = plt.gca()
-        ax.set_aspect(1)
-        ax.set_xlim(*xrange)
-        ax.set_ylim(*yrange)
-        print("child: ",i)
-        indices=np.arange(X_var_length,(i+1)*X_var_length+Y_var_length)
-
-        if previous_gmm_cond:
-            sample=np.array(previous_gmm_cond.sample(1)).flatten()
-            values=np.hstack((np.array(sample),np.array(values)))
-            point= np.array(sample) + np.array(parent_position)
-            points.append(point)
-            x,y=zip(*points)
-            ax.scatter(x,y,color="r")
-
-        values=np.array(values).flatten()
-        gmm_cond=gmms[i].condition(indices,values)
-        previous_gmm_cond=gmm_cond
-
-        gmm_show=deepcopy(gmm_cond)
-        gmm_show._means=[list(map(add, c, np.array(parent_position))) for c in gmm_show._means]
-        gmm_show._set_gmms()
-        vis.visualise_gmm_marg_2D_density(ax,gmm=gmm_show,colors=["g"])
-
-        vis.draw_polygons([polygon],ax)
-        plt.show()
+#for p_shape in zip(p_shape_points,p_shape_points):
+#    shape=[(0, 0), (0, 1),(0.5,1),p_shape,(1, 0.5),(1,0)]
+#
+#    polygon = mp.map_to_polygon(shape,[0.5,0.5],parent_position,0,(1,1))
+#
+#    previous_gmm_cond=None
+#    from copy import deepcopy
+#    #visualise the conditional distribution of children
+#    #P(c_i,c_i-1,..,c_0,p) -> P(c_i|c_i-1,..,c_0,p)
+#    values=p_shape
+#    points=[]
+#    for i in range(sibling_order+1):
+#
+#        ax = plt.gca()
+#        ax.set_aspect(1)
+#        ax.set_xlim(*xrange)
+#        ax.set_ylim(*yrange)
+#        print("child: ",i)
+#        indices=np.arange(X_var_length,(i+1)*X_var_length+Y_var_length)
+#
+#        if previous_gmm_cond:
+#            sample=np.array(previous_gmm_cond.sample(1)).flatten()
+#            values=np.hstack((np.array(sample),np.array(values)))
+#            point= np.array(sample) + np.array(parent_position)
+#            points.append(point)
+#            x,y=zip(*points)
+#            ax.scatter(x,y,color="r")
+#
+#        values=np.array(values).flatten()
+#        gmm_cond=gmms[i].condition(indices,values)
+#        previous_gmm_cond=gmm_cond
+#
+#        gmm_show=deepcopy(gmm_cond)
+#        gmm_show._means=[list(map(add, c, np.array(parent_position))) for c in gmm_show.means_]
+#        gmm_show._set_params_gmr()
+#        vis.visualise_gmm_marg_2D_density(ax,gmm=gmm_show,colors=["g"])
+#
+#        vis.draw_polygons([polygon],ax)
+#        plt.show()
 
 #construct new model
 from model.search_space import GMMVariable,DummyStochasticVariable

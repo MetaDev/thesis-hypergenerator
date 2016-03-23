@@ -69,8 +69,6 @@ vis.print_fitness_statistics(fitness["parent"])
 if sibling_order>0:
     print("child fitness")
     vis.print_fitness_statistics(fitness["children"])
-print("total fitness")
-vis.print_fitness_statistics(fitness["all"],print_hist=True)
 
 data, fitness_p,fitness_c= zip(*[(d,fp,fc) for d,fp,fc in zip(data,fitness["parent"],fitness["children"]) if fp>0.0001 and fc > 0.0001])
 
@@ -85,8 +83,10 @@ max_k=30
 #gmm = VBGMMARD(n_components = max_k, prune_thresh = prune_thresh)
 import gmm_sk_ext
 gmm = gmm_sk_ext.VBGMMARD(n_components = max_k, prune_thresh = prune_thresh)
-gmm.fit_weighted(data,fitness_p)
+gmm.weighted_fit(data,fitness_p)
 print(len(gmm.means_))
+print(gmm.covars_)
+
 gmm= GMM(weights=gmm.weights_,means=gmm.means_,covariances=gmm.covars_)
 #fitness_gmm = gmm.condition([len(train_data[0])-2,len(train_data[0])-1],[1.1,1])
 #fitness_gmm = gmm.condition([len(train_data[0])-2],[1])

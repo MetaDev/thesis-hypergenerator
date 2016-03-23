@@ -110,7 +110,7 @@ def visualise_gmm_marg_2D_density(ax,gmm,
     max_alpha=0.4
 
     for factor in np.linspace(min_factor, max_factor, steps):
-        for (mean, (angle, width, height)),weight in zip(gmm.gmm_gmr.to_ellipses(factor),gmm._weights):
+        for (mean, (angle, width, height)),weight in zip(gmm.gmm_gmr.to_ellipses(factor),gmm.weights_):
             ell = Ellipse(xy=mean, width=width, height=height,
                           angle=np.degrees(angle))
             ell.set_alpha(min_alpha+(max_alpha-min_alpha)*weight)
