@@ -1,27 +1,37 @@
-set up tests to compare with weighted samples
-
-integrate DPGMM in GMM
+set up tests to compare regression with weighted samples
 
 calculate MSE of GMM
+add visualisation of GMM to GMM
+
+learn different gmm if stochastic number of children
+and integrate in search space, to sibling order defines the number of children on which is learned
+thus to learn configuration of different amount of children I should learn on each sibling order
+that is possible (until a maximum), but for example the config of 5 can be derived from 6 by marginalsing
+even though it less precise, it still works, thus the learning should be defined
+by a sequence that groups configuration that are learned together
+
+add method to alter a stochastic variable to a temporary variable (dict)
+this is necessary to be able to measure the goodness of a certain sibling model seperately
+eg model for 5->7 siblings (with k-fold)
+
+to achieve best combination of all sibling models
 
 add k fold cross validation to find best best fitted model due to stochastic EM
 use different metrics, fitness MSE, fit and weighted variance of n generated samples
 
 add gridsearch on parameters to find best parameters
 
-reachability
 
-learn different gmm if stochastic number of children
+do some reading on gmm regression, to gain some insight in and ideas
 
-
-do some reading on gmm regression
-than implement regression
 
 truncuated gmm with MCMC
 
-factory method to visualise fitness functions
 
-more variables and fitness functions
+more variables, fitness functions and scene models
+
+
+reachability
 
 learn to fit surface according to surface ratio in a polygon
 
@@ -34,9 +44,6 @@ the fitness values and according data used to calculate it
 also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
 
 
-visualisation is part of the model, the mapping
-add visualisation to fitness model as well
-
 research:
 
 Neufert constraints
@@ -46,6 +53,12 @@ research question: How to optimise the search space of a procedural content gene
 evaluation, the type of metrics and parameters that will be varied
 3 models for scenes, constraints and search space
 
+visualisation is part of the model, the mapping
+add visualisation to fitness model as well
+
+factory method to visualise fitness functions
+
+retraining
 
 learning optimisation
 -------------------------
@@ -231,10 +244,26 @@ do an example of room generation, where the fitness can be the validity of a pol
 
 evaluation and tests
 ------------------
+compare differen configurations of sibling order learning
+compare sibling learning between seperate models and full joint with marganilising
+seperate models for P(c1|c0,p), P(c2|c1,c0,p),... or one model for P(c0,c1,c2,..|p) and marginilise out
+
+also evaluate the influence of reusing data (learning on combinations of available children)
+
 compare different values of capping the fitness
 compare different values of conditions for the fitness
 
-compare weighted samples with regression
+compare weighted samples wrt regression
+
+calculate fitness performance
+
+calculate expressivenes as the weighted average of the distance between samples, where the weight is based on the
+fitness of the samples
+
+seperately
+evaluate performance of regression using MSE
+
+evaluate weighted sampling using likelihood of a point and it's according weight
 
 try dimensionality reduction to convert multi-objective in single-objective (PCA)
 also try weighted and multiplied fitness functions.
@@ -257,22 +286,9 @@ dividing this stroke in smaller substrokes is unintuitive for the user and will 
 using the implicit parent child relation would be more intuitive than explicit search space definition in this stroke
 or when the user doesn't know what the search space will look like.
 
-compare sibling learning between seperate models and full joint with marganilising
-seperate models for P(c1|c0,p), P(c2|c1,c0,p),... or one model for P(c0,c1,c2,..|p) and marginilise out
-
-compare joint learning parent->child child->child with seperate learning
-seperate model for P(c|p) , P(c1|c0),p(c2|c1,c0),... and assume independende between distributions
-thus we get P(c1|c0,p)=P(c1,c0,p)/p(c0,p)=(P(c1|c0)*P(c0|p))/P(c0,p)
-or a single model P(c1|c0,p)
-
 expressiveness evaluaion: difference in surface between polygon and surface of gaussians
 likelihood of handmade examples in learned distribution
 
-the fitted gaussian mixture model can be evaluated by estimating the fitness of a point and plotting
-the MSE, a metric proposed in thesis about gmm regression
-
-calculate expressivenes as the weighted average of the distance between samples, where the weight is based on the
-fitness of the samples
 
 could maybe the entropy of the gaussian as a measure of information give some form of expressiveness?
 

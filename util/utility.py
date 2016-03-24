@@ -8,7 +8,10 @@ import operator as op
 from shapely.geometry import Point
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPolygon
+from functools import reduce
 import re
+def prod(iterable):
+    return reduce(op.mul, iterable, 1)
 
 def get_trailing_number(s):
     m = re.search(r'\d+$', s)

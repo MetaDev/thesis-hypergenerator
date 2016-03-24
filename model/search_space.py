@@ -177,7 +177,8 @@ class GMMVariable(StochasticVariable):
         #only retrieve values of necessary siblings
         for sibling in sibling_samples[-self.sibling_order:]:
             Y_sibling_values.extend(np.array([sibling.values["ind"][var.name] for var in self.Y_vars_siblings]).flatten())
-        Y_values=np.hstack((Y_sibling_values,Y_parent_values))
+        #the order of values is by convention, also enforced in the sampling and learning procedure
+        Y_values=np.hstack((Y_parent_values,Y_sibling_values))
         #the last X are cond attributes
         Y_indices=np.arange(self.size,self.gmm_size)
         #maybe cache the gmm cond if ithe value of cond_x has already been conditioned

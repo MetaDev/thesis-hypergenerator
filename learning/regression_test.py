@@ -43,8 +43,9 @@ n_components=15
 #training variables and fitness functions
 vars_children=["position"]
 vars_parent=["shape3"]
-sibling_fitness_funcs={tr.fitness_min_dist:2}
-parent_child_fitness_funcs={tr.fitness_polygon_overl:32}
+#fitness func, order and cap
+sibling_fitness_funcs=[(tr.fitness_min_dist,2,0.1)]
+parent_child_fitness_funcs=[(tr.fitness_polygon_overl,32,0.5)]
 
 #model to train on
 root=tm.test_model_var_child_position_parent_shape()
@@ -77,21 +78,16 @@ data, fitness_p,fitness_c= zip(*[(d,fp,fc) for d,fp,fc in zip(data,fitness["pare
 train_data=np.column_stack((data,fitness_p,fitness_c))
 
 #calculate the joint of both fitness and vars P(X,Y)
-#gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
-prune_thresh = 1e-2
-max_k=30
-#gmm = VBGMMARD(n_components = max_k, prune_thresh = prune_thresh)
-import gmm_sk_ext
-gmm = gmm_sk_ext.VBGMMARD(n_components = max_k, prune_thresh = prune_thresh)
-gmm.weighted_fit(data,fitness_p)
+gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
+
+gmm.fit(data,fitness_p)
 print(len(gmm.means_))
 print(gmm.covars_)
 
 gmm= GMM(weights=gmm.weights_,means=gmm.means_,covariances=gmm.covars_)
-#fitness_gmm = gmm.condition([len(train_data[0])-2,len(train_data[0])-1],[1.1,1])
-#fitness_gmm = gmm.condition([len(train_data[0])-2],[1])
+fitness_gmm = gmm.condition([len(train_data[0])-2,len(train_data[0])-1],[1.1,1])
 
-gmm_points=gmm.marginalise([0,1])
+gmm_points=fitness_gmm.marginalise([0,1])
 points=np.array(gmm_points.sample(400))
 x,y=zip(*points)
 ax=plt.gca()

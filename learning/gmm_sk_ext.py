@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from sklearn import mixture
+import sklearn.mixture
 
 
 
@@ -11,7 +11,7 @@ from sklearn.utils import  check_array
 from scipy.misc import logsumexp as bayes_logsumexp
 
 from sklearn.utils.extmath import logsumexp
-class GMM(mixture.gmm.GMM):
+class GMM(sklearn.mixture.gmm.GMM):
     def weighted_fit(self, X, Xweights, y=None, do_prediction=False):
 
             #sample weight need to be normalised
@@ -183,7 +183,7 @@ class GMM(mixture.gmm.GMM):
         responsibilities = np.exp(lpr - logprob[:, np.newaxis])
         return logprob, responsibilities
 
-import sklearn_bayes
+import sklearn_bayes.mixture
 from scipy.linalg import pinvh
 
 class VBGMMARD(sklearn_bayes.mixture.VBGMMARD):
