@@ -1,7 +1,6 @@
 set up tests to compare regression with weighted samples
+continue
 
-calculate MSE of GMM
-add visualisation of GMM to GMM
 
 learn different gmm if stochastic number of children
 and integrate in search space, to sibling order defines the number of children on which is learned
@@ -21,11 +20,20 @@ use different metrics, fitness MSE, fit and weighted variance of n generated sam
 
 add gridsearch on parameters to find best parameters
 
+calculate MSE of GMM
+add visualisation of GMM to GMM
+
+if possible
+
+truncuated gmm with MCMC
+
+should be done by 31/03
 
 do some reading on gmm regression, to gain some insight in and ideas
 
 
-truncuated gmm with MCMC
+
+start writing methodology
 
 
 more variables, fitness functions and scene models
@@ -43,6 +51,8 @@ in training utility, a method sould receive the samples, and the fitness functio
 the fitness values and according data used to calculate it
 also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
 
+create seperate class for fitness
+the order and cap of a fitness function belongs in the fitness calculation not the training method
 
 research:
 
@@ -244,6 +254,16 @@ do an example of room generation, where the fitness can be the validity of a pol
 
 evaluation and tests
 ------------------
+
+because for the fitness function order is not important I should look how the learning best incorporates the fitness
+in terms of relativity to the data, should the data be ordered (random or deterministic) mor because it doesn't
+matter another approach is to add all possible orderings as data, they are all valid for the fitness function
+
+train with ordering, order by a variable (position, rotation), random order, or no ordering (keep order given by combination) or train on all possible orderings
+
+by training only on parent->child and increasing sibling order the scaling properties in dimensionality can be shown
+in terms of necessary data, performance
+
 compare differen configurations of sibling order learning
 compare sibling learning between seperate models and full joint with marganilising
 seperate models for P(c1|c0,p), P(c2|c1,c0,p),... or one model for P(c0,c1,c2,..|p) and marginilise out

@@ -32,7 +32,7 @@ class GMM(sklearn.mixture.gmm.GMM):
                 Posterior probabilities of each mixture component for each
                 observation.
             """
-            if not Xweights:
+            if Xweights is None:
                 return self.fit(X)
             #check the weights between [0,1]
             if np.min(Xweights)<0 or np.max(Xweights)>1:
@@ -73,7 +73,7 @@ class GMM(sklearn.mixture.gmm.GMM):
                     if not cv.shape:
                         cv.shape = (1, 1)
                     self.covars_ = \
-                        mixture.gmm.distribute_covar_matrix_to_match_covariance_type(
+                        sklearn.mixture.gmm.distribute_covar_matrix_to_match_covariance_type(
                             cv, self.covariance_type, self.n_components)
                     if self.verbose > 1:
                         print('\tCovariance matrices have been initialized.')
@@ -175,7 +175,7 @@ class GMM(sklearn.mixture.gmm.GMM):
         if X.shape[1] != self.means_.shape[1]:
             raise ValueError('The shape of X  is not compatible with self')
 
-        lpr = (mixture.gmm.log_multivariate_normal_density(X, self.means_, self.covars_,
+        lpr = (sklearn.mixture.gmm.log_multivariate_normal_density(X, self.means_, self.covars_,
                                                self.covariance_type) +
                np.log(self.weights_))
         logprob = logsumexp(lpr, axis=1)
@@ -202,7 +202,7 @@ class VBGMMARD(sklearn_bayes.mixture.VBGMMARD):
         self: object
            self
         '''
-        if not Xweights:
+        if Xweights is None:
                 return self.fit(X)
             #check the weights between [0,1]
         if np.min(Xweights)<0 or np.max(Xweights)>1:
