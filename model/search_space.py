@@ -138,65 +138,50 @@ class DummyStochasticVariable(StochasticVariable):
         Variable.__init__(self,variable.name,variable.func)
         self.size=variable.size
 
+import util.data_format as dtfr
 
 #P(X|Y)
-#maybe add method to generate trained samples if they are turned on
 class GMMVariable(StochasticVariable):
-    #the GMM should be trained on vector [non_cond_vars,cond_vars]
     #for the GMM the names are a list names of each variable it generates when sampled
     #the lengths are an array of ints indicating the non_cond var length
     #TODO check validity of GMM, its dimension against the given X and Y vars
-    def __init__(self,name,gmm: GMM,X_vars:List[DummyStochasticVariable], Y_vars_parent:List[Variable],Y_vars_siblings,sibling_order):
+    def __init__(self,name,gmm: GMM,child_vars:List[Variable], parent_vars:List[Variable],sibling_vars,sibling_order):
         #non_cond_vars are save in attribute variables of VectorVariable
         Variable.__init__(self,name)
-        self.unpack_names=[v.name for v in X_vars]
+        self.child_vars=child_vars
+        self.unpack_names=[v.name for v in child_vars]
         self.unpack=True
-        self.X_vars=X_vars
+        self.sibling_vars=sibling_vars
         self.gmm=gmm
-        self.Y_vars_parent=Y_vars_parent
-        self.Y_vars_siblings=Y_vars_siblings
-        self.X_lengths=[v.size for v in X_vars]
-        #this is for calculating the edges of the vector to be return in relative value
-        self.X_lengths.insert(0,0)
-        self.size=sum(self.X_lengths)
+        self.parent_vars=parent_vars
         self.sibling_order=sibling_order
-        self.gmm_size=len(gmm.means_[0])
 
         #create dummy variable list
 
     #when sampling, sample from a the distribution completely conditioned on the parent independent variable values
     #values on which is trained of course
-
     #group the values according the vector structure of the search space (given by dummy variables)
     def sample(self, parent_sample,sibling_samples,i,n_samples):
-        #flatten list for calculation of cond distr
-        #parent condition variable
-        Y_parent_values=np.array([parent_sample.values["ind"][var.name] for var in self.Y_vars_parent]).flatten()
-        #sibling condition variable
-        Y_sibling_values=[]
-        #only retrieve values of necessary siblings
-        for sibling in sibling_samples[-self.sibling_order:]:
-            Y_sibling_values.extend(np.array([sibling.values["ind"][var.name] for var in self.Y_vars_siblings]).flatten())
-        #the order of values is by convention, also enforced in the sampling and learning procedure
-        Y_values=np.concatenate((Y_sibling_values,Y_parent_values))
-        #the last X are cond attributes
-        Y_indices=np.arange(self.size,self.gmm_size)
-        #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
-        X_values=self.gmm.condition(Y_indices,Y_values).sample(1)[0]
-        return [X_values[l1:l2] for l1,l2 in ut.pairwise(self.X_lengths)]
+        values,indices= dtfr.format_data_for_conditional(parent_sample,self.parent_vars,
+                                                         sibling_samples,self.sibling_vars,
+                                                         self.sibling_order)
 
+        #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
+        cond_values=self.gmm.condition(indices,values).sample(1)[0]
+        #split the data obtained from the joint distribution back into an array of variables
+        return dtfr.split_variables(self.sibling_vars,cond_values)
 
 
     def relative_sample(self,samples,parent_sample):
-        return [var.relative_sample(value,parent_sample) for var,value in zip(self.X_vars,samples)]
+        return [var.relative_sample(value,parent_sample) for var,value in zip(self.child_vars,samples)]
 
 class TreeDefNode:
 
     class VarDefNode:
         class SampleNode:
 
-            def __init__(self,var_def_node,order_id,values):
-                self.order_id=order_id
+            def __init__(self,var_def_node,values):
+                self.index=var_def_node.index
                 self.var_def_node=var_def_node
                 self.values=values
                 self.children=None
@@ -254,7 +239,8 @@ class TreeDefNode:
                                                   var.unpack_names):
                         values["ind"][name]=v
                         values["rel"][name]=rel_v
-                        values["stoch"][name]=v
+                        if var.stochastic():
+                            values["stoch"][name]=v
             #than iterate unpacked variables, which possibly override previous variables
             #from a packed variable
             for var in self.sample_variables:
@@ -266,12 +252,14 @@ class TreeDefNode:
                     if var.stochastic():
                         values["stoch"][var.name]=value
             child_samples={}
-            order_id=str(n_siblings)+ ":" + str(self.index)+ ";"+ str(n_samples) + ':'+str(i)
-            sample=self.SampleNode(self,order_id,values)
+            #convert var def node to actual sample node
+            sample=self.SampleNode(self,values)
+            #TODO check ordering of children
             for child_nodes in self.children.values():
                 child_samples[child_nodes[0].name]=[]
                 for child in child_nodes:
                     n_children=values["rel"][child.name]
+                    #only sample the amount of children as sampled
                     if child.index < n_children:
                         siblings=list(child_samples[child.name])
                         child_sample=child._sample(i,n_samples,sample,siblings)
@@ -341,7 +329,8 @@ class TreeDefNode:
         #the children keep the variable as key
         self.children=dict([(c[1].name,c[1])for c in children])
 
-
+    def max_children(self,child_name):
+        return self.variables[child_name].high
 
 
 

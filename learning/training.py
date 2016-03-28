@@ -21,8 +21,11 @@ class SiblingTrainReOrder(Enum):
     any_order = 5
 #the order variable should be a string matching either a parent fitness func method or a string matching a variable name
 def parent_child_variable_training(n_samples,root,parental_fitness,sibling_fitness,
-                                vars_parent,vars_children,child_name="child",sibling_order=0,sibling_train_order=SiblingTrainReOrder.no_reorder,order_variable=None):
-    #the order of the data is sibling0,sibling1,..sibling0,parent,
+                                vars_parent,vars_children,child_name="child",
+                                sibling_order=0,
+                                sibling_train_order=SiblingTrainReOrder.no_reorder,
+                                order_variable=None,respect_sibling_order=False):
+    #the order of the data is parent,sibling0,sibling1,..
     data=[]
     #fitness order parent_funcs,sibling_funcs
     fitness=[]
@@ -50,7 +53,7 @@ def parent_child_variable_training(n_samples,root,parental_fitness,sibling_fitne
             #data -> child,parent
             if not capped[child]:
                 child_vars=np.array([child.values["ind"][name] for name in vars_children]).flatten()
-                data_child[child]=np.concatenate((child_vars,data_parent))
+                data_child[child]=np.concatenate((data_parent,child_vars))
 
         # if the sibling order is 0, only the child parent fitness is learned
         if sibling_order is 0:
@@ -60,14 +63,16 @@ def parent_child_variable_training(n_samples,root,parental_fitness,sibling_fitne
          #sibling fitness only necessary if the order of the siblings in the model is > 0
         else:
             #the number of siblings trained on cannot be bigger than the number of children
-            n_siblings=min(len(children),sibling_order+1)
-            #calculate sibling funcs
+            n_siblings=sibling_order+1
 
-            #for all possible combinations of lenght sibling order of existing children
-
-            #TODO add combinations iteration where the order is respected, eg window combinations, no reuse of data
-            #this matters when the number of children that is sampled changes the distribution -> after training
-            for childcombinations in combinations(children,n_siblings):
+            #if the order of the sibling needs to be respected we can not reuse that data by training
+            #on all possible combinations of siblings, because the siblings are no longer independent from their order
+            #for example after training the n order markov chain between siblings
+            if respect_sibling_order:
+                sibling_sequences=[children]
+            else:
+                sibling_sequences=combinations(children,n_siblings)
+            for childcombinations in sibling_sequences:
                 fitness_values_siblings=[]
                 #calculate complete pairwise fitness
 
@@ -103,8 +108,8 @@ def parent_child_variable_training(n_samples,root,parental_fitness,sibling_fitne
                 if sibling_train_order is SiblingTrainReOrder.any_order:
                     for children in permutations(childcombinations):
                         data_sibling=np.array([np.array([child.values["ind"][name]
-                                for name in vars_children]).flatten() for child in children ]).flatten()
-                        data.append(np.concatenate((data_sibling,data_parent)))
+                                for name in vars_children]).flatten() for child in children]).flatten()
+                        data.append(np.concatenate((data_parent,data_sibling)))
                         fitness.append(fitness_values)
                 else:
                     if sibling_train_order is SiblingTrainReOrder.reorder_fitness:
@@ -125,7 +130,7 @@ def parent_child_variable_training(n_samples,root,parental_fitness,sibling_fitne
                         random.shuffle(list(childcombinations))
                     data_siblings=np.array([np.array([child.values["ind"][name]
                                 for name in vars_children]).flatten() for child in childcombinations ]).flatten()
-                    data.append(np.concatenate((data_siblings,data_parent)))
+                    data.append(np.concatenate((data_parent,data_siblings)))
                     fitness.append(fitness_values)
 
     return np.array(data),np.array(fitness)

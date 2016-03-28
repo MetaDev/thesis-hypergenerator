@@ -1,27 +1,24 @@
-set up tests to compare regression with weighted samples
-continue
+centralise data format for traing and sampling
+give order to variables in TreeDefNode
+
+to compare performance between learned models the actual fitness should be used not the fitness with order that used in traing
+
+re-training
+
+Thus implement, retraining, where sampled data originates from previously trained models
 
 
-learn different gmm if stochastic number of children
-and integrate in search space, to sibling order defines the number of children on which is learned
-thus to learn configuration of different amount of children I should learn on each sibling order
-that is possible (until a maximum), but for example the config of 5 can be derived from 6 by marginalsing
-even though it less precise, it still works, thus the learning should be defined
-by a sequence that groups configuration that are learned together
+visualise the distributions of a model and a small representative sample set
+make something that visualise some random (or best, worst) samples
+and also the corresponding GMMs (in stages of the generation, this visualisation should be placed with the variables)
+->in gmm if variable is dim 1 or 2 and visual is true, plot the gmm
+->visualise sampling process
+add visualisation of GMM to GMM
 
-add method to alter a stochastic variable to a temporary variable (dict)
-this is necessary to be able to measure the goodness of a certain sibling model seperately
-eg model for 5->7 siblings (with k-fold)
-
-to achieve best combination of all sibling models
-
-add k fold cross validation to find best best fitted model due to stochastic EM
-use different metrics, fitness MSE, fit and weighted variance of n generated samples
 
 add gridsearch on parameters to find best parameters
 
 calculate MSE of GMM
-add visualisation of GMM to GMM
 
 if possible
 
@@ -254,6 +251,9 @@ do an example of room generation, where the fitness can be the validity of a pol
 
 evaluation and tests
 ------------------
+
+different ways of combining fitness values (between siblings in the joint)
+either multiply, average, other more complex functions, (the order of a functions is already a way of changing this function) so different values for the order can be tested as well
 
 because for the fitness function order is not important I should look how the learning best incorporates the fitness
 in terms of relativity to the data, should the data be ordered (random or deterministic) mor because it doesn't
