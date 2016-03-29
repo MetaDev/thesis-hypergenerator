@@ -28,6 +28,7 @@ class Variable(metaclass = ABCMeta):
         self.unpack=False
         self.set_func(func)
     #these samples are for conditional relations
+
     @abstractmethod
     def sample(self, parent_sample,sibling_sample,i,n_samples):
         pass
@@ -51,21 +52,29 @@ class Variable(metaclass = ABCMeta):
     def stochastic(self):
         pass
 
+class NumberChildrenVariable(Variable):
+    def __init__(self,name,low,high,step=1):
+        super().__init__(name,None)
+        self.size=1
+        self.high=high
+        self.low=low
+        self.choices=np.arange(low,high+1,step)
+    def sample(self,parent_sample,sibling_sample,i,n_samples):
+        return np.random.choice(self.choices)
 
 class StochasticVariable(Variable):
 
-    def __init__(self,name,low,high,func=None,step=None,poisson=True):
+    def __init__(self,name,low,high,func=None,poisson=True):
         super().__init__(name,func)
         self.size=len(high)
         self.high=np.array(high)
         self.low=np.array(low)
+        self.points=None
         if len(low) is not len(high):
             raise ValueError("Dimensions of bounds are not equal.")
         self.poisson=poisson
-        #create possible discrete values
-        if step is not None:
-            self.choices=np.arange(low,high,step)
-        elif poisson and self.size>3:
+
+        if poisson and self.size>3:
             raise ValueError("Poisson disk sampling is only supported up to 3 dimensions")
 
 
@@ -75,16 +84,13 @@ class StochasticVariable(Variable):
         self.points = poisson_generator.find_point_set(n_samples)
 
     def sample(self,parent_sample,sibling_sample,i,n_samples):
-        if hasattr(self,"choices"):
-            return np.random.choice(self.choices,size=self.size)
+        if self.poisson and n_samples>1:
+            if  self.points is None:
+                self.init_poisson(n_samples)
+            point=self.points[i]
         else:
-            if self.poisson and n_samples>1:
-                if i is 0:
-                    self.init_poisson(n_samples)
-                point=self.points[i]
-            else:
-                point=scipy.stats.uniform.rvs(size=self.size)
-            return self.low + point*(self.high-self.low)
+            point=scipy.stats.uniform.rvs(size=self.size)
+        return self.low + point*(self.high-self.low)
 
     def stochastic(self):
         return True
@@ -319,12 +325,12 @@ class TreeDefNode:
     def __init__(self,name,variables:List[Variable] ,children=[]):
         self.node_sample=None
         self.name=name
-        self.variables=variables
         #add number of child distributions to variables
         #the name of that distribution needs to be equal
         for c in children:
             c[0].name=c[1].name
-            self.variables.append(c[0])
+            variables.append(c[0])
+
         self.variables=dict([(var.name,var) for var in variables])
         #the children keep the variable as key
         self.children=dict([(c[1].name,c[1])for c in children])

@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Feb 13 12:56:37 2016
 
-@author: Harald
-"""
 from shapely.geometry import Point,LineString
 from shapely.ops import cascaded_union
 from itertools import combinations
@@ -16,6 +11,10 @@ import util.utility as ut
 #add interface for fitness, such that it can be either an optimisation (soft constraint) or a threshhold function (hard constraint)
 #also always option to return normalised fitness
 #fitness 1 should mean good 0 bad
+
+class Fitness:
+    def __init__(self,func,order,threshhold,regression_target):
+        self.func=func
 
 
 def angle(line_segment):

@@ -1,26 +1,49 @@
-use poisson disk sampling
+done
+---------
+use of poisson disk sampling
 
-I found a lot of great examples of functional constraint in a pattern language
-It would make for a very intersting generator to encode some of the patterns from the book
-probabilistically in my generator
+regression works
+
+infinite gauss
+
+set up tests to evaluate training
+
+still to do
+-------------------------
+
+evaluation metrics:
+
+for the generator  (to select between consecutive runs)
+
+- expressiveness
+             weighted emperical variance
+
+eenvoudige use-case -> ad-hoc evaluatie, overlap van correcte search space aen gemoddeleerde serach space
+
+complexe case emperische analyse -> verzameling punten
+
+- performance,  fitness mean and variance
+compare over n samples between brute force en model
+
+for training itself (to select hyperparameters)
+
+-MSE between x,y for regression
+-MSE between x and it's likelyhood for weighted sampling
+
+evaluation models
+------------------
+extract info from neufert and combine with pattern language examples to create 3 scenes
+with different constraints, tree hierarchies
+
+implement retraining
+implement MCMC sampling of truncuated gmms
+
+for literature:
+writing methodology
+write related work
+15/04
 
 
-Slight change in orientation to defend the fact that sampling can take longer
-very expensive fitness functions (which I don't incorporate in the learning process)
-like an AI playing a level (very high cost in terms of O notation) will need less evaluations if trivial faulty scene instances
-are no longer samples
 
-mention to try and move from weighted density estimation to regression, is mathematically more correct because the EM will try
-to find a GMM that exactly crosses the fitness values, this also allows to use other GMM (like DPGMM) with standard EM
-
-values isntead of implicitly
-->possibility for more finegrained sampling of multiple objectives (each can have different interval)
-
-would require multi-dimensional sampling of truncuated gmm, can also be used to sample more efficiently from learned distr
--> requires mcmc
--> or inverse transform sampling with interpolation
-
-or I could simpy sample from the empirical distribution of the fitness values
-
-mention the affine transformation of gaussian mixtures as a way to reuse previously trained distributions
+deadline ?
 

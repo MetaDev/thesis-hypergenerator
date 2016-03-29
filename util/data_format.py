@@ -43,10 +43,16 @@ def marginalise_gmm(gmm_full,parent_vars,sibling_vars,sibling_order):
 def variables_length(variables):
     return np.sum([var.size for var in variables])
 
-def format_data_for_training():
+#the order of the fitness functions is defined by the lists given
+def format_fitness_for_training(parent,parent_child_fitness,siblings,sibling_fitness):
     pass
-def extract_data_for_traing(children,parent):
-    pass
+#the order of the data is parent,sibling0,sibling1,..
+#the order of the variable of each instance in the data is defined by the variable lists
+def format_data_for_traing(parent,parent_vars,siblings,sibling_vars):
+    parent_data=np.array([parent.values["ind"][name] for name in parent_vars]).flatten()
+    sibling_data=np.array([np.array([child.values["ind"][name]
+                                for name in sibling_vars]).flatten() for child in siblings]).flatten()
+    return np.concatenate((parent_data,sibling_data))
 #here is where the order of variables will be enforced
 def concat_variables():
     pass

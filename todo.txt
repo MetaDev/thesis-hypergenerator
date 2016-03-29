@@ -1,11 +1,27 @@
-centralise data format for traing and sampling
+first complete idea of new training method
+
+make seperate data generation algorithm for regression
+
+put some protection on the properties of sample nodes, in terms of querying variable name and sizes
+the treedef should be use not the sample nodes
+
+remove colors from search space
+
+centralise data format for traing and sampling ()
 give order to variables in TreeDefNode
 
-to compare performance between learned models the actual fitness should be used not the fitness with order that used in traing
+order children, order variables, make fitness class
 
-re-training
+titel kiezen: search-space optimisation for procedural content generators
 
-Thus implement, retraining, where sampled data originates from previously trained models
+re-training, where sampled data originates from previously trained models
+
+make it possible to train a seperate gmm for each n child (no marginalisation)
+
+
+
+to compare performance between learned models the actual fitness should be used not the fitness with order that used in training
+
 
 
 visualise the distributions of a model and a small representative sample set
@@ -34,7 +50,6 @@ start writing methodology
 
 
 more variables, fitness functions and scene models
-
 
 reachability
 
@@ -65,83 +80,23 @@ add visualisation to fitness model as well
 
 factory method to visualise fitness functions
 
-retraining
+make planning of tests and evaluation
 
 learning optimisation
 -------------------------
 
 instead of multiplying the multiple fitness functions -> dim reduction
 
-test learning with and without threshold on the fitness
-
-penalise gmm that strongly exceeds search space bounds (using likelyhood)
-
-initialise weights,covars and priors such that the gmm fits a unifrom distr in the given search space
-use standard sk init for this, maybe only updating the covars and setting the means on a grid and weights uniform
 
 only assign sibling conditionallity if the found distribution is above a certain order of quality (in expressiveness)
 or if higher order distribution is of lower quality, only train until n children and assign variables
 
 evaluate quality of learned model, MSE form random points with high fitness
 
-In learning not only the finding of optimum should be encouraged (by the log likelihood) but also expressiveness
-should be promoted in the learning algorithm, that's why an important optimisation would be to additionally reward
-data points based on their difference from previously used data points in the learning algorithm
-any distance metric could be used for this
-
 increase learning and sampling robustness by using k-fold cross validation.
 wich would result in a mixture of GMM's with uniform weights to sample from.
 or blend different mixtures together
 this would increase the sampling time, but reduce the accidental bias
-
-instead of modelling the curve fitting using density estimation (extra likelihood layer), I could do regression on the fitness
-p(p,c0,c1,...ck,f)-> integral (f^1_lowerthreshold)(p(ck|p,c0,...,f))
-and integrate (http://docs.scipy.org/doc/scipy/reference/tutorial/integrate.html)
-this even supports multi variable fitness, thus we could define the fitness as a joint distribution
-
-allow training with tied covariance for the gmm, this should be reset to full after training because gmr doesnt support tied
-
-use feature extraction to optmize learning, but each feature should be able to be reconverted
-
-use BIC to find optimal number of clusters
-
-normalise the data you train on [0,1] -> use affine transform of the search space
-
-use pomegranate library
-
-id hyperparameters for over/underfitting
-
-make interface for training, train in batches by sampling from the previous model in the next
-only expose hyperparamters that could influence over/under fitting (to be determined by experimentation)
-
-learn(n_sample_barhces,n_batches,child_attributes,parent_attributes,fitness_funcs, GMM_hyperparams)
-
-Note: larger batches will mean less overfitting because the model will train on more varied data
-smaller batches but more number of batches will more overfit, reducing models expressivens but increasing average fitness faster
-
-
-training should be done on scaled data
-given only a set of attributes to train on and fitness function on the attribute vector for the weight of the samples
-
-check if cross validation can benefit the system
-
-experiment weighted samples vs slicing and  data or show that data with 0 weight is equal to sliced data
-
-find attributes in children that don't interfere with fitness (can be omitted from training) (automatic feature extraction)
-or attributes independent of others regardin the fitness (covariance analysis) (they can be trained seperately)(dim reduciton)
-
-or even better (and in the case of child-child training): for large number of chidlren, deduce hierarchical independence between children (using clustering), this will return cluster label or each sample, which can be used to slice data accordingly for training
-e.g. tables far apart will not likely collide
-and train in a hierachical divided search space (naive bayes?, divide search space in n clusters)
-
-train gaussian mixture using pomegranate (mixture of multivariate gaussian) (added benefit of decay, priority based multi-objective) also faster, correct see http://homes.cs.washington.edu/~jmschr/lectures/pomegranate.html
-
-for larger number of children , the search space parent=>child should be specified implicitly
-this would also allow the ordering of children to be according to fitness (implicitly)
-
-best is to have seperate model for each number of children but to share some paremeters between the models
-one such thing that I can think of is expressiveness, you want each model to be as expressive as the other
-this could maybe be done by sharing the sum of covariances as parameter?
 
 
 sampling optimisation
@@ -252,6 +207,13 @@ do an example of room generation, where the fitness can be the validity of a pol
 evaluation and tests
 ------------------
 
+use-case scenes, compare the combination of several variables (like rotation and position) into the
+joint distribution (rotation and position can be trained independently on different parent properties)
+but this would also mean that if you wish to derive position and rotation of the children that you would
+have to "tie" these variables in the joint concerning the parent/child fitness
+
+compare single and multi-objective regression
+
 different ways of combining fitness values (between siblings in the joint)
 either multiply, average, other more complex functions, (the order of a functions is already a way of changing this function) so different values for the order can be tested as well
 
@@ -271,7 +233,7 @@ seperate models for P(c1|c0,p), P(c2|c1,c0,p),... or one model for P(c0,c1,c2,..
 also evaluate the influence of reusing data (learning on combinations of available children)
 
 compare different values of capping the fitness
-compare different values of conditions for the fitness
+compare different values of conditions for the fitness in regression
 
 compare weighted samples wrt regression
 
@@ -291,26 +253,11 @@ also try weighted and multiplied fitness functions.
 evaluate with and without poisson sampling, change the search space size and number of dimensions and
 compare expressiveness and mse
 
-model 3 different scenec to do the tests on
+model 3 different scenes to do the tests on
 
-influence of model prior (hierachical relations) on learning and fitness (hierachical relations)
-compare learning performance with and withour hierarchical relations (additive for pos and rot and scale for size)
-
-this could be done by modelling search space hierachically: parent-> children
-and flat parent,children and defining a parent->child relation functionaly e.g. by distance
-->closest 5 chairs to table are his children
-afterwards compare expressiveness, learning convergence,..
-
-a good example would be a long search space for a forest where there needs to be a path between the trees
-dividing this stroke in smaller substrokes is unintuitive for the user and will affect the results expressivens
-using the implicit parent child relation would be more intuitive than explicit search space definition in this stroke
-or when the user doesn't know what the search space will look like.
 
 expressiveness evaluaion: difference in surface between polygon and surface of gaussians
 likelihood of handmade examples in learned distribution
-
-
-could maybe the entropy of the gaussian as a measure of information give some form of expressiveness?
 
 
 metrics
