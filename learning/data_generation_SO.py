@@ -24,7 +24,7 @@ class SiblingTrainReOrder(Enum):
 
 #this data generation is tailored for weighted sampling
 def data_generation(n_samples,root,parental_fitness,sibling_fitness,
-                                vars_parent,vars_children,child_name="child",
+                                parent_var_names,sibling_var_names,child_name="child",
                                 sibling_order=1,
                                 sibling_train_order=SiblingTrainReOrder.no_reorder,
                                 order_variable=None,respect_sibling_order=False):
@@ -38,7 +38,7 @@ def data_generation(n_samples,root,parental_fitness,sibling_fitness,
     for i in range(n_samples):
         root_sample=root_samples[i]
         children=root_sample.children[child_name]
-        data_parent=np.array([root_sample.values["ind"][name] for name in vars_parent]).flatten()
+        data_parent=np.array([root_sample.values["ind"][name] for name in parent_var_names]).flatten()
 
         #first calculate all parent->child fitness funcs
         fitness_value_parent_child={}
@@ -98,7 +98,7 @@ def data_generation(n_samples,root,parental_fitness,sibling_fitness,
             if sibling_train_order is SiblingTrainReOrder.any_order:
                 for childrenperm in permutations(childcombinations):
                     data_sibling=np.array([np.array([child.values["ind"][name]
-                            for name in vars_children]).flatten() for child in childrenperm]).flatten()
+                            for name in sibling_var_names]).flatten() for child in childrenperm]).flatten()
                     data.append(np.concatenate((data_parent,data_sibling)))
                     fitness.append(fitness_values)
             else:
@@ -119,7 +119,7 @@ def data_generation(n_samples,root,parental_fitness,sibling_fitness,
                     import random
                     random.shuffle(list(childcombinations))
                 data_siblings=np.array([np.array([child.values["ind"][name]
-                            for name in vars_children]).flatten() for child in childcombinations ]).flatten()
+                            for name in sibling_var_names]).flatten() for child in childcombinations ]).flatten()
                 data.append(np.concatenate((data_parent,data_siblings)))
                 fitness.append(fitness_values)
 

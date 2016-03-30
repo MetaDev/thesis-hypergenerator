@@ -202,13 +202,19 @@ class TreeDefNode:
                         child.get_flat_list(sample_list)
                 return sample_list
 
+        def delete_learned_variable(self,gmm_name):
+            for var in self.sample_variables:
+                if var.name is gmm_name:
+                    #put all original vars back
+                    for var_name in var.unpack_names:
+                        self.variable_assignment[var_name]=self.variables[var_name]
+
         def set_learned_variable(self, gmmvar: GMMVariable):
             #set variables that will be replaced to unactive
             for name in gmmvar.unpack_names:
                 self.variable_assignment[name]=gmmvar
-            self.variables.append(gmmvar)
             #update set of unique variables
-            self.sample_variables=frozenset(self.variable_assignment.values())
+            self._update_sample_variables()
 
         def get_variable(self,name):
             var=self.variable_assignment[name]
@@ -279,18 +285,22 @@ class TreeDefNode:
             #necessary to be able to retrieve stochastic vars
             #properties are saved independent from the parent, for later use of its values in machine learning
             self.name=node.name
-            #variables is a list of all variables, like an archive
+            #variables is a list of all variables, like an archive, these define the structure of the node sample variables
             #make deep copy of variable as each vardefnode should have unique vars
-            self.variables=[deepcopy(v) for v in node.variables.values()]
+            self.variables=dict([(v.name,deepcopy(v)) for v in node.variables.values()])
+
             #keep track which variable is assigned in the node
             #when constructing the assignment is 1-1
-            self.variable_assignment=dict([(v.name,v) for v in self.variables])
-            #set from which can be sampled
-            self.sample_variables=frozenset(self.variable_assignment.values())
+            self.variable_assignment=dict(self.variables)
+
+
+            self._update_sample_variables()
             #children are ordered on index
             self.children=children
             self.index=index
-
+        def _update_sample_variables(self):
+            #set containing all variables from which needs to be samples
+            self.sample_variables=frozenset(self.variable_assignment.values())
 
 
         def __str__(self):
