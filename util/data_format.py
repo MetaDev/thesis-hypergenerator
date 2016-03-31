@@ -48,11 +48,10 @@ def format_fitness_for_training(parent,parent_child_fitness,siblings,sibling_fit
     pass
 #the order of the data is parent,sibling0,sibling1,..
 #the order of the variable of each instance in the data is defined by the variable lists
-def format_data_for_traing(parent,parent_vars,siblings,sibling_vars):
-    parent_data=np.array([parent.values["ind"][name] for name in parent_vars]).flatten()
-    sibling_data=np.array([np.array([child.values["ind"][name]
-                                for name in sibling_vars]).flatten() for child in siblings]).flatten()
-    return np.concatenate((parent_data,sibling_data))
+def format_data_for_training(parent,parent_var_names,siblings,sibling_var_names):
+    data=list(ut.flatten([parent.values["ind"][name] for name in parent_var_names]+[[child.values["ind"][name] for name in sibling_var_names] for child in siblings]))
+    return data
+
 #here is where the order of variables will be enforced
 def concat_variables():
     pass
@@ -60,5 +59,5 @@ def split_variables(variables,joint_data):
     lengths=[v.size for v in variables]
     #this is for calculating the edges of the vector to be return in relative value
     lengths.insert(0,0)
-    return [joint_data[l1:l2] for l1,l2 in ut.pairwise(lengths)]
+    return [joint_data[l1:l2] if not var.frozen() else var.freeze_value for (l1,l2),var in zip(ut.pairwise(lengths),variables)]
 

@@ -58,7 +58,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                                parent_var_names,
                                                sibling_var_names,
                                                child_name=child_name,
-                                               sibling_order=sibling_order,
+                                               n_siblings=sibling_order+1,
                                                sibling_train_order=sibling_train_order,
                                                order_variable=order_variable,
                                                respect_sibling_order=respect_sibling_order)
@@ -102,7 +102,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                                    parent_var_names,
                                                    sibling_var_names,
                                                    child_name=child_name,
-                                                   sibling_order=sibling_order,
+                                                   n_siblings=sibling_order+1,
                                                    sibling_train_order=sibling_train_order,
                                                    order_variable=order_variable,
                                                    respect_sibling_order=respect_sibling_order)
@@ -133,7 +133,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                                parent_var_names,
                                                sibling_var_names,
                                                child_name=child_name,
-                                               sibling_order=sibling_order,
+                                               n_siblings=sibling_order+1,
                                                sibling_train_order=sibling_train_order,
                                                order_variable=order_variable,
                                                respect_sibling_order=respect_sibling_order)
@@ -155,14 +155,11 @@ def _train_weighted_sampling(gmm,data,fitness,infinite):
     return gmm
 def _train_regression(gmm,data,fitness,infinite,fitness_targets):
     #check if regression works better this way
-#    fitness = np.array(fitness[:,1])*np.array(fitness[:,0])
-#    fitness_targets=[np.prod(fitness_targets)]
     train_data=np.column_stack((data,fitness))
     #for regression calculate full joint
     gmm.fit(train_data,infinite=infinite,min_covar=0.01)
     #fitness indices and values according to convention
     fitness_indices=np.arange(len(data[0]),len(data[0])+len(fitness[0]))
-#    fitness_indices=np.arange(len(data[0]),len(data[0])+1)
     #condition on fitness
     return gmm.condition(fitness_indices,fitness_targets)
 
@@ -182,13 +179,12 @@ def _construct_gmm_vars(gmm,gmm_name,parent_def,parent_node,child_name,
     from model.search_space import GMMVariable
     child_def=parent_def.children["child"]
 
-    child_vars=[child_def.variables["position"]]
     sibling_vars=[child_def.variables[name] for name in sibling_var_names]
     parent_vars=[parent_def.variables[name] for name in parent_var_names]
 
 
     #the sibling order of the gmm is maximum the sibling order of the trained gmm
-    gmm_vars=[GMMVariable(gmm_name,gmm,child_vars,parent_vars,sibling_vars,sibling_order=i)
+    gmm_vars=[GMMVariable(gmm_name,gmm,parent_vars,sibling_vars,sibling_order=i)
     for gmm,i in zip(gmms,range(len(gmms)))]
     return gmm_vars
 

@@ -7,7 +7,6 @@ import model.test_models as tm
 
 from learning.gmm import GMM
 
-from operator import itemgetter
 
 import learning.data_generation_MO as dg
 

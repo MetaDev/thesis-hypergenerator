@@ -10,9 +10,17 @@ from shapely.geometry import Polygon
 from shapely.geometry import MultiPolygon
 from functools import reduce
 import re
-
+import warnings
 from itertools import islice
 
+import collections
+def flatten(l):
+    for el in l:
+        if isinstance(el, collections.Iterable) and not isinstance(el, (str, bytes)):
+            for sub in flatten(el):
+                yield sub
+        else:
+            yield el
 def window(seq, n):
     "Returns a sliding window (of width n) over data from the iterable"
     "   s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...                   "

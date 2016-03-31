@@ -52,20 +52,14 @@ class Variable(metaclass = ABCMeta):
     def stochastic(self):
         pass
 
-class NumberChildrenVariable(Variable):
-    def __init__(self,name,low,high,step=1):
-        super().__init__(name,None)
-        self.size=1
-        self.high=high
-        self.low=low
-        self.choices=np.arange(low,high+1,step)
-    def sample(self,parent_sample,sibling_sample,i,n_samples):
-        return np.random.choice(self.choices)
+
+
 
 class StochasticVariable(Variable):
 
     def __init__(self,name,low,high,func=None,poisson=True):
         super().__init__(name,func)
+        self.freeze_value=None
         self.size=len(high)
         self.high=np.array(high)
         self.low=np.array(low)
@@ -90,11 +84,26 @@ class StochasticVariable(Variable):
             point=self.points[i]
         else:
             point=scipy.stats.uniform.rvs(size=self.size)
-        return self.low + point*(self.high-self.low)
+        return self.low + point*(self.high-self.low) if not self.frozen() else self.freeze_value
 
     def stochastic(self):
         return True
+    def freeze(self,value):
+        self.freeze_value=value
+    def thaw(self):
+        self.freeze(None)
+    def frozen(self):
+        return self.freeze_value
 
+class NumberChildrenVariable(StochasticVariable):
+    def __init__(self,name,low,high,step=1):
+        Variable.__init__(self,name,None)
+        self.size=1
+        self.high=high
+        self.low=low
+        self.choices=np.arange(low,high+1,step)
+    def sample(self,parent_sample,sibling_sample,i,n_samples):
+        return np.random.choice(self.choices) if not self.frozen() else self.freeze_value
 
 
 class DeterministicVariable(Variable):
@@ -136,14 +145,6 @@ class VectorVariableUtility():
             var.name=list_name + str(i)
         return variables
 
-    #name indicates the collection of variables, the name of each variable will be overwritten
-
-
-class DummyStochasticVariable(StochasticVariable):
-    def __init__(self,variable: StochasticVariable):
-        Variable.__init__(self,variable.name,variable.func)
-        self.size=variable.size
-
 import util.data_format as dtfr
 
 #P(X|Y)
@@ -151,13 +152,12 @@ class GMMVariable(StochasticVariable):
     #for the GMM the names are a list names of each variable it generates when sampled
     #the lengths are an array of ints indicating the non_cond var length
     #TODO check validity of GMM, its dimension against the given X and Y vars
-    def __init__(self,name,gmm: GMM,child_vars:List[Variable], parent_vars:List[Variable],sibling_vars,sibling_order):
+    def __init__(self,name,gmm: GMM, parent_vars:List[Variable],sibling_vars,sibling_order):
         #non_cond_vars are save in attribute variables of VectorVariable
         Variable.__init__(self,name)
-        self.child_vars=child_vars
-        self.unpack_names=[v.name for v in child_vars]
         self.unpack=True
-        self.sibling_vars=sibling_vars
+        self.sibling_vars=[deepcopy(var) for var in sibling_vars]
+        self.unpack_names=[v.name for v in sibling_vars]
         self.gmm=gmm
         self.parent_vars=parent_vars
         self.sibling_order=sibling_order
@@ -179,7 +179,20 @@ class GMMVariable(StochasticVariable):
 
 
     def relative_sample(self,samples,parent_sample):
-        return [var.relative_sample(value,parent_sample) for var,value in zip(self.child_vars,samples)]
+        return [var.relative_sample(value,parent_sample) for var,value in zip(self.sibling_vars,samples)]
+
+    def freeze(self,var_name,value):
+        if var_name not in self.unpack_names:
+            raise ValueError("Variable to freeze not packed in GMM variable.")
+        for var in self.sibling_vars:
+            if var.name is var_name:
+                var.freeze(value)
+    def thaw(self,var_name):
+        if var_name not in self.unpack_names:
+            raise ValueError("Variable to thaw not packed in GMM variable.")
+        for var in self.sibling_vars:
+            if var.name is var_name:
+                var.freeze(None)
 
 class TreeDefNode:
 
@@ -222,7 +235,8 @@ class TreeDefNode:
                  warnings.warn("The variable "+ var.name + "assigned to " + name+
                  " is packed, possibly used to sample multiple variables",RuntimeWarning)
             return var
-
+        def freeze_n_children(self,child_name,n_children):
+            self.variable_assignment[child_name].freeze(n_children)
 
         def sample(self,n_samples):
             sample_roots=[]
@@ -345,8 +359,8 @@ class TreeDefNode:
         #the children keep the variable as key
         self.children=dict([(c[1].name,c[1])for c in children])
 
-    def max_children(self,child_name):
-        return self.variables[child_name].high
+    def children_range(self,child_name):
+        return (self.variables[child_name].low,self.variables[child_name].high)
 
 
 

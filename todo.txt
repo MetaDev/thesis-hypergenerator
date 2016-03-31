@@ -1,11 +1,24 @@
 make seperate data generation algorithm for regression
 
+find a way to generate the same amount of data with stochastic children
+-> first sample from the number of children
+
 seperate method for single objective training and multi-objective training
 this illustrates the power of weighted sampling in low dimensionality
 
-
+add parameter for the type of sibling data: -windowed (sliding window over the sibling samples)
+                                            -combinations (combination over the sibling samples)
+                                            -exact (combine data of siblings seperately)
+add parameter for the type of sibling data: -windowed (sliding window over the sibling samples)
+                                            -combinations (combination over the sibling samples)
+                                            -exact (combine data of siblings seperately)
+                                            -slice
+add parameter for the type of sibling fitness: -combinations
+                                                -previous
 
 make method for custom marginalisation
+
+fix poisson sampling for stochastic number of children
 
 make fitness class
 
