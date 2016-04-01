@@ -15,6 +15,12 @@ import util.utility as ut
 class Fitness:
     def __init__(self,func,order,threshhold,regression_target):
         self.func=func
+        self.order=order
+        self.threshhold=threshhold
+        self.regression_target=regression_target
+    def calc(self,*args):
+        temp=self.func(*args) ** self.order
+        return temp if temp > self.threshhold else None
 
 
 def angle(line_segment):
@@ -85,9 +91,16 @@ def polygon_path_sequence(graph,polygon_sequence):
         paths.extend(path)
     return paths
 
-#fitness that calculates a sequence of occurences on a path-> from point 1 to 2 avoind a set of polygon what are the polygons you intersect with
-#a direct metric that calculates the angle of intersection between polygons
-#metric
-#also add fitness function that evaluates a certain metric towards a treshhold
 
-#MST between points->use graph kernel for likelyhood
+
+def fitness_polygon_overl(sample0,sample1):
+    polygons=mp.map_layoutsamples_to_geometricobjects([sample0,sample1],shape_name="shape")
+    return pairwise_overlap(polygons[0],polygons[1])
+
+def fitness_polygon_alignment(sample0,sample1):
+    polygons=mp.map_layoutsamples_to_geometricobjects([sample0,sample1],shape_name="shape")
+    return pairwise_closest_line_alignment(polygons[0],polygons[1],threshold=30)
+def fitness_min_dist(sample0,sample1):
+    pos0=sample0.values["ind"]["position"]
+    pos1=sample1.values["ind"]["position"]
+    return pairwise_min_dist(pos0,pos1,threshold=1)

@@ -48,7 +48,6 @@ calculate MSE of GMM
 
 if possible
 
-truncuated gmm with MCMC
 
 should be done by 31/03
 

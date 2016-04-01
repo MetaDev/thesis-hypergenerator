@@ -5,6 +5,31 @@
 #in this class the order can be checked of both variables and samples
 import util.utility as ut
 import numpy as np
+from enum import Enum
+
+#the dimensionality of the fitness per instance in the data
+#single means all fitness value are combined into a single fitness function
+#parent children means that there the fitness between parent-child and siblings is combined
+#parent siblings means that each sibling has a seperate fitness value, calculated relative to the previously placed siblings
+
+class FitnessInstanceDim(Enum):
+    single=1
+    parent_children=2
+    parent_sibling=3
+
+#the difference between parent_children and parent_sibling dimensionality can be seen semanticalliy as
+#how you look at the child placement concept, if each child is placed after the other the fitness of the next only depends on the previous
+#however if you see it as if all children are placed simultanously than their fitness has to be calculated likewise
+#->in relation to all children
+#the dimensionality of the fitness per fitness function
+
+class FitnessFuncDim(Enum):
+    single=1
+    seperate=2
+#TODO add weighted average
+class FitnessCombination(Enum):
+    product=1
+    average=2
 
 
 #conditioning format for trained GMM: P(S_i|P,S_0,...,S_i-1) given parent and all siblings
@@ -43,9 +68,55 @@ def marginalise_gmm(gmm_full,parent_vars,sibling_vars,sibling_order):
 def variables_length(variables):
     return np.sum([var.size for var in variables])
 
-#the order of the fitness functions is defined by the lists given
-def format_fitness_for_training(parent,parent_child_fitness,siblings,sibling_fitness):
-    pass
+
+
+def combine_fitness(fitness_values,fitness_axis,fitness_comb):
+    if fitness_comb is FitnessCombination.product:
+        return np.prod(fitness_values,fitness_axis)
+    else:
+        return np.average(fitness_values,fitness_axis)
+
+def format_fitness_dimension(parental_fitness_values,sibling_fitness_values,fitness_dim,fitness_comb):
+    if fitness_dim[0] is FitnessInstanceDim.parent_children and fitness_dim[1] is FitnessFuncDim.seperate:
+        fitness_axis=0
+    if fitness_dim[0] is FitnessInstanceDim.parent_sibling and fitness_dim[1] is FitnessFuncDim.single:
+        fitness_axis=1
+    if fitness_dim[0] is FitnessInstanceDim.single or (fitness_dim[0] is FitnessInstanceDim.parent_children
+    and fitness_dim[1] is FitnessFuncDim.single):
+        fitness_axis=None
+    if fitness_dim[0] is FitnessInstanceDim.single:
+        fitness_values=list(ut.flatten([parental_fitness_values,sibling_fitness_values]))
+        return combine_fitness(fitness_values,fitness_axis,fitness_comb)
+
+    if not (fitness_dim[0] is FitnessInstanceDim.parent_sibling and fitness_dim[1] is FitnessFuncDim.seperate):
+        parental_fitness_values=combine_fitness(parental_fitness_values,fitness_axis,fitness_comb)
+        sibling_fitness_values=combine_fitness(sibling_fitness_values,fitness_axis,fitness_comb)
+    return list(ut.flatten([parental_fitness_values,sibling_fitness_values]))
+#this method is used to combine the result from the data generation process
+def format_generated_fitness(fitness,fitness_dim,fitness_comb):
+    return np.array([format_fitness_dimension(vals[0],vals[1],fitness_dim,fitness_comb) for vals in fitness])
+
+
+def format_fitness_values_training(fitness_value_parent_child,fitness_value_sibling,siblings):
+    parental_fitness_values=[fitness_value_parent_child[child] for child in siblings]
+    sibling_fitness_values=[fitness_value_sibling[child] for child in siblings[1:]]
+    return parental_fitness_values,sibling_fitness_values
+
+def format_fitness_targets_regression(parental_fitness,sibling_fitness,n_siblings):
+    parental_fitness_targets=[parental_fitness[i].regression_target for i in range(len(parental_fitness))]
+    parental_fitness_values=[parental_fitness_targets for _ in range(n_siblings)]
+    sibling_fitness_targets=[sibling_fitness[i].regression_target for i in range(len(sibling_fitness))]
+    sibling_fitness_values=[sibling_fitness_targets for _ in range(n_siblings-1)]
+    return parental_fitness_values,sibling_fitness_values
+
+def format_fitness_for_regression_conditioning(parental_fitness,sibling_fitness,n_siblings,data_size,fitness_dim):
+    fitness_value_parental,fitness_value_sibling=format_fitness_targets_regression(parental_fitness,sibling_fitness,n_siblings)
+    fitness=format_fitness_dimension(fitness_value_parental,fitness_value_sibling,
+                                   fitness_dim,FitnessCombination.average)
+    fitness_size= len(fitness) if isinstance(fitness, (list, tuple,np.ndarray)) else 1
+    indices=np.arange(data_size,data_size+fitness_size)
+    return indices,fitness
+
 #the order of the data is parent,sibling0,sibling1,..
 #the order of the variable of each instance in the data is defined by the variable lists
 def format_data_for_training(parent,parent_var_names,siblings,sibling_var_names):

@@ -5,11 +5,15 @@ import learning.evaluation as ev
 from util import setting_values
 import model.test_models as tm
 
+from model import fitness as fn
 from learning.gmm import GMM
 
 from operator import itemgetter
 
-import learning.data_generation_SO as dg
+import util.data_format as dtfr
+
+
+import learning.data_generation as dg
 
 def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regression=False,verbose=True):
     #experiment hyperparameters:
@@ -17,27 +21,32 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     #the third on the first and second
     #the first child is always independent
     sibling_order_sequence=[0,1,2,3,4,4,4,4]
-    #sibling_order_sequence=[0,1,2,3,4]
+
+    sibling_data=dg.SiblingData.combination
+    fitness_dim=(dtfr.FitnessInstanceDim.single,dtfr.FitnessFuncDim.single)
+
     #the sibling order defines the size of the joint distribution that will be trained
     sibling_order=np.max(sibling_order_sequence)
-    child_name="child"
-    sibling_train_order=dg.SiblingTrainReOrder.no_reorder
-    order_variable="position"
-    respect_sibling_order=False
+    n_siblings=sibling_order+1
+
+    #TODO
+    #gmm marginalisation [order_1,order_2,..,order_sibling_order]
+    #0->train full joint
+    #-1->derive (marginalise) from closest higher order
+    #n->derive from order n, ! n< order, n<n_children-1
 
     #training variables and fitness functions
     #this expliicitly also defines the format of the data
     sibling_var_names=["position"]
     parent_var_names=["shape3"]
+    child_name="child"
 
     #this expliicitly also defines the format of the data
     #fitness func, order cap and regression target
-    sibling_fitness_funcs=[(dg.fitness_min_dist,4,0,1)]
+    sibling_fitness=[fn.Fitness(fn.fitness_min_dist,4,0,1)]
     #only the func order and cap is used for training
-    sibling_fitness_funcs_sampling=[f[0:3] for f in sibling_fitness_funcs]
 
-    parent_child_fitness_funcs=[(dg.fitness_polygon_overl,32,0,1)]
-    parent_child_fitness_funcs_sampling=[f[0:3] for f in parent_child_fitness_funcs]
+    parental_fitness=[fn.Fitness(fn.fitness_polygon_overl,32,0,1)]
     #model to train on
     parent_node,parent_def=tm.test_model_var_child_position_parent_shape()
     child_nodes=parent_node.children[child_name]
@@ -47,31 +56,34 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     wrong_sequence = any(sibling_order_sequence[i]>i for i in range(len(sibling_order_sequence)))
     if wrong_sequence:
         raise ValueError("Some orders of the sibling order sequence exceed the number of previous siblings.")
-    max_children=parent_def.max_children(child_name)
+    max_children=parent_def.children_range(child_name)[1]
     if len(sibling_order_sequence) != max_children:
         raise ValueError("The number of siblings implied by the sibling order sequence can not be different than the maximum number of children in the model.")
     #do n_iter number of retrainings using previously best model
     for iteration in range(n_iter):
         #find out the performance of the current model
-        data,fitness=dg.data_generation(n_data,parent_node,parent_child_fitness_funcs_sampling,
-                                               sibling_fitness_funcs_sampling,
-                                               parent_var_names,
-                                               sibling_var_names,
-                                               child_name=child_name,
-                                               n_siblings=sibling_order+1,
-                                               sibling_train_order=sibling_train_order,
-                                               order_variable=order_variable,
-                                               respect_sibling_order=respect_sibling_order)
+        data,fitness=dg.data_generation(n_data,parent_def,
+                                parent_node,parent_var_names,parental_fitness,
+                                child_name,sibling_fitness,sibling_var_names,n_siblings=n_siblings,
+                                sibling_data=sibling_data,
+                                fitness_dim=fitness_dim)
 
         if verbose:
+            fitness_parent_child=dtfr.format_generated_fitness(fitness,
+                                                               (dtfr.FitnessInstanceDim.parent_children,
+                                                                dtfr.FitnessFuncDim.single),
+                                                                dtfr.FitnessCombination.product)
             print("fitness before training iteration ", iteration)
             #print the first fitness func
             print("parent fitness")
-            ev.fitness_statistics(fitness[:,0],verbose=verbose)
+            ev.fitness_statistics(fitness_parent_child[:,0],verbose=verbose)
             print("child fitness")
-            ev.fitness_statistics(fitness[:,1],verbose=verbose)
-
-        mean_fitness=np.mean(fitness,axis=0)
+            ev.fitness_statistics(fitness_parent_child[:,1],verbose=verbose)
+        fitness_single_seperate=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
+                                                              dtfr.FitnessFuncDim.seperate),
+                                                              dtfr.FitnessCombination.product)
+        print(fitness_single_seperate.shape)
+        mean_fitness=np.average(fitness_single_seperate,axis=0)
 
 
         gmm_vars_retry_eval=[]
@@ -80,11 +92,15 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
 
             gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
             if regression:
-                all_fitness=parent_child_fitness_funcs+sibling_fitness_funcs
-                fitness_targets=[f[3] for f in all_fitness]
-                gmm=_train_regression(gmm,data,fitness,infinite,fitness_targets)
+                fitness_regression=dtfr.format_generated_fitness(fitness,fitness_dim,
+                                                              dtfr.FitnessCombination.product)
+                gmm=_train_regression(gmm,data,fitness_regression,infinite,parental_fitness,sibling_fitness,
+                                      n_siblings,fitness_dim)
             else:
-                gmm=_train_weighted_sampling(gmm,data,fitness,infinite)
+                fitness_single=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
+                                                              dtfr.FitnessFuncDim.single),
+                                                              dtfr.FitnessCombination.product)
+                gmm=_train_weighted_sampling(gmm,data,fitness_single,infinite)
 
             gmm_vars=_construct_gmm_vars(gmm,"test",parent_def,parent_node,child_name,
                          parent_var_names,sibling_var_names,
@@ -97,16 +113,15 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                 child_nodes[k].set_learned_variable(gmm_vars[sibling_order_sequence[k]])
 
             #evaluate new model
-            _,eval_fitness=dg.data_generation(n_data,parent_node,parent_child_fitness_funcs_sampling,
-                                                   sibling_fitness_funcs_sampling,
-                                                   parent_var_names,
-                                                   sibling_var_names,
-                                                   child_name=child_name,
-                                                   n_siblings=sibling_order+1,
-                                                   sibling_train_order=sibling_train_order,
-                                                   order_variable=order_variable,
-                                                   respect_sibling_order=respect_sibling_order)
-            temp_mean_fitness=np.mean(eval_fitness,axis=0)
+            _,eval_fitness=dg.data_generation(n_data,parent_def,
+                                parent_node,parent_var_names,parental_fitness,
+                                child_name,sibling_fitness,sibling_var_names,n_siblings=n_siblings,
+                                sibling_data=sibling_data,
+                                fitness_dim=fitness_dim)
+            fitness_single_seperate=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
+                                                              dtfr.FitnessFuncDim.seperate),
+                                                              dtfr.FitnessCombination.product)
+            temp_mean_fitness=np.average(fitness_single_seperate,axis=0)
 
             gmm_vars_retry_eval.append((gmm_vars,temp_mean_fitness))
             #put original vars back
@@ -128,23 +143,23 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
         if max_gmm_vars:
             for i in range(len(child_nodes)):
                 child_nodes[i].set_learned_variable(max_gmm_vars[sibling_order_sequence[i]])
-        _,fitness=dg.data_generation(n_data,parent_node,parent_child_fitness_funcs_sampling,
-                                               sibling_fitness_funcs_sampling,
-                                               parent_var_names,
-                                               sibling_var_names,
-                                               child_name=child_name,
-                                               n_siblings=sibling_order+1,
-                                               sibling_train_order=sibling_train_order,
-                                               order_variable=order_variable,
-                                               respect_sibling_order=respect_sibling_order)
+        _,fitness=dg.data_generation(n_data,parent_def,
+                                parent_node,parent_var_names,parental_fitness,
+                                child_name,sibling_fitness,sibling_var_names,n_siblings=n_siblings,
+                                sibling_data=sibling_data,
+                                fitness_dim=fitness_dim)
     #show the result of nth iteration
     if verbose:
         print("final")
+        fitness_parent_child=dtfr.format_generated_fitness(fitness,
+                                                               (dtfr.FitnessInstanceDim.parent_children,
+                                                                dtfr.FitnessFuncDim.single))
+        print("fitness before training iteration ", iteration)
         #print the first fitness func
         print("parent fitness")
-        ev.fitness_statistics(fitness[:,0],verbose=verbose)
+        ev.fitness_statistics(fitness_parent_child[:,0],verbose=verbose)
         print("child fitness")
-        ev.fitness_statistics(fitness[:,1],verbose=verbose)
+        ev.fitness_statistics(fitness_parent_child[:,1],verbose=verbose)
 
 
 
@@ -153,15 +168,16 @@ def _train_weighted_sampling(gmm,data,fitness,infinite):
     fitness_all = np.array(fitness[:,1])*np.array(fitness[:,0])
     gmm.fit(data,fitness_all,infinite=infinite,min_covar=0.01)
     return gmm
-def _train_regression(gmm,data,fitness,infinite,fitness_targets):
+def _train_regression(gmm,data,fitness,infinite,parental_fitness,sibling_fitness,n_siblings,fitness_dim):
     #check if regression works better this way
     train_data=np.column_stack((data,fitness))
     #for regression calculate full joint
-    gmm.fit(train_data,infinite=infinite,min_covar=0.01)
-    #fitness indices and values according to convention
-    fitness_indices=np.arange(len(data[0]),len(data[0])+len(fitness[0]))
+    gmm.fit(train_data,infinite=False,min_covar=0.01)
+    indices,targets = dtfr.format_fitness_for_regression_conditioning(parental_fitness,
+                                                                      sibling_fitness,n_siblings,
+                                                                      len(data[0]),fitness_dim)
     #condition on fitness
-    return gmm.condition(fitness_indices,fitness_targets)
+    return gmm.condition(indices,targets)
 
 
 def _construct_gmm_vars(gmm,gmm_name,parent_def,parent_node,child_name,

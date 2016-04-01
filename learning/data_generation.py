@@ -1,7 +1,7 @@
 import model.mapping as mp
 import model.fitness as fn
 import util.data_format as dtfr
-
+from util.data_format import FitnessInstanceDim,FitnessFuncDim
 import numpy as np
 from itertools import combinations,permutations
 import util.utility as ut
@@ -18,25 +18,7 @@ import warnings
 #sibling order 1 is child-parent relation only
 #the fitness funcs should include their order
 from enum import Enum
-#the dimensionality of the fitness per instance in the data
-#single means all fitness value are combined into a single fitness function
-#parent children means that there the fitness between parent-child and siblings is combined
-#parent siblings means that each sibling has a seperate fitness value, calculated relative to the previously placed siblings
 
-class FitnessInstanceDim(Enum):
-    single=1
-    parent_children=2
-    parent_sibling=3
-
-#the difference between parent_children and parent_sibling dimensionality can be seen semanticalliy as
-#how you look at the child placement concept, if each child is placed after the other the fitness of the next only depends on the previous
-#however if you see it as if all children are placed simultanously than their fitness has to be calculated likewise
-#->in relation to all children
-#the dimensionality of the fitness per fitness function
-
-class FitnessFuncDim(Enum):
-    single=1
-    seperate=2
 
 
 #in the case that the number of requested siblings is smaller than
@@ -123,16 +105,16 @@ def _fitness_calc(parent,parental_fitness,
         fitness_value_parent_child[child]=[]
         #the sibling fitness of the first child is always 1
         fitness_value_sibling[child]=[]
-        for func,order,cap in parental_fitness:
-            temp_fitness_parent_child=func(child,parent)**order
-            capped =  temp_fitness_parent_child < cap
-            if not temp_fitness_parent_child < cap:
+        for fitn in parental_fitness:
+            temp_fitness_parent_child=fitn.calc(parent,child)
+            capped =  temp_fitness_parent_child is None
+            if not capped:
                 fitness_value_parent_child[child].append(temp_fitness_parent_child)
             else:
                 break
 
     #calculate fitness between siblings, respecting the order of the fitness funcs
-    for func,order,cap in sibling_fitness:
+    for fitn in sibling_fitness:
         #add an index to children in siblings
         sibling_pairs=combinations(zip(siblings,range(len(siblings))),2)
 
@@ -141,8 +123,8 @@ def _fitness_calc(parent,parental_fitness,
             #child0 is the child with the largest index and is the child for which the fitness value will be saved
             child0=indexed_child0[0] if indexed_child0[1]>indexed_child1[1] else indexed_child1[0]
             child1=indexed_child0[0] if indexed_child0[1]<indexed_child1[1] else indexed_child1[0]
-            temp_sibling_fitness=func(child0,child1)**order
-            capped=temp_sibling_fitness < cap
+            temp_sibling_fitness= fitn.calc(child0,child1)
+            capped=temp_sibling_fitness is None
             if not capped:
                 fitness_func_value_sibling[child0].append(temp_sibling_fitness)
             else:
@@ -157,35 +139,14 @@ def _fitness_calc(parent,parental_fitness,
     if capped:
         return None
 
-    #depending on the dimensionality options combine the fitness values
+    #format the fitness according convention
 
+    parental_fitness_values,sibling_fitness_values=dtfr.format_fitness_values_training(fitness_value_parent_child,
+                                                                                       fitness_value_sibling,
+                                                                                       siblings)
     #combine fitness functions
+    return [parental_fitness_values,sibling_fitness_values]
 
-    if fitness_dim[0] is FitnessInstanceDim.parent_children and fitness_dim[1] is FitnessFuncDim.seperate:
-        fitness_axis=0
-    if fitness_dim[0] is FitnessInstanceDim.parent_sibling and fitness_dim[1] is FitnessFuncDim.single:
-        fitness_axis=1
-    if fitness_dim[0] is FitnessInstanceDim.single or (fitness_dim[0] is FitnessInstanceDim.parent_children
-    and fitness_dim[1] is FitnessFuncDim.single):
-        fitness_axis=None
-
-    if fitness_dim[0] is FitnessInstanceDim.single and fitness_dim[1] is FitnessFuncDim.seperate:
-        warnings.warn("The fitness will have dimension 1 even though seperate functions are requested, this is because the instance dimension combines sibling and parent functions.")
-
-    #convert dict to array of fitness values in correct order
-    fitness_value_parent_child=[fitness_value_parent_child[child] for child in siblings]
-    fitness_value_sibling=[fitness_value_sibling[child] for child in siblings[1:]]
-    if not (fitness_dim[0] is FitnessInstanceDim.parent_sibling and fitness_dim[1] is FitnessFuncDim.seperate):
-        #combine fitness for parent and all siblings
-        #order needs to be respected for siblings
-        fitness_value_parent_child=np.prod(fitness_value_parent_child,fitness_axis)
-        fitness_value_sibling=np.prod(fitness_value_sibling,fitness_axis)
-
-    #combine both parent and child fitness
-    if fitness_dim[0] is FitnessInstanceDim.single:
-        return np.array(fitness_value_parent_child*fitness_value_sibling).flatten()
-
-    return list(ut.flatten([fitness_value_parent_child,fitness_value_sibling]))
 
 
 
