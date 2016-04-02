@@ -33,7 +33,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     #True->train full joint
     #False->derive (marginalise) from closest higher order
 
-    gmm_full=[False,False,False,False]
+    gmm_full=[False,False,False,True]
     #the largest sibling order always has to be calculated
     gmm_full.append(True)
 
@@ -108,7 +108,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
         for trial in range(n_trial):
             #calculate all full joints
             gmms=[None]*n_children
-            for child_index in np.where(gmm_full):
+            for child_index in np.where(gmm_full)[0]:
                 data,fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children=child_index+1,
@@ -118,8 +118,8 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                 if regression:
                     fitness_regression=dtfr.format_generated_fitness(fitness,fitness_dim,
                                                                   dtfr.FitnessCombination.product)
-                    gmm=_train_regression(gmm,data,fitness_regression,infinite,parental_fitness,sibling_fitness,
-                                          child_index,fitness_dim)
+
+                    gmm=_train_regression(gmm,data,fitness_regression,infinite,parental_fitness,sibling_fitness,child_index,fitness_dim)
                 else:
                     fitness_single=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
                                                                   dtfr.FitnessFuncDim.single),

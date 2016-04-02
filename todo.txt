@@ -1,8 +1,12 @@
+debugs marginalisation array
 
-add method for deciding whether new model is better than previous
+test with only a single child
+
+check if none of the fitnes funcs is always 1
+
 
 bug in polygon mapping-> why is rotation so important for the model to converge? the fitness doesn't depend on it
-is the mapping in the correct ordeR
+is the mapping in the correct order?
 
 rejection sampling for gmm
 
@@ -11,6 +15,10 @@ rejection sampling for gmm
 
 evaluation and tests
 -------------------------------
+add method for deciding whether new model is better than previous based on expressiveness and performance
+see evaluation file
+s
+
 evaluate performance and expressiveness of model
 
 to evaluate the expressivenes of the result, calculate exact (using integrals, with a lot of data)

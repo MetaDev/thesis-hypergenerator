@@ -71,6 +71,7 @@ def combine_fitness(fitness_values,fitness_axis,fitness_comb):
         return np.average(fitness_values,fitness_axis)
 
 def format_fitness_dimension(parental_fitness_values,sibling_fitness_values,fitness_dim,fitness_comb):
+
     if fitness_dim[0] is FitnessInstanceDim.parent_children and fitness_dim[1] is FitnessFuncDim.seperate:
         fitness_axis=0
     if fitness_dim[0] is FitnessInstanceDim.parent_sibling and fitness_dim[1] is FitnessFuncDim.single:
@@ -78,6 +79,12 @@ def format_fitness_dimension(parental_fitness_values,sibling_fitness_values,fitn
     if fitness_dim[0] is FitnessInstanceDim.single or (fitness_dim[0] is FitnessInstanceDim.parent_children
     and fitness_dim[1] is FitnessFuncDim.single):
         fitness_axis=None
+
+    if not sibling_fitness_values:
+        #if only a single child , there are no sibling fitness values
+        fitness_axis=None if FitnessFuncDim.single else 0
+        fitness_values=parental_fitness_values
+        return combine_fitness(fitness_values,fitness_axis,fitness_comb)
     if fitness_dim[0] is FitnessInstanceDim.single:
         fitness_values=list(ut.flatten([parental_fitness_values,sibling_fitness_values]))
         return combine_fitness(fitness_values,fitness_axis,fitness_comb)
@@ -88,19 +95,27 @@ def format_fitness_dimension(parental_fitness_values,sibling_fitness_values,fitn
     return list(ut.flatten([parental_fitness_values,sibling_fitness_values]))
 #this method is used to combine the result from the data generation process
 def format_generated_fitness(fitness,fitness_dim,fitness_comb):
-    return np.array([format_fitness_dimension(vals[0],vals[1],fitness_dim,fitness_comb) for vals in fitness])
+    if ut.size(fitness[0])>1:
+        return np.array([format_fitness_dimension(vals[0],vals[1],fitness_dim,fitness_comb) for vals in fitness])
+    else:
+        return np.array([format_fitness_dimension(vals,None,fitness_dim,fitness_comb) for vals in fitness])
 
 
 def format_fitness_values_training(fitness_value_parent_child,fitness_value_sibling,siblings):
+    if len(siblings)<2:
+        return fitness_value_parent_child[siblings[0]]
     parental_fitness_values=[fitness_value_parent_child[child] for child in siblings]
     sibling_fitness_values=[fitness_value_sibling[child] for child in siblings[1:]]
     return parental_fitness_values,sibling_fitness_values
 
 def format_fitness_targets_regression(parental_fitness,sibling_fitness,n_siblings):
+    if n_siblings<2:
+        return [parental_fitness[i].regression_target for i in range(len(parental_fitness))],None
     parental_fitness_targets=[parental_fitness[i].regression_target for i in range(len(parental_fitness))]
     parental_fitness_values=[parental_fitness_targets for _ in range(n_siblings)]
     sibling_fitness_targets=[sibling_fitness[i].regression_target for i in range(len(sibling_fitness))]
     sibling_fitness_values=[sibling_fitness_targets for _ in range(n_siblings-1)]
+
     return parental_fitness_values,sibling_fitness_values
 
 def format_fitness_for_regression_conditioning(parental_fitness,sibling_fitness,n_siblings,data_size,fitness_dim):

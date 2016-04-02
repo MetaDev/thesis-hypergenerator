@@ -43,7 +43,8 @@ def training_data_generation(n_data,parent_def,
     if n_children>max_children:
         raise ValueError("Number of requested siblings in the data is larger than the possible number of children in the model.")
 
-    if n_children<min_children:
+
+    if min_children>2 and n_children>=2 and n_children<min_children:
         #generate for smallest possible amount of children
         n_sample_children=min_children
         if sibling_data is SiblingData.combination:
@@ -64,7 +65,7 @@ def training_data_generation(n_data,parent_def,
         #you have 3 options: either respect the order of the children and train on a windowed view of the children
         #or only the first n
         #or don't respect the order (the order is not real anyway it is only implied by the trained variable)
-        if n_children<min_children:
+        if min_children>2 and n_children>=2 and n_children<min_children:
             if sibling_data is SiblingData.combination:
                 sibling_collection=combinations(siblings,n_children)
             elif sibling_data is SiblingData.window:
@@ -99,7 +100,6 @@ def _fitness_calc(parent,parental_fitness,
                        siblings,sibling_fitness,
                        fitness_dim=(FitnessInstanceDim.single,FitnessFuncDim.single)):
 
-
     #calcualte fitness parent->child
     fitness_value_parent_child=dict([(child,[]) for child in siblings])
     fitness_value_sibling=dict([(child,[]) for child in siblings[1:]])
@@ -114,38 +114,41 @@ def _fitness_calc(parent,parental_fitness,
                 fitness_value_parent_child[child].append(temp_fitness_parent_child)
             else:
                 break
+    if capped:
+        return None
+    #when only a single child no sibling fitness aplies
+    fitness_func_value_sibling=None
+    if len(siblings)>1:
+        #calculate fitness between siblings, respecting the order of the fitness funcs
+        for fitn in sibling_fitness:
+            #add an index to children in siblings
+            sibling_pairs=combinations(zip(siblings,range(len(siblings))),2)
 
-    #calculate fitness between siblings, respecting the order of the fitness funcs
-    for fitn in sibling_fitness:
-        #add an index to children in siblings
-        sibling_pairs=combinations(zip(siblings,range(len(siblings))),2)
-
-        fitness_func_value_sibling=dict([(child,[])for child in siblings[1:]])
-        for indexed_child0,indexed_child1 in sibling_pairs:
-            #child0 is the child with the largest index and is the child for which the fitness value will be saved
-            child0=indexed_child0[0] if indexed_child0[1]>indexed_child1[1] else indexed_child1[0]
-            child1=indexed_child0[0] if indexed_child0[1]<indexed_child1[1] else indexed_child1[0]
-            temp_sibling_fitness= fitn.calc(child0,child1)
-            capped=temp_sibling_fitness is None
-            if not capped:
-                fitness_func_value_sibling[child0].append(temp_sibling_fitness)
-            else:
+            fitness_func_value_sibling=dict([(child,[])for child in siblings[1:]])
+            for indexed_child0,indexed_child1 in sibling_pairs:
+                #child0 is the child with the largest index and is the child for which the fitness value will be saved
+                child0=indexed_child0[0] if indexed_child0[1]>indexed_child1[1] else indexed_child1[0]
+                child1=indexed_child0[0] if indexed_child0[1]<indexed_child1[1] else indexed_child1[0]
+                temp_sibling_fitness= fitn.calc(child0,child1)
+                capped=temp_sibling_fitness is None
+                if not capped:
+                    fitness_func_value_sibling[child0].append(temp_sibling_fitness)
+                else:
+                    break
+            #a set of siblings is invalid if one of its fitness funcs is below the cap
+            if capped:
                 break
-        #a set of siblings is invalid if one of its fitness funcs is below the cap
-        if capped:
-            break
-        #save product of fitness with previous siblings
-        for child in siblings[1:]:
-            fitness_value_sibling[child].append(np.prod(fitness_func_value_sibling[child]))
+            #save product of fitness with previous siblings
+            for child in siblings[1:]:
+                fitness_value_sibling[child].append(np.prod(fitness_func_value_sibling[child]))
 
     if capped:
         return None
 
     #format the fitness according convention
-
     parental_fitness_values,sibling_fitness_values=dtfr.format_fitness_values_training(fitness_value_parent_child,
                                                                                        fitness_value_sibling,
-                                                                                       siblings)
+                                                                                      siblings)
     #combine fitness functions
     return [parental_fitness_values,sibling_fitness_values]
 
