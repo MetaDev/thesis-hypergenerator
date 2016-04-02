@@ -34,12 +34,22 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     #0->train full joint
     #-1->derive (marginalise) from closest higher order
     #n->derive from order n, ! n< order, n<n_children-1
+    child_name="child"
+    #model to train on
+    parent_node,parent_def=tm.test_model_var_child_position_parent_shape()
+    child_nodes=parent_node.children[child_name]
 
     #training variables and fitness functions
     #this expliicitly also defines the format of the data
-    sibling_var_names=["position"]
+    sibling_var_names=["position","rotation"]
     parent_var_names=["shape3"]
-    child_name="child"
+
+    sibling_vars=[parent_def.children[child_name].variables[name] for name in sibling_var_names]
+    parent_vars=[parent_def.variables[name] for name in parent_var_names]
+    if not all( var.stochastic() for var in sibling_vars+parent_vars):
+        raise ValueError("Only the distribution of stochastic variables can be trained on.")
+    #check if none of the vars is deterministic
+
 
     #this expliicitly also defines the format of the data
     #fitness func, order cap and regression target
@@ -47,9 +57,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     #only the func order and cap is used for training
 
     parental_fitness=[fn.Fitness(fn.fitness_polygon_overl,32,0,1)]
-    #model to train on
-    parent_node,parent_def=tm.test_model_var_child_position_parent_shape()
-    child_nodes=parent_node.children[child_name]
+
 
 
     #check sibling sequence
@@ -79,11 +87,11 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
             ev.fitness_statistics(fitness_parent_child[:,0],verbose=verbose)
             print("child fitness")
             ev.fitness_statistics(fitness_parent_child[:,1],verbose=verbose)
-        fitness_single_seperate=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
+        #combine fitness per func
+        fitness_funcs=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.parent_children,
                                                               dtfr.FitnessFuncDim.seperate),
                                                               dtfr.FitnessCombination.product)
-        print(fitness_single_seperate.shape)
-        mean_fitness=np.average(fitness_single_seperate,axis=0)
+        mean_fitness=np.average(fitness_funcs,axis=0)
 
 
         gmm_vars_retry_eval=[]
@@ -118,7 +126,8 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                 child_name,sibling_fitness,sibling_var_names,n_siblings=n_siblings,
                                 sibling_data=sibling_data,
                                 fitness_dim=fitness_dim)
-            fitness_single_seperate=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
+            fitness_single_seperate=dtfr.format_generated_fitness(eval_fitness,
+                                                                  (dtfr.FitnessInstanceDim.parent_children,
                                                               dtfr.FitnessFuncDim.seperate),
                                                               dtfr.FitnessCombination.product)
             temp_mean_fitness=np.average(fitness_single_seperate,axis=0)
@@ -153,7 +162,8 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
         print("final")
         fitness_parent_child=dtfr.format_generated_fitness(fitness,
                                                                (dtfr.FitnessInstanceDim.parent_children,
-                                                                dtfr.FitnessFuncDim.single))
+                                                                dtfr.FitnessFuncDim.single),
+                                                                dtfr.FitnessCombination.product)
         print("fitness before training iteration ", iteration)
         #print the first fitness func
         print("parent fitness")
@@ -187,6 +197,7 @@ def _construct_gmm_vars(gmm,gmm_name,parent_def,parent_node,child_name,
     #get size of vars
     sibling_vars=[parent_def.children[child_name].variables[name] for name in sibling_var_names]
     parent_vars=[parent_def.variables[name] for name in parent_var_names]
+    #check if none of the vars is deterministic
 
     import util.data_format as dtfr
     gmms=dtfr.marginalise_gmm(gmm,parent_vars,sibling_vars,sibling_order)

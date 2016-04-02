@@ -14,6 +14,14 @@ import warnings
 from itertools import islice
 
 import collections
+def size(value):
+    if  isinstance(value,np.ndarray):
+        return value.shape[0] if len(value.shape) > 0 else 1
+    else:
+        return len(value) if isinstance(value,(list,tuple)) else 1
+def check_list(value):
+    if not isinstance(value, (list, tuple,np.ndarray)):
+        raise ValueError("Only list, tuple or numpy arrays are supported.")
 def flatten(l):
     for el in l:
         if isinstance(el, collections.Iterable) and not isinstance(el, (str, bytes)):

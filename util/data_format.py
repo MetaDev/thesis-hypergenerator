@@ -36,17 +36,16 @@ class FitnessCombination(Enum):
 def format_data_for_conditional(parent_sample,parent_vars,sibling_samples,sibling_vars,sibling_order):
     #flatten list for calculation of cond distr
     #parent condition variable
-    parent_values=np.array([parent_sample.values["ind"][var.name] for var in parent_vars]).flatten()
+    parent_values=list(ut.flatten([parent_sample.values["ind"][var.name] for var in parent_vars]))
     #sibling condition variable
-    sibling_values=[]
     #only retrieve values of necessary siblings,for sibling order i take last i siblings
-    for sibling in sibling_samples[-sibling_order:]:
-        sibling_values.extend(np.array([sibling.values["ind"][var.name] for var in sibling_vars]).flatten())
+    sibling_values=list(ut.flatten([sibling.values["ind"][var.name] for var in sibling_vars
+    for sibling in sibling_samples[-sibling_order:]]))
     #the order of values is by convention, also enforced in the sampling and learning procedure
     values=np.concatenate((parent_values,sibling_values))
     #the first X are cond attributes
     indices=np.arange(0,len(values))
-    return values,indices
+    return indices,values
 
 def marginalise_gmm(gmm_full,parent_vars,sibling_vars,sibling_order):
     #a model trained on 4 children can also be used for 5 children of the fifth no longer conditions on the first
@@ -60,7 +59,7 @@ def marginalise_gmm(gmm_full,parent_vars,sibling_vars,sibling_order):
     #thus to find GMM[i] we need to marginalise out the sibling data beyond sibling i
     #GMM[i]=P(p,c0,c1,c2,..,ci)
     for i in range(sibling_order):
-        indices=np.arange(0,(sibling_order+1)*variables_length(sibling_vars)+variables_length(parent_vars))
+        indices=np.arange(0,(i+1)*variables_length(sibling_vars)+variables_length(parent_vars))
         #gmms[i]=markov chain order i
         gmms[i]=gmm_full.marginalise(indices)
     return gmms
@@ -113,7 +112,7 @@ def format_fitness_for_regression_conditioning(parental_fitness,sibling_fitness,
     fitness_value_parental,fitness_value_sibling=format_fitness_targets_regression(parental_fitness,sibling_fitness,n_siblings)
     fitness=format_fitness_dimension(fitness_value_parental,fitness_value_sibling,
                                    fitness_dim,FitnessCombination.average)
-    fitness_size= len(fitness) if isinstance(fitness, (list, tuple,np.ndarray)) else 1
+    fitness_size= ut.size(fitness)
     indices=np.arange(data_size,data_size+fitness_size)
     return indices,fitness
 
@@ -126,9 +125,12 @@ def format_data_for_training(parent,parent_var_names,siblings,sibling_var_names)
 #here is where the order of variables will be enforced
 def concat_variables():
     pass
+#all variables need to be of type numpy array
 def split_variables(variables,joint_data):
-    lengths=[v.size for v in variables]
+    sizes=[v.size for v in variables]
+    sizes.insert(0,0)
+    lengths=np.cumsum(sizes)
     #this is for calculating the edges of the vector to be return in relative value
-    lengths.insert(0,0)
-    return [joint_data[l1:l2] if not var.frozen() else var.freeze_value for (l1,l2),var in zip(ut.pairwise(lengths),variables)]
+    return [np.array(joint_data[l1:l2]) if not var.frozen() else var.freeze_value
+    for (l1,l2),var in zip(ut.pairwise(lengths),variables)]
 

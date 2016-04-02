@@ -9,7 +9,7 @@ import numpy as np
 from util import setting_values
 from gmr import GMM
 from typing import List
-from util import utility as ut
+import util.utility as ut
 from typing import  TypeVar
 from operator import itemgetter
 from itertools import chain
@@ -60,11 +60,11 @@ class StochasticVariable(Variable):
     def __init__(self,name,low,high,func=None,poisson=True):
         super().__init__(name,func)
         self.freeze_value=None
-        self.size=len(high)
         self.high=np.array(high)
         self.low=np.array(low)
+        self.size=ut.size(self.high)
         self.points=None
-        if len(low) is not len(high):
+        if ut.size(self.high) is not ut.size(self.low):
             raise ValueError("Dimensions of bounds are not equal.")
         self.poisson=poisson
 
@@ -79,7 +79,8 @@ class StochasticVariable(Variable):
 
     def sample(self,parent_sample,sibling_sample,i,n_samples):
         if self.poisson and n_samples>1:
-            if  self.points is None:
+            #init poisson disk at the start of sampling
+            if i is 0:
                 self.init_poisson(n_samples)
             point=self.points[i]
         else:
@@ -109,7 +110,8 @@ class NumberChildrenVariable(StochasticVariable):
 class DeterministicVariable(Variable):
     def __init__(self,name,value,func=None):
         super().__init__(name,func)
-        self._value=value
+        self._value=np.array(value)
+        self.size=ut.size(self._value)
         self.high=value
         self.low=value
     def stochastic(self):
@@ -168,7 +170,7 @@ class GMMVariable(StochasticVariable):
     #values on which is trained of course
     #group the values according the vector structure of the search space (given by dummy variables)
     def sample(self, parent_sample,sibling_samples,i,n_samples):
-        values,indices= dtfr.format_data_for_conditional(parent_sample,self.parent_vars,
+        indices,values= dtfr.format_data_for_conditional(parent_sample,self.parent_vars,
                                                          sibling_samples,self.sibling_vars,
                                                          self.sibling_order)
 
@@ -367,7 +369,7 @@ class TreeDefNode:
 class LayoutTreeDefNode(TreeDefNode):
     shape_exteriors={"square":                                         VectorVariableUtility.from_deterministic_list("shape",[(0, 0), (0, 1), (1, 1),(1,0)])}
 
-    position_rel= lambda p , position: [p[0]+position[0],p[1]+position[1]]
+    position_rel= lambda p , position: p+position
     rotation_rel = lambda r, rotation: r + rotation
     size_rel = lambda s, size: s* size
 

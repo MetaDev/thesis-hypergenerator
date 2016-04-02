@@ -28,14 +28,14 @@ n_siblings=sibling_order+1
 #-1->derive (marginalise) from closest higher order
 #n->derive from order n, ! n< order, n<n_children-1
 
-#sibling_order_marginilasation=[]
+sibling_order_marginilasation=[]
 #
 #if len(sibling_order_marginilasation) != sibling_order
 child_name="child"
 
 #training variables and fitness functions
 #this expliicitly also defines the format of the data
-sibling_var_names=["position","rotation"]
+sibling_var_names=["position"]
 parent_var_names=["shape3"]
 
 #this expliicitly also defines the format of the data

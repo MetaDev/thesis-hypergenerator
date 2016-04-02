@@ -55,7 +55,7 @@ def map_layoutsamples_to_geometricobjects(layout_samples,shape_name):
         rel_vars=sample.values["rel"]
         #extract points from vars and put in list ordered on their index saved in the name
         shape=VectorVariableUtility.extract_ordered_list_vars_values(shape_name,rel_vars)
-        geom_objs.append(map_to_polygon(shape,rel_vars["origin"],rel_vars["position"],rel_vars["rotation"]
+        geom_objs.append(map_to_polygon(shape,rel_vars["origin"],rel_vars["position"],int(rel_vars["rotation"])
         ,rel_vars["size"]))
     return geom_objs
 
