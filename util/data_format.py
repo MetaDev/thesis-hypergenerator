@@ -47,22 +47,17 @@ def format_data_for_conditional(parent_sample,parent_vars,sibling_samples,siblin
     indices=np.arange(0,len(values))
     return indices,values
 
-def marginalise_gmm(gmm_full,parent_vars,sibling_vars,sibling_order):
+def marginalise_gmm(gmms,child_index,parent_vars,sibling_vars):
     #a model trained on 4 children can also be used for 5 children of the fifth no longer conditions on the first
     #These models can be reused because there's no difference in the markov chain of order n between the n+1 and n+2 state
 
-    #if sibling order is 0 you have only a single gmm
-    gmms=[None]*(sibling_order+1)
-    gmms[sibling_order]=gmm_full
-    #marginalise for each child
-    #the gmm is trained on data of the form parent,sibling0,sibling1,..
-    #thus to find GMM[i] we need to marginalise out the sibling data beyond sibling i
-    #GMM[i]=P(p,c0,c1,c2,..,ci)
-    for i in range(sibling_order):
-        indices=np.arange(0,(i+1)*variables_length(sibling_vars)+variables_length(parent_vars))
-        #gmms[i]=markov chain order i
-        gmms[i]=gmm_full.marginalise(indices)
-    return gmms
+    #find next full gmm
+    full_gmm=next(gmm for gmm in gmms[child_index:] if gmm is not None)
+    #calculate indices
+    #the order of the data is parent,sibling0,sibling1,..
+    indices=np.arange(0,variables_length(parent_vars)+(child_index+1)*variables_length(sibling_vars))
+    gmm=full_gmm.marginalise(indices)
+    return gmm
 
 def variables_length(variables):
     return np.sum([var.size for var in variables])

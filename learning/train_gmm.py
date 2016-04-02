@@ -8,8 +8,6 @@ import model.test_models as tm
 from model import fitness as fn
 from learning.gmm import GMM
 
-from operator import itemgetter
-
 import util.data_format as dtfr
 
 
@@ -23,17 +21,23 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     sibling_order_sequence=[0,1,2,3,4,4,4,4]
 
     sibling_data=dg.SiblingData.combination
-    fitness_dim=(dtfr.FitnessInstanceDim.single,dtfr.FitnessFuncDim.single)
+    fitness_dim=(dtfr.FitnessInstanceDim.parent_children,dtfr.FitnessFuncDim.single)
 
     #the sibling order defines the size of the joint distribution that will be trained
     sibling_order=np.max(sibling_order_sequence)
-    n_siblings=sibling_order+1
+    n_children=sibling_order+1
 
     #TODO
     #gmm marginalisation [order_1,order_2,..,order_sibling_order]
-    #0->train full joint
-    #-1->derive (marginalise) from closest higher order
-    #n->derive from order n, ! n< order, n<n_children-1
+
+    #True->train full joint
+    #False->derive (marginalise) from closest higher order
+
+    gmm_full=[False,False,False,False]
+    #the largest sibling order always has to be calculated
+    gmm_full.append(True)
+
+
     child_name="child"
     #model to train on
     parent_node,parent_def=tm.test_model_var_child_position_parent_shape()
@@ -67,12 +71,17 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     max_children=parent_def.children_range(child_name)[1]
     if len(sibling_order_sequence) != max_children:
         raise ValueError("The number of siblings implied by the sibling order sequence can not be different than the maximum number of children in the model.")
+    #check marginalisation
+    if len(gmm_full) != n_children:
+        raise ValueError("the array defining which sibling order to train seperately should have the same length as the maximum amount of children for a given sibling order. \n length array: ",len(gmm_full),", expected: ",n_children)
     #do n_iter number of retrainings using previously best model
     for iteration in range(n_iter):
         #find out the performance of the current model
-        data,fitness=dg.data_generation(n_data,parent_def,
+
+        #TODO change training data to evaluation
+        data,fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
-                                child_name,sibling_fitness,sibling_var_names,n_siblings=n_siblings,
+                                child_name,sibling_fitness,sibling_var_names,n_children=n_children,
                                 sibling_data=sibling_data,
                                 fitness_dim=fitness_dim)
 
@@ -97,20 +106,33 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
         gmm_vars_retry_eval=[]
         #do n trials to find a better gmm for the model
         for trial in range(n_trial):
+            #calculate all full joints
+            gmms=[None]*n_children
+            for child_index in np.where(gmm_full):
+                data,fitness=dg.training_data_generation(n_data,parent_def,
+                                parent_node,parent_var_names,parental_fitness,
+                                child_name,sibling_fitness,sibling_var_names,n_children=child_index+1,
+                                sibling_data=sibling_data,
+                                fitness_dim=fitness_dim)
+                gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
+                if regression:
+                    fitness_regression=dtfr.format_generated_fitness(fitness,fitness_dim,
+                                                                  dtfr.FitnessCombination.product)
+                    gmm=_train_regression(gmm,data,fitness_regression,infinite,parental_fitness,sibling_fitness,
+                                          child_index,fitness_dim)
+                else:
+                    fitness_single=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
+                                                                  dtfr.FitnessFuncDim.single),
+                                                                  dtfr.FitnessCombination.product)
+                    gmm=_train_weighted_sampling(gmm,data,fitness_single,infinite)
+                gmms[child_index]=gmm
 
-            gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
-            if regression:
-                fitness_regression=dtfr.format_generated_fitness(fitness,fitness_dim,
-                                                              dtfr.FitnessCombination.product)
-                gmm=_train_regression(gmm,data,fitness_regression,infinite,parental_fitness,sibling_fitness,
-                                      n_siblings,fitness_dim)
-            else:
-                fitness_single=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
-                                                              dtfr.FitnessFuncDim.single),
-                                                              dtfr.FitnessCombination.product)
-                gmm=_train_weighted_sampling(gmm,data,fitness_single,infinite)
+            #marginalise gmms, starting from the largest
+            for child_index in reversed(range(n_children)):
+                if not gmms[child_index]:
+                    gmms[child_index]=dtfr.marginalise_gmm(gmms,child_index,parent_vars,sibling_vars)
 
-            gmm_vars=_construct_gmm_vars(gmm,"test",parent_def,parent_node,child_name,
+            gmm_vars=_construct_gmm_vars(gmms,"test",parent_def,parent_node,child_name,
                          parent_var_names,sibling_var_names,
                          sibling_order)
 
@@ -121,9 +143,9 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                 child_nodes[k].set_learned_variable(gmm_vars[sibling_order_sequence[k]])
 
             #evaluate new model
-            _,eval_fitness=dg.data_generation(n_data,parent_def,
+            _,eval_fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
-                                child_name,sibling_fitness,sibling_var_names,n_siblings=n_siblings,
+                                child_name,sibling_fitness,sibling_var_names,n_children=n_children,
                                 sibling_data=sibling_data,
                                 fitness_dim=fitness_dim)
             fitness_single_seperate=dtfr.format_generated_fitness(eval_fitness,
@@ -152,9 +174,9 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
         if max_gmm_vars:
             for i in range(len(child_nodes)):
                 child_nodes[i].set_learned_variable(max_gmm_vars[sibling_order_sequence[i]])
-        _,fitness=dg.data_generation(n_data,parent_def,
+        _,fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
-                                child_name,sibling_fitness,sibling_var_names,n_siblings=n_siblings,
+                                child_name,sibling_fitness,sibling_var_names,n_children=n_children,
                                 sibling_data=sibling_data,
                                 fitness_dim=fitness_dim)
     #show the result of nth iteration
@@ -190,7 +212,7 @@ def _train_regression(gmm,data,fitness,infinite,parental_fitness,sibling_fitness
     return gmm.condition(indices,targets)
 
 
-def _construct_gmm_vars(gmm,gmm_name,parent_def,parent_node,child_name,
+def _construct_gmm_vars(gmms,gmm_name,parent_def,parent_node,child_name,
                  parent_var_names,sibling_var_names,
                  sibling_order):
 
@@ -199,8 +221,7 @@ def _construct_gmm_vars(gmm,gmm_name,parent_def,parent_node,child_name,
     parent_vars=[parent_def.variables[name] for name in parent_var_names]
     #check if none of the vars is deterministic
 
-    import util.data_format as dtfr
-    gmms=dtfr.marginalise_gmm(gmm,parent_vars,sibling_vars,sibling_order)
+
 
     #edit model with found variables
     from model.search_space import GMMVariable

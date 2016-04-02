@@ -1,38 +1,22 @@
-make seperate data generation algorithm for regression
 
-find a way to generate the same amount of data with stochastic children
--> first sample from the number of children
+add method for deciding whether new model is better than previous
 
-seperate method for single objective training and multi-objective training
-this illustrates the power of weighted sampling in low dimensionality
+bug in polygon mapping-> why is rotation so important for the model to converge? the fitness doesn't depend on it
+is the mapping in the correct ordeR
 
-add parameter for the type of sibling data: -windowed (sliding window over the sibling samples)
-                                            -combinations (combination over the sibling samples)
-                                            -exact (combine data of siblings seperately)
-add parameter for the type of sibling data: -windowed (sliding window over the sibling samples)
-                                            -combinations (combination over the sibling samples)
-                                            -exact (combine data of siblings seperately)
-                                            -slice
-add parameter for the type of sibling fitness: -combinations
-                                                -previous
+rejection sampling for gmm
 
-make method for custom marginalisation
 
-fix poisson sampling for stochastic number of children
 
-make fitness class
 
-titel kiezen: search-space optimisation for procedural content generators
+evaluation and tests
+-------------------------------
+evaluate performance and expressiveness of model
 
-re-training, where sampled data originates from previously trained models
-
-make it possible to train a seperate gmm for each n child (no marginalisation)
-
-there is a problem with poisson sampling with non-deterministic number of children, the number of sameples i incorrect
+to evaluate the expressivenes of the result, calculate exact (using integrals, with a lot of data)
+the occupation of the relevant search space (fitness cutoff)
 
 to compare performance between learned models the actual fitness should be used not the fitness with order that used in training
-
-
 
 visualise the distributions of a model and a small representative sample set
 make something that visualise some random (or best, worst) samples
@@ -41,20 +25,9 @@ and also the corresponding GMMs (in stages of the generation, this visualisation
 ->visualise sampling process
 add visualisation of GMM to GMM
 
-
 add gridsearch on parameters to find best parameters
 
 calculate MSE of GMM
-
-if possible
-
-
-should be done by 31/03
-
-
-start writing methodology
-
-
 
 more variables, fitness functions and scene models
 
@@ -66,20 +39,6 @@ find out why alignment is so hard to learn in gmm2
 
 plot fitness seperately, fitness func is maybe not correct, try to visualise it
 
-in training utility, a method sould receive the samples, and the fitness function and return
-the fitness values and according data used to calculate it
-also an argument for fitness threshold, fitness target and whether you're looking to minimize or maximize the
-
-create seperate class for fitness
-the order and cap of a fitness function belongs in the fitness calculation not the training method
-
-research:
-
-Neufert constraints
-
-research question:
-How to optimise the search space of a procedural content generator, a priori defined by bottom up constraints and a posteriori by its top-down constraints, without negatively impacting its expressiveness?
-
 evaluation, the type of metrics and parameters that will be varied
 3 models for scenes, constraints and search space
 
@@ -90,8 +49,22 @@ factory method to visualise fitness functions
 
 make planning of tests and evaluation
 
+writing
+------------------
+start writing methodology
+
+research:
+
+Neufert constraints
+
+research question:
+How to optimise the search space of a procedural content generator, a priori defined by bottom up constraints and a posteriori by its top-down constraints, without negatively impacting its expressiveness?
+
+
+
 learning optimisation
 -------------------------
+add weigthed average as way to combine fitness
 
 instead of multiplying the multiple fitness functions -> dim reduction
 

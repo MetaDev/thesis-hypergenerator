@@ -30,7 +30,7 @@ class Variable(metaclass = ABCMeta):
     #these samples are for conditional relations
 
     @abstractmethod
-    def sample(self, parent_sample,sibling_sample,i,n_samples):
+    def sample(self, parent_sample,sibling_sample,i,n_samples,expressive):
         pass
     def set_func(self,func):
         self.func=func
@@ -57,7 +57,7 @@ class Variable(metaclass = ABCMeta):
 
 class StochasticVariable(Variable):
 
-    def __init__(self,name,low,high,func=None,poisson=True):
+    def __init__(self,name,low,high,func=None):
         super().__init__(name,func)
         self.freeze_value=None
         self.high=np.array(high)
@@ -66,10 +66,6 @@ class StochasticVariable(Variable):
         self.points=None
         if ut.size(self.high) is not ut.size(self.low):
             raise ValueError("Dimensions of bounds are not equal.")
-        self.poisson=poisson
-
-        if poisson and self.size>3:
-            raise ValueError("Poisson disk sampling is only supported up to 3 dimensions")
 
 
     def init_poisson(self,n_samples):
@@ -77,8 +73,10 @@ class StochasticVariable(Variable):
         poisson_generator = poisson.PoissonGenerator(self.size)
         self.points = poisson_generator.find_point_set(n_samples)
 
-    def sample(self,parent_sample,sibling_sample,i,n_samples):
-        if self.poisson and n_samples>1:
+    def sample(self,parent_sample,sibling_sample,i,n_samples,expressive):
+        if expressive and self.size>3:
+            raise ValueError("Poisson disk sampling for more expressive result is only supported up to 3 dimensions")
+        if expressive and n_samples>1:
             #init poisson disk at the start of sampling
             if i is 0:
                 self.init_poisson(n_samples)
@@ -103,7 +101,7 @@ class NumberChildrenVariable(StochasticVariable):
         self.high=high
         self.low=low
         self.choices=np.arange(low,high+1,step)
-    def sample(self,parent_sample,sibling_sample,i,n_samples):
+    def sample(self,parent_sample,sibling_sample,i,n_samples,expressive):
         return np.random.choice(self.choices) if not self.frozen() else self.freeze_value
 
 
@@ -116,7 +114,7 @@ class DeterministicVariable(Variable):
         self.low=value
     def stochastic(self):
         return False
-    def sample(self, parent_sample,sibling_sample,i,n_samples):
+    def sample(self, parent_sample,sibling_sample,i,n_samples,expressive):
         return self._value
 
 class VectorVariableUtility():
@@ -169,7 +167,7 @@ class GMMVariable(StochasticVariable):
     #when sampling, sample from a the distribution completely conditioned on the parent independent variable values
     #values on which is trained of course
     #group the values according the vector structure of the search space (given by dummy variables)
-    def sample(self, parent_sample,sibling_samples,i,n_samples):
+    def sample(self, parent_sample,sibling_samples,i,n_samples,expressive):
         indices,values= dtfr.format_data_for_conditional(parent_sample,self.parent_vars,
                                                          sibling_samples,self.sibling_vars,
                                                          self.sibling_order)
@@ -240,13 +238,13 @@ class TreeDefNode:
         def freeze_n_children(self,child_name,n_children):
             self.variable_assignment[child_name].freeze(n_children)
 
-        def sample(self,n_samples):
+        def sample(self,n_samples,expressive):
             sample_roots=[]
             for i in range(n_samples):
-                sample_roots.append(self._sample(i,n_samples))
+                sample_roots.append(self._sample(i,n_samples,expressive))
             return sample_roots
         #recursively sample the tree
-        def _sample(self,i,n_samples,parent_sample=None,sibling_samples=None):
+        def _sample(self,i,n_samples,expressive,parent_sample=None,sibling_samples=None):
             values={}
             values["ind"]={}
             values["rel"]={}
@@ -261,7 +259,7 @@ class TreeDefNode:
              #first sample the packed variables
             for var in self.sample_variables:
                 if var.unpack:
-                    value=var.sample(parent_sample,sibling_samples,i,n_samples)
+                    value=var.sample(parent_sample,sibling_samples,i,n_samples,expressive)
                     rel_value=var.relative_sample(value,parent_sample)
                     for v,rel_v,name in zip(value,rel_value,
                                                   var.unpack_names):
@@ -273,7 +271,7 @@ class TreeDefNode:
             #from a packed variable
             for var in self.sample_variables:
                 if not var.unpack:
-                    value=var.sample(parent_sample,sibling_samples,i,n_samples)
+                    value=var.sample(parent_sample,sibling_samples,i,n_samples,expressive)
                     rel_value=var.relative_sample(value,parent_sample)
                     values["ind"][var.name]=value
                     values["rel"][var.name]=rel_value
@@ -290,7 +288,7 @@ class TreeDefNode:
                     #only sample the amount of children as sampled
                     if child.index < n_children:
                         siblings=list(child_samples[child.name])
-                        child_sample=child._sample(i,n_samples,sample,siblings)
+                        child_sample=child._sample(i,n_samples,expressive,sample,siblings)
                         child_samples[child.name].append(child_sample)
             #relative values are calculated based on parent, thus the children have to be instantiated before the parent
             sample.children=child_samples
@@ -337,10 +335,6 @@ class TreeDefNode:
                 #give a copy of the sibling list, because it is different for each child
                 children[child_node.name].append(child_node.build_tree(i))
         return TreeDefNode.VarDefNode(self,index,children)
-
-
-
-
 
     #the structure of the variables is important for later mapping from search space sample to actual
     #generated content

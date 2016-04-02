@@ -27,32 +27,34 @@ class SiblingData(Enum):
     window=2
     first=3
 
+#TODO data generation for evaluation, no poisson sampling, variable amount of children, return list of siblings
 
-def data_generation(n_data,parent_def,
+
+def training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
-                                child_name,sibling_fitness,sibling_var_names,n_siblings,
+                                child_name,sibling_fitness,sibling_var_names,n_children,
                                 sibling_data=SiblingData.combination,
                                 fitness_dim=(FitnessInstanceDim.single,FitnessFuncDim.single)):
     #generate sample data
 
     sample_fraction=1
     min_children,max_children=parent_def.children_range(child_name)
-    n_sample_children=n_siblings
-    if n_siblings>max_children:
+    n_sample_children=n_children
+    if n_children>max_children:
         raise ValueError("Number of requested siblings in the data is larger than the possible number of children in the model.")
 
-    if n_siblings<min_children:
+    if n_children<min_children:
         #generate for smallest possible amount of children
         n_sample_children=min_children
         if sibling_data is SiblingData.combination:
-            sample_fraction=comb(min_children,n_siblings)
+            sample_fraction=comb(min_children,n_children)
         elif sibling_data is SiblingData.window:
-            sample_fraction=min_children+1-n_siblings
+            sample_fraction=min_children+1-n_children
 
     parent_node.freeze_n_children(child_name,n_sample_children)
     #the sample fraction is necessary because the number to generate samples is used to generate in poisson disk sampling
     #to generate diversified samples
-    parent_samples=parent_node.sample(math.ceil(n_data/sample_fraction))
+    parent_samples=parent_node.sample(math.ceil(n_data/sample_fraction),expressive=True)
     #generate data with n_siblings
     data=[]
     fitness=[]
@@ -62,13 +64,13 @@ def data_generation(n_data,parent_def,
         #you have 3 options: either respect the order of the children and train on a windowed view of the children
         #or only the first n
         #or don't respect the order (the order is not real anyway it is only implied by the trained variable)
-        if n_siblings<min_children:
+        if n_children<min_children:
             if sibling_data is SiblingData.combination:
-                sibling_collection=combinations(siblings,n_siblings)
+                sibling_collection=combinations(siblings,n_children)
             elif sibling_data is SiblingData.window:
-                sibling_collection=ut.window(siblings,n_siblings)
+                sibling_collection=ut.window(siblings,n_children)
             else:
-                sibling_collection=[siblings[:n_siblings]]
+                sibling_collection=[siblings[:n_children]]
             for sibling_sub_collection in sibling_collection:
                 fitness_value=_fitness_calc(parent,parental_fitness,
                                        sibling_sub_collection,sibling_fitness,
