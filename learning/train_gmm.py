@@ -9,12 +9,16 @@ from model import fitness as fn
 from learning.gmm import GMM
 
 import util.data_format as dtfr
-
+import util.utility as ut
 
 import learning.data_generation as dg
 
 def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regression=False,verbose=True):
     #experiment hyperparameters:
+
+    fitness_average_threshhold=0.95
+    fitness_func_threshhold=0.98
+
     #this sequence indicates the order of the markov chain between siblings [1,2]-> second child depends on the first
     #the third on the first and second
     #the first child is always independent
@@ -33,7 +37,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     #True->train full joint
     #False->derive (marginalise) from closest higher order
 
-    gmm_full=[False,False,False,True]
+    gmm_full=[False,True,False,True]
     #the largest sibling order always has to be calculated
     gmm_full.append(True)
 
@@ -85,6 +89,8 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                 sibling_data=sibling_data,
                                 fitness_dim=fitness_dim)
 
+
+
         if verbose:
             fitness_parent_child=dtfr.format_generated_fitness(fitness,
                                                                (dtfr.FitnessInstanceDim.parent_children,
@@ -96,6 +102,18 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
             ev.fitness_statistics(fitness_parent_child[:,0],verbose=verbose)
             print("child fitness")
             ev.fitness_statistics(fitness_parent_child[:,1],verbose=verbose)
+
+
+        #calcualte average
+        fitness_average=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
+                                                              dtfr.FitnessFuncDim.single),
+                                                              dtfr.FitnessCombination.average)
+
+        if fitness_average>fitness_average_threshhold or any(fn>fitness_func_threshhold
+                                                                for fn in ut.flatten(fitness)):
+            print("Convergence reached, further training would lead be numerically unstable.")
+            return
+
         #combine fitness per func
         fitness_funcs=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.parent_children,
                                                               dtfr.FitnessFuncDim.seperate),
@@ -197,8 +215,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
 
 
 def _train_weighted_sampling(gmm,data,fitness,infinite):
-    fitness_all = np.array(fitness[:,1])*np.array(fitness[:,0])
-    gmm.fit(data,fitness_all,infinite=infinite,min_covar=0.01)
+    gmm.fit(data,fitness,infinite=infinite,min_covar=0.01)
     return gmm
 def _train_regression(gmm,data,fitness,infinite,parental_fitness,sibling_fitness,n_siblings,fitness_dim):
     #check if regression works better this way

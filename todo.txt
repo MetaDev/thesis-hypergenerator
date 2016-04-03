@@ -1,16 +1,12 @@
-debugs marginalisation array
+parent_sibgling % single func should return 1 fitness per siblings, change in data format
+
+test evaluation of model
+
+add guard for expressivenis or exclude training on extremely high fitness and test it
 
 test with only a single child
 
-check if none of the fitnes funcs is always 1
-
-
-bug in polygon mapping-> why is rotation so important for the model to converge? the fitness doesn't depend on it
-is the mapping in the correct order?
-
 rejection sampling for gmm
-
-
 
 
 evaluation and tests
@@ -170,10 +166,9 @@ better print of node sample
 code clean up
 ----------------------
 
-centralise data format for traing and sampling ()
+to speed up fitness func Prepared Geometry Operations
 
-
-remove colors from search space
+remove colors from search space and add type
 
 put some protection on the properties of sample nodes, in terms of querying variable name and sizes
 the treedef should be use not the sample nodes

@@ -43,6 +43,7 @@ def get_ax(ax):
         return ax
 def draw_polygons(polygons,ax=None,colors=[],size=1.2,show_edges=False,set_range=False):
     ax=get_ax(ax)
+    ax.set_aspect(1)
     color="b"
     for i in range(len(polygons)):
         polygon=polygons[i]
@@ -66,9 +67,7 @@ def draw_polygons(polygons,ax=None,colors=[],size=1.2,show_edges=False,set_range
 #this is can be used as indicator for expressivens of this dimension
 #it's limitation is that it assumes independence between vars but it is very hard to visualise multi dimensional data
 
-#TODO line for not learned expressiveness should reflect the original distribution
-
-#TODO check dimensionality
+#TODO check dimensionality, move to gmm (where a dimension can be chosen)
 def visualise_gmm_marg_1D_density(ax,marg_index,gmm_weights,gmm_means,gmm_cov,
                                  factor=2,xrange=None,verbose=False):
     means=[]

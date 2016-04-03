@@ -27,6 +27,7 @@ class Variable(metaclass = ABCMeta):
         self.parent_vars_name=None
         self.unpack=False
         self.set_func(func)
+        self.freeze_value=None
     #these samples are for conditional relations
 
     @abstractmethod
@@ -238,7 +239,7 @@ class TreeDefNode:
         def freeze_n_children(self,child_name,n_children):
             self.variable_assignment[child_name].freeze(n_children)
 
-        def sample(self,n_samples,expressive):
+        def sample(self,n_samples,expressive=True):
             sample_roots=[]
             for i in range(n_samples):
                 sample_roots.append(self._sample(i,n_samples,expressive))

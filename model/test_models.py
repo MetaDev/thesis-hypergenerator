@@ -13,7 +13,7 @@ def test_model_var_child_position_parent_shape():
     colors = DV("color",(0,1,0))
 
 
-    child_size = DV("size",(0.2,0.2))
+    child_size = DV("size",(0.2,0.4))
     rotation=SV("rotation",low=0,high=359)
     chair = LN(size=child_size,name="child" ,position=child_position,
                                     rotation=rotation,shape=LN.shape_exteriors["square"], color=colors)

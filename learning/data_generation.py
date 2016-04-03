@@ -29,12 +29,10 @@ class SiblingData(Enum):
 
 #TODO data generation for evaluation, no poisson sampling, variable amount of children, return list of siblings
 
-
 def training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children,
-                                sibling_data=SiblingData.combination,
-                                fitness_dim=(FitnessInstanceDim.single,FitnessFuncDim.single)):
+                                sibling_data=SiblingData.combination):
     #generate sample data
 
     sample_fraction=1
@@ -74,16 +72,14 @@ def training_data_generation(n_data,parent_def,
                 sibling_collection=[siblings[:n_children]]
             for sibling_sub_collection in sibling_collection:
                 fitness_value=_fitness_calc(parent,parental_fitness,
-                                       sibling_sub_collection,sibling_fitness,
-                                       fitness_dim)
+                                       sibling_sub_collection,sibling_fitness)
                 if fitness_value is not None:
                     fitness.append(fitness_value)
                     data.append(dtfr.format_data_for_training(parent,parent_var_names,
                                                               sibling_sub_collection,sibling_var_names))
         else:
             fitness_value=_fitness_calc(parent,parental_fitness,
-                                       siblings,sibling_fitness,
-                                       fitness_dim)
+                                       siblings,sibling_fitness)
             if fitness_value is not None:
                 fitness.append(fitness_value)
                 data.append(dtfr.format_data_for_training(parent,parent_var_names,siblings,sibling_var_names))
@@ -94,11 +90,9 @@ def training_data_generation(n_data,parent_def,
     parent_node.freeze_n_children(child_name,None)
     return np.array(data),np.array(fitness)
 
-#calculate fitness with given options
-#the options will define the fitness dimensionality
+#calculate fitness of a given parent-children model
 def _fitness_calc(parent,parental_fitness,
-                       siblings,sibling_fitness,
-                       fitness_dim=(FitnessInstanceDim.single,FitnessFuncDim.single)):
+                       siblings,sibling_fitness):
 
     #calcualte fitness parent->child
     fitness_value_parent_child=dict([(child,[]) for child in siblings])
