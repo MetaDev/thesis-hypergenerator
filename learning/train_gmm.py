@@ -12,6 +12,7 @@ import util.data_format as dtfr
 import util.utility as ut
 
 import learning.data_generation as dg
+import model.evaluation as mev
 
 def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regression=False,verbose=True):
     #experiment hyperparameters:
@@ -66,6 +67,9 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
 
     parental_fitness=[fn.Fitness(fn.fitness_polygon_overl,32,0,1)]
 
+    model_evaluation = mev.ModelEvaluation(100,parent_node,parent_var_names,parental_fitness,
+                                               child_name,sibling_fitness,sibling_var_names,
+                                               fitness_average_threshhold,fitness_func_threshhold)
 
 
     #check sibling sequence
@@ -86,32 +90,14 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
         data,fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children=n_children,
-                                sibling_data=sibling_data,
-                                fitness_dim=fitness_dim)
-
-
+                                sibling_data=sibling_data)
 
         if verbose:
-            fitness_parent_child=dtfr.format_generated_fitness(fitness,
-                                                               (dtfr.FitnessInstanceDim.parent_children,
-                                                                dtfr.FitnessFuncDim.single),
-                                                                dtfr.FitnessCombination.product)
-            print("fitness before training iteration ", iteration)
-            #print the first fitness func
-            print("parent fitness")
-            ev.fitness_statistics(fitness_parent_child[:,0],verbose=verbose)
-            print("child fitness")
-            ev.fitness_statistics(fitness_parent_child[:,1],verbose=verbose)
+            print_result(fitness,iteration)
 
 
-        #calcualte average
-        fitness_average=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
-                                                              dtfr.FitnessFuncDim.single),
-                                                              dtfr.FitnessCombination.average)
 
-        if fitness_average>fitness_average_threshhold or any(fn>fitness_func_threshhold
-                                                                for fn in ut.flatten(fitness)):
-            print("Convergence reached, further training would lead be numerically unstable.")
+        if model_evaluation.converged(fitness):
             return
 
         #combine fitness per func
@@ -130,8 +116,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                 data,fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children=child_index+1,
-                                sibling_data=sibling_data,
-                                fitness_dim=fitness_dim)
+                                sibling_data=sibling_data)
                 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
                 if regression:
                     fitness_regression=dtfr.format_generated_fitness(fitness,fitness_dim,
@@ -164,8 +149,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
             _,eval_fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children=n_children,
-                                sibling_data=sibling_data,
-                                fitness_dim=fitness_dim)
+                                sibling_data=sibling_data)
             fitness_single_seperate=dtfr.format_generated_fitness(eval_fitness,
                                                                   (dtfr.FitnessInstanceDim.parent_children,
                                                               dtfr.FitnessFuncDim.seperate),
@@ -195,24 +179,25 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
         _,fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children=n_children,
-                                sibling_data=sibling_data,
-                                fitness_dim=fitness_dim)
+                                sibling_data=sibling_data)
     #show the result of nth iteration
     if verbose:
-        print("final")
-        fitness_parent_child=dtfr.format_generated_fitness(fitness,
+        print_result(fitness,iteration)
+
+
+def print_result(fitness_values,iteration):
+    fitness_parent_child=dtfr.format_generated_fitness(fitness_values,
                                                                (dtfr.FitnessInstanceDim.parent_children,
                                                                 dtfr.FitnessFuncDim.single),
                                                                 dtfr.FitnessCombination.product)
-        print("fitness before training iteration ", iteration)
-        #print the first fitness func
-        print("parent fitness")
-        ev.fitness_statistics(fitness_parent_child[:,0],verbose=verbose)
+    fitness_parent_child=np.array(fitness_parent_child)
+    print("fitness before training iteration ", iteration)
+    #print the first fitness func
+    print("parent fitness")
+    ev.fitness_statistics(fitness_parent_child[:,0],verbose=True)
+    if fitness_parent_child.shape[0]>1:
         print("child fitness")
-        ev.fitness_statistics(fitness_parent_child[:,1],verbose=verbose)
-
-
-
+        ev.fitness_statistics(fitness_parent_child[:,1],verbose=True)
 
 def _train_weighted_sampling(gmm,data,fitness,infinite):
     gmm.fit(data,fitness,infinite=infinite,min_covar=0.01)

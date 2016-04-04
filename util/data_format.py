@@ -89,16 +89,25 @@ def format_fitness_dimension(parental_fitness_values,sibling_fitness_values,fitn
         fitness_values=list(ut.flatten([parental_fitness_values,sibling_fitness_values]))
         return combine_fitness(fitness_values,fitness_axis,fitness_comb)
 
-    if not (fitness_dim[0] is FitnessInstanceDim.parent_sibling and fitness_dim[1] is FitnessFuncDim.seperate):
+    if not (fitness_dim[0] is FitnessInstanceDim.parent_sibling and
+                                                fitness_dim[1] is FitnessFuncDim.seperate):
         parental_fitness_values=combine_fitness(parental_fitness_values,fitness_axis,fitness_comb)
         sibling_fitness_values=combine_fitness(sibling_fitness_values,fitness_axis,fitness_comb)
-    return list(ut.flatten([parental_fitness_values,sibling_fitness_values]))
+    if fitness_dim[0] is FitnessInstanceDim.parent_sibling and fitness_dim[1] is FitnessFuncDim.single:
+        fitness_values=[sibling_fitness_values[i]*parental_fitness_values[i+1]
+                                            for i in range(len(sibling_fitness_values))]
+        #first sibling only parental fitness
+        fitness_values.insert(0,parental_fitness_values[0])
+    else:
+        fitness_values=[parental_fitness_values,sibling_fitness_values]
+
+    return list(ut.flatten(fitness_values))
 #this method is used to combine the result from the data generation process
 def format_generated_fitness(fitness,fitness_dim,fitness_comb):
     if ut.size(fitness[0])>1:
-        return np.array([format_fitness_dimension(vals[0],vals[1],fitness_dim,fitness_comb) for vals in fitness])
+        return [format_fitness_dimension(vals[0],vals[1],fitness_dim,fitness_comb) for vals in fitness]
     else:
-        return np.array([format_fitness_dimension(vals,None,fitness_dim,fitness_comb) for vals in fitness])
+        return [format_fitness_dimension(vals,None,fitness_dim,fitness_comb) for vals in fitness]
 
 
 def format_fitness_values_training(fitness_value_parent_child,fitness_value_sibling,siblings):

@@ -70,7 +70,9 @@ class GMM:
 
     def _is_fitted(self):
         return self.covars_ is not None
-
+    #TODO
+    def variance(self):
+        pass
     def condition(self, indices, x):
         if self._is_fitted():
             gmm = self.gmm_gmr.condition(indices,x)
@@ -90,6 +92,7 @@ class GMM:
             for k in range(self.n_components):
                 mvn = gmr.MVN(mean=means[k],covariance=covars[k],
                               random_state=self.random_state)
+                mvn.
                 mvn= mvn.marginalize(indices)
                 mvns.append(mvn)
             means_marg=np.array([mvn.mean for mvn in mvns])

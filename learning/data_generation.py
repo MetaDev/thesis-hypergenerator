@@ -27,7 +27,6 @@ class SiblingData(Enum):
     window=2
     first=3
 
-#TODO data generation for evaluation, no poisson sampling, variable amount of children, return list of siblings
 
 def training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,

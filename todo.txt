@@ -1,8 +1,12 @@
-parent_sibgling % single func should return 1 fitness per siblings, change in data format
-
 test evaluation of model
 
-add guard for expressivenis or exclude training on extremely high fitness and test it
+variance of the model can be calculated analytically (from variables)
+
+add guard for expressivenis or exclude training on extremely high fitness and test it in gmm_train
+
+single instance mutli func can give multiple func, but not if the func is the same between parent->child and sibling
+
+single instance single func always 1 value
 
 test with only a single child
 
