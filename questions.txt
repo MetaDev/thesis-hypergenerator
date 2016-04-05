@@ -1,12 +1,9 @@
 done
----------
-use of poisson disk sampling
+---------------
+retraining
+evaluation of model
+->model selection
 
-regression works
-
-infinite gauss
-
-set up tests to evaluate training
 
 still to do
 -------------------------
@@ -35,15 +32,10 @@ evaluation models
 extract info from neufert and combine with pattern language examples to create 3 scenes
 with different constraints, tree hierarchies
 
-implement retraining
-implement MCMC sampling of truncuated gmms
-
 for literature:
 writing methodology
 write related work
 15/04
 
 
-
-deadline ?
 

@@ -29,11 +29,11 @@ class ModelEvaluation:
 
     #calculate emperical performance and expressiveness
     #compare per fitness func for perfomance and per sibling variable for expressiveness
-    def evaluate(self,parent_node):
+    def evaluate(self,parent_node,parental_fitness,sibling_fitness,expressive_performance_ratio=[1,1]):
 
         #unfreeze model
-        self.parent_node.freeze_n_children(self.child_name,None)
-        parent_samples = self.parent_node.sample(self.n_data,expressive=False)
+        parent_node.freeze_n_children(self.child_name,None)
+        parent_samples = parent_node.sample(self.n_data,expressive=False)
         sibling_samples= [ps.children[self.child_name]for ps in parent_samples]
         #performance
 
@@ -41,7 +41,9 @@ class ModelEvaluation:
         fitness=[dg._fitness_calc(ps,self.parental_fitness,
                                   ss,self.sibling_fitness) for ps,ss in zip(parent_samples,sibling_samples)]
         #there are different ways of comparing fitness, for now we choose average of product combined fitness
-        fitness_average=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
+        fitness_average=dtfr.format_generated_fitness(fitness,
+                                                      parental_fitness,sibling_fitness,
+                                                      (dtfr.FitnessInstanceDim.single,
                                                                   dtfr.FitnessFuncDim.single),
                                                                   dtfr.FitnessCombination.average)
         #expressiveness
@@ -49,32 +51,30 @@ class ModelEvaluation:
         #calculate weighted variance between sibling vars
         #calculate 1 fitness per sibling as weight
 
-        fitness_siblings=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.parent_sibling,
+        fitness_siblings=dtfr.format_generated_fitness(fitness,
+                                                       parental_fitness,sibling_fitness,
+                                                       (dtfr.FitnessInstanceDim.parent_sibling,
                                                                   dtfr.FitnessFuncDim.single),
                                                                   dtfr.FitnessCombination.average)
         #calc per variable it's weighted variance
         sibling_var_variance=[]
-        sibling_vars=[sibling_samples[i][j].values["ind"]["position"] for i in range(len(sibling_samples)) for j in range(len(sibling_samples[i]))]
-        print(min(sibling_vars),max(sibling_vars))
         for var_name in self.sibling_var_names:
             for siblings,fitness in zip(sibling_samples,fitness_siblings):
-                sibling_var_variance.append(np.var([sibling_samples[i].values["ind"][var_name]/fitness[i] for i in range(siblings)]))
+                sibling_var_variance.append(np.var([siblings[i].values["ind"][var_name]/fitness[i] for i in range(len(siblings))]))
 
-        return fitness_average,np.average(sibling_var_variance)
+        ratio=expressive_performance_ratio[0]*np.average(sibling_var_variance) + expressive_performance_ratio[1]*np.average(fitness_average)
+        return ratio
 
-    def best(self,parent_node1,parent_node2, expressive_performance_ratio=[1,1]):
-        fn_1,var_1=self.evaluate(parent_node1)
-        fn_2,var_2=self.evaluate(parent_node2)
-
-        ratio1=expressive_performance_ratio[0]*var_1+expressive_performance_ratio[1]*fn_1
-        ratio2=expressive_performance_ratio[0]*var_2+expressive_performance_ratio[1]*fn_2
-        return parent_node1 if ratio1>ratio2 else parent_node2
 
     def converged(self,fitness_values,verbose=True):
-        fitness_average=dtfr.format_generated_fitness(fitness_values,(dtfr.FitnessInstanceDim.single,
+        fitness_average=dtfr.format_generated_fitness(fitness_values,
+                                                      self.parental_fitness,self.sibling_fitness,
+                                                      (dtfr.FitnessInstanceDim.single,
                                                                   dtfr.FitnessFuncDim.single),
                                                                   dtfr.FitnessCombination.average)
-        fitness_func_average=dtfr.format_generated_fitness(fitness_values,(dtfr.FitnessInstanceDim.parent_children,
+        fitness_func_average=dtfr.format_generated_fitness(fitness_values,
+                                                           self.parental_fitness,self.sibling_fitness,
+                                                           (dtfr.FitnessInstanceDim.parent_children,
                                                                   dtfr.FitnessFuncDim.seperate),
                                                                   dtfr.FitnessCombination.average)
         fitness_average=np.average(fitness_average,None)

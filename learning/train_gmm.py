@@ -38,7 +38,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     #True->train full joint
     #False->derive (marginalise) from closest higher order
 
-    gmm_full=[False,True,False,True]
+    gmm_full=[False,False,False,False]
     #the largest sibling order always has to be calculated
     gmm_full.append(True)
 
@@ -67,7 +67,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
 
     parental_fitness=[fn.Fitness(fn.fitness_polygon_overl,32,0,1)]
 
-    model_evaluation = mev.ModelEvaluation(100,parent_node,parent_var_names,parental_fitness,
+    model_evaluation = mev.ModelEvaluation(100,parent_var_names,parental_fitness,
                                                child_name,sibling_fitness,sibling_var_names,
                                                fitness_average_threshhold,fitness_func_threshhold)
 
@@ -91,9 +91,17 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children=n_children,
                                 sibling_data=sibling_data)
+        #test
+        test= dtfr.format_generated_fitness(fitness,
+                                            parental_fitness,sibling_fitness,
+                                            (dtfr.FitnessInstanceDim.single,
+                                                                      dtfr.FitnessFuncDim.seperate),
+                                                                     dtfr.FitnessCombination.product)
+        print(np.array(test).shape)
+
 
         if verbose:
-            print_result(fitness,iteration)
+            print_result(fitness,parental_fitness,sibling_fitness,iteration)
 
 
 
@@ -101,10 +109,8 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
             return
 
         #combine fitness per func
-        fitness_funcs=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.parent_children,
-                                                              dtfr.FitnessFuncDim.seperate),
-                                                              dtfr.FitnessCombination.product)
-        mean_fitness=np.average(fitness_funcs,axis=0)
+        #evaluate model at the start of every iteration
+        iteration_gmm_score=model_evaluation.evaluate(parent_node,parental_fitness,sibling_fitness)
 
 
         gmm_vars_retry_eval=[]
@@ -119,14 +125,18 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                 sibling_data=sibling_data)
                 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
                 if regression:
-                    fitness_regression=dtfr.format_generated_fitness(fitness,fitness_dim,
-                                                                  dtfr.FitnessCombination.product)
+                    fitness_regression=dtfr.format_generated_fitness(fitness,
+                                                                     parental_fitness,sibling_fitness,
+                                                                     fitness_dim,
+                                                                     dtfr.FitnessCombination.product)
 
                     gmm=_train_regression(gmm,data,fitness_regression,infinite,parental_fitness,sibling_fitness,child_index,fitness_dim)
                 else:
-                    fitness_single=dtfr.format_generated_fitness(fitness,(dtfr.FitnessInstanceDim.single,
-                                                                  dtfr.FitnessFuncDim.single),
-                                                                  dtfr.FitnessCombination.product)
+                    fitness_single=dtfr.format_generated_fitness(fitness,
+                                                                 parental_fitness,sibling_fitness,
+                                                                 (dtfr.FitnessInstanceDim.single,
+                                                                         dtfr.FitnessFuncDim.single),
+                                                                         dtfr.FitnessCombination.product)
                     gmm=_train_weighted_sampling(gmm,data,fitness_single,infinite)
                 gmms[child_index]=gmm
 
@@ -134,8 +144,8 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
             for child_index in reversed(range(n_children)):
                 if not gmms[child_index]:
                     gmms[child_index]=dtfr.marginalise_gmm(gmms,child_index,parent_vars,sibling_vars)
-
-            gmm_vars=_construct_gmm_vars(gmms,"test",parent_def,parent_node,child_name,
+            gmm_var_name="test"+str(iteration)
+            gmm_vars=_construct_gmm_vars(gmms,gmm_var_name,parent_def,parent_node,child_name,
                          parent_var_names,sibling_var_names,
                          sibling_order)
 
@@ -146,47 +156,40 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                 child_nodes[k].set_learned_variable(gmm_vars[sibling_order_sequence[k]])
 
             #evaluate new model
-            _,eval_fitness=dg.training_data_generation(n_data,parent_def,
-                                parent_node,parent_var_names,parental_fitness,
-                                child_name,sibling_fitness,sibling_var_names,n_children=n_children,
-                                sibling_data=sibling_data)
-            fitness_single_seperate=dtfr.format_generated_fitness(eval_fitness,
-                                                                  (dtfr.FitnessInstanceDim.parent_children,
-                                                              dtfr.FitnessFuncDim.seperate),
-                                                              dtfr.FitnessCombination.product)
-            temp_mean_fitness=np.average(fitness_single_seperate,axis=0)
-
-            gmm_vars_retry_eval.append((gmm_vars,temp_mean_fitness))
+            score=model_evaluation.evaluate(parent_node,parental_fitness,sibling_fitness)
+            print(score)
+            gmm_vars_retry_eval.append((gmm_vars,score))
             #put original vars back
             for i in range(len(child_nodes)):
-                child_nodes[i].delete_learned_variable("test")
+                child_nodes[i].delete_learned_variable(gmm_var_name)
         #check which gmm performed best
 
-        #first check which one is larger than previous
-        #than choose the "best", we will use the product of all fitness as final value
-        gmm_f_prod=0
         max_gmm_vars=None
-        for gmm_vars,gmm_mean_fitness in gmm_vars_retry_eval:
-            if all((gmm_f > f for f,gmm_f in zip(mean_fitness,gmm_mean_fitness))):
-                gmm_f_prod_temp=np.prod(gmm_mean_fitness)
-                if gmm_f_prod_temp>gmm_f_prod:
-                    max_gmm_vars=gmm_vars
-                    gmm_f_prod=gmm_f_prod_temp
+        for gmm_vars,gmm_score in gmm_vars_retry_eval:
+            if gmm_score>iteration_gmm_score:
+                max_gmm_vars=gmm_vars
+        #if it is better as the previous iteration-
         #inject new variable
+        #else print that training didn't help
         if max_gmm_vars:
             for i in range(len(child_nodes)):
                 child_nodes[i].set_learned_variable(max_gmm_vars[sibling_order_sequence[i]])
-        _,fitness=dg.training_data_generation(n_data,parent_def,
+        else:
+            print("The model did not improve over consecutive training iteration.")
+            break
+
+    _,fitness=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children=n_children,
                                 sibling_data=sibling_data)
     #show the result of nth iteration
     if verbose:
-        print_result(fitness,iteration)
+        print("final results")
+        print_result(fitness,parental_fitness,sibling_fitness,iteration)
 
 
-def print_result(fitness_values,iteration):
-    fitness_parent_child=dtfr.format_generated_fitness(fitness_values,
+def print_result(fitness_values,parental_fitness,sibling_fitness,iteration):
+    fitness_parent_child=dtfr.format_generated_fitness(fitness_values,parental_fitness,sibling_fitness,
                                                                (dtfr.FitnessInstanceDim.parent_children,
                                                                 dtfr.FitnessFuncDim.single),
                                                                 dtfr.FitnessCombination.product)

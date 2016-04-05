@@ -92,7 +92,6 @@ class GMM:
             for k in range(self.n_components):
                 mvn = gmr.MVN(mean=means[k],covariance=covars[k],
                               random_state=self.random_state)
-                mvn.
                 mvn= mvn.marginalize(indices)
                 mvns.append(mvn)
             means_marg=np.array([mvn.mean for mvn in mvns])

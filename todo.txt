@@ -1,20 +1,26 @@
-test evaluation of model
+rejection sampling for gmm
 
-variance of the model can be calculated analytically (from variables)
 
-add guard for expressivenis or exclude training on extremely high fitness and test it in gmm_train
+todo evaluation and test
+--------------------------
 
-single instance mutli func can give multiple func, but not if the func is the same between parent->child and sibling
-
-single instance single func always 1 value
+named siblings in training
 
 test with only a single child
 
-rejection sampling for gmm
+test evaluation of model
+
+test complete training code
+
+visualise gmm
+
 
 
 evaluation and tests
 -------------------------------
+
+calculate expressiveness by counting a lot of points in trained and non trained distributions
+
 add method for deciding whether new model is better than previous based on expressiveness and performance
 see evaluation file
 s
