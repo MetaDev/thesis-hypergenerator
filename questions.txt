@@ -4,28 +4,16 @@ retraining
 evaluation of model
 ->model selection
 
-
-still to do
--------------------------
-
-evaluation metrics:
-
 for the generator  (to select between consecutive runs)
 
 - expressiveness
              weighted emperical variance
 
-eenvoudige use-case -> ad-hoc evaluatie, overlap van correcte search space aen gemoddeleerde serach space
 
-complexe case emperische analyse -> verzameling punten
+still to do
+-------------------------
 
-- performance,  fitness mean and variance
-compare over n samples between brute force en model
 
-for training itself (to select hyperparameters)
-
--MSE between x,y for regression
--MSE between x and it's likelyhood for weighted sampling
 
 evaluation models
 ------------------

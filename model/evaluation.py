@@ -10,13 +10,13 @@ import util.utility as ut
 
 
 class ModelEvaluation:
-    def __init__(self,n_data,parent_var_names,parental_fitness,
+    def __init__(self,n_data,parent_tree_def,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,fitness_average_threshhold,fitness_func_threshhold):
         self.fitness_average_threshhold=fitness_average_threshhold
         self.fitness_func_threshhold=fitness_func_threshhold
         self.n_data=n_data
         self.parent_var_names=parent_var_names
-
+        self.parent_tree_def=parent_tree_def
         #copy and set order to 1 for all fitness funcs
         self.parental_fitness=[copy.deepcopy(fn) for fn in parental_fitness]
         self.sibling_fitness=[copy.deepcopy(fn) for fn in sibling_fitness]
@@ -46,23 +46,53 @@ class ModelEvaluation:
                                                       (dtfr.FitnessInstanceDim.single,
                                                                   dtfr.FitnessFuncDim.single),
                                                                   dtfr.FitnessCombination.average)
+        #TODO
+        #check quality of a GMM variable by checking how often it's sampling failed
+        #incorporate this in the score
+
         #expressiveness
 
-        #calculate weighted variance between sibling vars
-        #calculate 1 fitness per sibling as weight
 
-        fitness_siblings=dtfr.format_generated_fitness(fitness,
-                                                       parental_fitness,sibling_fitness,
-                                                       (dtfr.FitnessInstanceDim.parent_sibling,
-                                                                  dtfr.FitnessFuncDim.single),
-                                                                  dtfr.FitnessCombination.average)
+        #calculate normalised weighted variance between sibling vars
+
         #calc per variable it's weighted variance
         sibling_var_variance=[]
-        for var_name in self.sibling_var_names:
-            for siblings,fitness in zip(sibling_samples,fitness_siblings):
-                sibling_var_variance.append(np.var([siblings[i].values["ind"][var_name]/fitness[i] for i in range(len(siblings))]))
+        _,max_siblings=self.parent_tree_def.variable_range(self.child_name)
 
-        ratio=expressive_performance_ratio[0]*np.average(sibling_var_variance) + expressive_performance_ratio[1]*np.average(fitness_average)
+        for var_name in self.sibling_var_names:
+            variables=[]
+            for siblings,fitness in zip(sibling_samples,fitness_average):
+                if any(any(var>1 for var in siblings[i].get_normalised_value(var_name)) for i in range(len(siblings))):
+                    print("norm",[siblings[i].get_normalised_value(var_name) for i in range(len(siblings))])
+                    print("non norm",[siblings[i].values["ind"][var_name] for i in range(len(siblings))])
+                    print("name",var_name)
+                variables.append([siblings[i].get_normalised_value(var_name)*fitness for i in range(len(siblings))])
+
+            #calculate variance per variable and sibling
+            #not every set of siblings has the same length, wich complicates the calculation
+            var_length=self.parent_tree_def.get_child(self.child_name).variables[var_name].size
+            var_sum=[0]*max_siblings*var_length
+            var_count=[0]*max_siblings*var_length
+            for variable in variables:
+                for i,var in enumerate(ut.flatten(variable)):
+                    var_sum[i]+=var
+                    var_count[i]+=1
+
+            var_variance=[0]*max_siblings*var_length
+            var_mean = np.array(var_sum)/np.array(var_count)
+            for variable in variables:
+                for i,var in enumerate(ut.flatten(variable)):
+                    var_variance[i]+=(var-var_mean[i])**2
+            var_variance=np.array(var_variance)/np.array(var_count)
+            #the result is the variance of a variable and a specific object, one of the siblings in this case
+            sibling_var_variance.append(np.average(var_variance))
+
+        #the expressiveness get's an additional order,calculated using the fitness average, to be able to compare both
+        fitn_avg=np.average(fitness_average)
+        expr_order=10*(1/fitn_avg)
+        print("avg",np.average(sibling_var_variance))
+        ratio=expressive_performance_ratio[0]*np.average(sibling_var_variance)**expr_order + \
+                                        expressive_performance_ratio[1]*np.average(fitness_average)
         return ratio
 
 

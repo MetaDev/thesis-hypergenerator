@@ -84,12 +84,12 @@ class StochasticVariable(Variable):
             point=self.points[i]
         else:
             point=scipy.stats.uniform.rvs(size=self.size)
-        return self.low + point*(self.high-self.low) if not self.frozen() else self.freeze_value
+        return self.low + np.array(point)*(self.high-self.low) if not self.frozen() else self.freeze_value
 
     def stochastic(self):
         return True
     def freeze(self,value):
-        self.freeze_value=value
+        self.freeze_value=np.array(value)
     def thaw(self):
         self.freeze(None)
     def frozen(self):
@@ -150,33 +150,56 @@ import util.data_format as dtfr
 
 #P(X|Y)
 class GMMVariable(StochasticVariable):
+    max_tries=20
+
+
     #for the GMM the names are a list names of each variable it generates when sampled
     #the lengths are an array of ints indicating the non_cond var length
+    #the output variables of the GMM variable are the sibling_vars
     #TODO check validity of GMM, its dimension against the given X and Y vars
+    #also add sibling name, if parent has multiple named siblings these can also be passed
     def __init__(self,name,gmm: GMM, parent_vars:List[Variable],sibling_vars,sibling_order):
         #non_cond_vars are save in attribute variables of VectorVariable
         Variable.__init__(self,name)
         self.unpack=True
         self.sibling_vars=[deepcopy(var) for var in sibling_vars]
         self.unpack_names=[v.name for v in sibling_vars]
+        self.var_bounds=[(var.low,var.high) for var in sibling_vars]
+
         self.gmm=gmm
         self.parent_vars=parent_vars
         self.sibling_order=sibling_order
 
-        #create dummy variable list
+        #keep track of how sanpling quality, 0 is worst
+        self.sample_quality=1
 
     #when sampling, sample from a the distribution completely conditioned on the parent independent variable values
     #values on which is trained of course
     #group the values according the vector structure of the search space (given by dummy variables)
     def sample(self, parent_sample,sibling_samples,i,n_samples,expressive):
+        attempts=0
+        found=False
         indices,values= dtfr.format_data_for_conditional(parent_sample,self.parent_vars,
-                                                         sibling_samples,self.sibling_vars,
-                                                         self.sibling_order)
-
-        #maybe cache the gmm cond if ithe value of cond_x has already been conditioned
-        cond_values=self.gmm.condition(indices,values).sample(1)[0]
-        #split the data obtained from the joint distribution back into an array of variables
-        return dtfr.split_variables(self.sibling_vars,cond_values)
+                                                             sibling_samples,self.sibling_vars,
+                                                             self.sibling_order)
+        gmm_cond=self.gmm.condition(indices,values)
+        for i in range(GMMVariable.max_tries):
+            attempts+=1
+            cond_values=gmm_cond.sample(1)[0]
+            #split the data obtained from the joint distribution back into an array of variables
+            var_values=dtfr.split_variables(self.sibling_vars,cond_values)
+            #check if the values are within bounds
+            if all((all(np.greater_equal(var,bounds[0])) and all(np.less_equal(var,bounds[1]))) for var,bounds in zip(var_values,self.var_bounds)):
+                found=True
+                break
+        self.sample_quality=(self.sample_quality+(1-(1-attempts)/(1-GMMVariable.max_tries)))/2
+        if not found:
+            var_values=[var.sample(parent_sample,sibling_samples,i,n_samples,False) for var in self.sibling_vars]
+        test=[(var-bounds[0])/(bounds[1]-bounds[0]) for var,bounds in zip(var_values,self.var_bounds)]
+        if any(any(v> 1 for v in var )for var in test):
+            print("wrong values",var_values)
+            print("worng test",test)
+        return var_values
 
 
     def relative_sample(self,samples,parent_sample):
@@ -215,6 +238,9 @@ class TreeDefNode:
                     for child in children:
                         child.get_flat_list(sample_list)
                 return sample_list
+            def get_normalised_value(self,name):
+                low,high= self.var_def_node.tree_def_node.variable_range(name)
+                return (self.values["ind"][name]-low)/(high-low)
 
         def delete_learned_variable(self,gmm_name):
             for var in self.sample_variables:
@@ -296,13 +322,13 @@ class TreeDefNode:
             return sample
 
         #parent_sample: Node
-        def __init__(self,node,index:int,children):
-            #necessary to be able to retrieve stochastic vars
+        def __init__(self,tree_def_node,index:int,children):
             #properties are saved independent from the parent, for later use of its values in machine learning
-            self.name=node.name
+            self.name=tree_def_node.name
+            self.tree_def_node=tree_def_node
             #variables is a list of all variables, like an archive, these define the structure of the node sample variables
             #make deep copy of variable as each vardefnode should have unique vars
-            self.variables=dict([(v.name,deepcopy(v)) for v in node.variables.values()])
+            self.variables=dict([(v.name,deepcopy(v)) for v in tree_def_node.variables.values()])
 
             #keep track which variable is assigned in the node
             #when constructing the assignment is 1-1
@@ -356,8 +382,8 @@ class TreeDefNode:
         #the children keep the variable as key
         self.children=dict([(c[1].name,c[1])for c in children])
 
-    def children_range(self,child_name):
-        return (self.variables[child_name].low,self.variables[child_name].high)
+    def variable_range(self,var_name):
+        return (self.variables[var_name].low,self.variables[var_name].high)
 
 
 

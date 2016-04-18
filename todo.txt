@@ -4,46 +4,85 @@ rejection sampling for gmm
 todo evaluation and test
 --------------------------
 
-named siblings in training
+test rejection sampling, make it optional to be able to detect whether a variable is of good quality in evaluation
 
-test with only a single child
+split model into seperate cases where constraints are grouped for a single parent-child and sibling relation
+it is allowed to have multiple constraints
 
-test evaluation of model
+the connection between nodes should be done through string id's
+this allows grand-parent->child relations
+by passing the root sample everytime you create a new sample
+you can use the unique id to find the other existing sample from which
+the value can be used for conditioning
 
-test complete training code
+implement fitness like in paper interative furniture layout
 
-visualise gmm
+encode new model, with new constraints
+
+evaluate model
+
+
+visualise gmm (variables in general) after each training round
 
 
 
 evaluation and tests
 -------------------------------
 
+evaluation, the type of metrics and parameters that will be varied
+3 models for scenes, constraints and search space
+
+2. an outdoor scene (park, river, trees, benches, paths), trees should not be line of sight with benches and river
+3. an indoor scene, ground floor of a house with different rooms: carpets, tables, chairs, plates
+
+compare influence of dimensionality of fitness
+
+compare the combination of several variables (like rotation and position) into the
+joint distribution
+
+compare different ways of combining fitness values either multiply, average, other more complex functions, (the order of a functions is already a way of changing this function) so different values for the order can be tested as well
+
+show that PCA/LDA for dim reduction doesn't work
+
+compare all possible parameter combinations possible (gridsearch) in the learning method
+
+by training only on parent->child and increasing sibling order the scaling properties in dimensionality can be shown, in terms of necessary data, performance
+
+compare with different amounts of data
+
+evaluate with and without poisson sampling
+
+compare differen configurations of sibling order learning and marginalisation
+
+compare different values of capping the fitness
+
+compare different values of conditions for the fitness in regression
+
+compare weighted samples wrt regression
+
+---for each use-case:
+
+evaluate performance and expressiveness
+
 calculate expressiveness by counting a lot of points in trained and non trained distributions
 
-add method for deciding whether new model is better than previous based on expressiveness and performance
-see evaluation file
-s
+emperical performance is the average fitness (without order)
+emperical expressiveness is the weighted variance of variables
 
-evaluate performance and expressiveness of model
+an exact visualisation of the expressivenss can be done using grpags (1D and 2D)
 
-to evaluate the expressivenes of the result, calculate exact (using integrals, with a lot of data)
-the occupation of the relevant search space (fitness cutoff)
+visualise this performance and expressiveness over consecutive runs to show convergence
 
-to compare performance between learned models the actual fitness should be used not the fitness with order that used in training
 
-visualise the distributions of a model and a small representative sample set
-make something that visualise some random (or best, worst) samples
-and also the corresponding GMMs (in stages of the generation, this visualisation should be placed with the variables)
-->in gmm if variable is dim 1 or 2 and visual is true, plot the gmm
-->visualise sampling process
-add visualisation of GMM to GMM
+seperately the training itself can be evaluated
 
-add gridsearch on parameters to find best parameters
+MSE for regression
+MSE likelihood for weighted sampling
 
-calculate MSE of GMM
 
-more variables, fitness functions and scene models
+
+
+extra fitness funcs
 
 reachability
 
@@ -53,19 +92,17 @@ find out why alignment is so hard to learn in gmm2
 
 plot fitness seperately, fitness func is maybe not correct, try to visualise it
 
-evaluation, the type of metrics and parameters that will be varied
-3 models for scenes, constraints and search space
-
 visualisation is part of the model, the mapping
 add visualisation to fitness model as well
 
 factory method to visualise fitness functions
 
-make planning of tests and evaluation
 
 writing
 ------------------
 start writing methodology
+
+discuss truncuatedsampling vs truncuated learning, performance vs precision (overfitting)
 
 research:
 
@@ -78,6 +115,8 @@ How to optimise the search space of a procedural content generator, a priori def
 
 learning optimisation
 -------------------------
+init gmm uniformly like gmr
+
 add weigthed average as way to combine fitness
 
 instead of multiplying the multiple fitness functions -> dim reduction
@@ -96,6 +135,18 @@ this would increase the sampling time, but reduce the accidental bias
 
 sampling optimisation
 ----------------------------
+
+allowing constraints between differently named children
+for example to align different types of children, this would imply a new order on these children
+which should be respected when generating
+or this order could just be set a priori and checked for correctness
+this would allow to condition a childs variable on multiple other objects both it's ancestor as other siblings of
+any class, each constraint will have to define which classes are conditioned on
+
+allow encapsulation of a model into a node
+this would allow for relations between variables of a node (now the definition of variable and node blurs togehter)
+as a node is able to contain no variables but multiple nodes with their own variables
+these variables however fall under the namespace of the encapsulating node
 
 to sample from learned distribution using truncuated normal sampling
 
@@ -151,6 +202,9 @@ to visualise as a way to show expressive range
 generator additional features
 -------------------------
 
+define child parameter search space relative to parent parameter value
+for example the position search space of chairs based on the point coordinates of the room polygon
+
 implicit child->parent relation given by distance metric
 
 work with fixed shape and variable shape layout nodes
@@ -205,98 +259,4 @@ test learning with larger hierachy -> 2 level constraints (room->table_chairs)
 do the plates on a table example for multiple fitness
 
 do an example of room generation, where the fitness can be the validity of a polygon (non-convex)
-
-evaluation and tests
-------------------
-
-use-case scenes, compare the combination of several variables (like rotation and position) into the
-joint distribution (rotation and position can be trained independently on different parent properties)
-but this would also mean that if you wish to derive position and rotation of the children that you would
-have to "tie" these variables in the joint concerning the parent/child fitness
-
-compare single and multi-objective regression
-
-different ways of combining fitness values (between siblings in the joint)
-either multiply, average, other more complex functions, (the order of a functions is already a way of changing this function) so different values for the order can be tested as well
-
-because for the fitness function order is not important I should look how the learning best incorporates the fitness
-in terms of relativity to the data, should the data be ordered (random or deterministic) mor because it doesn't
-matter another approach is to add all possible orderings as data, they are all valid for the fitness function
-
-train with ordering, order by a variable (position, rotation), random order, or no ordering (keep order given by combination) or train on all possible orderings
-
-by training only on parent->child and increasing sibling order the scaling properties in dimensionality can be shown
-in terms of necessary data, performance
-
-compare differen configurations of sibling order learning
-compare sibling learning between seperate models and full joint with marganilising
-seperate models for P(c1|c0,p), P(c2|c1,c0,p),... or one model for P(c0,c1,c2,..|p) and marginilise out
-
-also evaluate the influence of reusing data (learning on combinations of available children)
-
-compare different values of capping the fitness
-compare different values of conditions for the fitness in regression
-
-compare weighted samples wrt regression
-
-calculate fitness performance
-
-calculate expressivenes as the weighted average of the distance between samples, where the weight is based on the
-fitness of the samples
-
-seperately
-evaluate performance of regression using MSE
-
-evaluate weighted sampling using likelihood of a point and it's according weight
-
-try dimensionality reduction to convert multi-objective in single-objective (PCA)
-also try weighted and multiplied fitness functions.
-
-evaluate with and without poisson sampling, change the search space size and number of dimensions and
-compare expressiveness and mse
-
-model 3 different scenes to do the tests on
-
-
-expressiveness evaluaion: difference in surface between polygon and surface of gaussians
-likelihood of handmade examples in learned distribution
-
-
-metrics
----------------------
-MSE with fitness
-fitness mean and variance
-weighted data diversity (distance between points) weighted with fitness-> Measures of statistical dispersion
-
-
-writing
----------------------
-
-argument taxonomy of constraints based on examples found in architectural books
-
-discuss truncuatedsampling vs truncuated learning, performance vs precision (overfitting)
-
-
-sibling fitness
----------------
-1. order siblings based on pair-wise fitness (weight function for samples)
-
-
-2.
-construct seperate models for each number of children if trained on (ordered) sibling data and their fitness that is calculated between siblings (tree structure)
-
-and train a model seperately on the structure of the network, using only (parent_n_siblings, n_siblings)->fitness to generate (conditional) n_siblings, than use training data to estimate optimal distribution for the number of children ()
-
-
-4. for a large range in the number of children (for example a large area where trees are placed but the area can be both dense or open)-> seperate models unfeasible, fit distribution for a markov chain between ordered siblings (using gmm)
-
-
-
-
-
-seperate idea, intuitive visualisation of dimensionality of each vector would be really handy
-this can be done by setting the dimensionality of the input and other necessary variables
-
-
-
 

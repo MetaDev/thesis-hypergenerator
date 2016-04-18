@@ -84,6 +84,8 @@ class GMM:
     def sample(self,n):
         if self._is_fitted():
             return self.gmm_gmr.sample(n)
+        else:
+            raise ValueError("GMM can not be sampled before fitting.")
     #TODO check if this is mathematically correct
     def marginalise(self,indices):
         weights,means,covars = self.get_params()
@@ -100,5 +102,54 @@ class GMM:
             gmm=GMM(random_state=self.random_state)
             gmm.set_params_for_sampling_cond_marg(weights=weights,means=means_marg,covars=covars_marg)
             return gmm
+#visualisation
 
-#TODO add visualisation
+import scipy.stats as ss
+import util.utility as ut
+
+def visualise_gmm_marg_density_1D_GMM(ax,marg_index,gmm,factor=3,verbose=False):
+    visualise_gmm_marg_1D_density(ax,marg_index,*gmm.get_params(),
+                                 factor,verbose)
+#TODO check dimensionality
+def visualise_gmm_marg_1D_density(ax,marg_index,gmm_weights,gmm_means,gmm_cov,
+                                 factor=2,xrange=None,verbose=False):
+    means=[]
+    weights=gmm_weights
+    stdevs=[]
+    for k in range(len(gmm_means)):
+        means.append(gmm_means[k][marg_index])
+        #calc std
+        cov = np.asanyarray(gmm_cov[k])
+        stdevs.append(np.sqrt(np.diag(cov))[marg_index])
+
+    min_x=np.min([mean-factor*stdev for mean,stdev in zip(means,stdevs)])
+    max_x=np.max([mean+factor*stdev for mean,stdev in zip(means,stdevs)])
+    x = np.arange(min_x, max_x, 0.01)
+    pdfs = [w * ss.norm.pdf(x, mu, sd) for mu, sd, w in zip(means, stdevs, weights)]
+    density = np.sum(np.array(pdfs), axis=0)
+    if verbose:
+        print("Expected mean value: "+ ut.format_float(np.mean([ w*m for m,w in zip(means, weights)])))
+        print("Expected mean standard dev: " + ut.format_float(np.mean([ w*sd for sd,w in zip(stdevs, weights)])))
+    #unfirom distribution line
+    y=[1/(max_x-min_x)]*len(x)
+    ax.plot(x, density)
+    ax.plot(x,y,color="r")
+
+#TODO check dimensionality
+def visualise_gmm_marg_2D_density(ax,gmm,
+                                  min_factor=.5,max_factor=3,steps=5, colors=["r","g","b"]):
+    from matplotlib.patches import Ellipse
+    from itertools import cycle
+    if colors is not None:
+        colors = cycle(colors)
+    min_alpha=0.03
+    max_alpha=0.4
+
+    for factor in np.linspace(min_factor, max_factor, steps):
+        for (mean, (angle, width, height)),weight in zip(gmm.gmm_gmr.to_ellipses(factor),gmm.weights_):
+            ell = Ellipse(xy=mean, width=width, height=height,
+                          angle=np.degrees(angle))
+            ell.set_alpha(min_alpha+(max_alpha-min_alpha)*weight)
+            if colors is not None:
+                ell.set_color(next(colors))
+            ax.add_artist(ell)

@@ -15,6 +15,8 @@ import learning.data_generation as dg
 import model.evaluation as mev
 
 def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regression=False,verbose=True):
+
+
     #experiment hyperparameters:
 
     fitness_average_threshhold=0.95
@@ -67,16 +69,18 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
 
     parental_fitness=[fn.Fitness(fn.fitness_polygon_overl,32,0,1)]
 
-    model_evaluation = mev.ModelEvaluation(100,parent_var_names,parental_fitness,
+    model_evaluation = mev.ModelEvaluation(100,parent_def,parent_var_names,parental_fitness,
                                                child_name,sibling_fitness,sibling_var_names,
                                                fitness_average_threshhold,fitness_func_threshhold)
+
+    score=model_evaluation.evaluate(parent_node,parental_fitness,sibling_fitness)
 
 
     #check sibling sequence
     wrong_sequence = any(sibling_order_sequence[i]>i for i in range(len(sibling_order_sequence)))
     if wrong_sequence:
         raise ValueError("Some orders of the sibling order sequence exceed the number of previous siblings.")
-    max_children=parent_def.children_range(child_name)[1]
+    max_children=parent_def.variable_range(child_name)[1]
     if len(sibling_order_sequence) != max_children:
         raise ValueError("The number of siblings implied by the sibling order sequence can not be different than the maximum number of children in the model.")
     #check marginalisation
@@ -91,14 +95,6 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                 parent_node,parent_var_names,parental_fitness,
                                 child_name,sibling_fitness,sibling_var_names,n_children=n_children,
                                 sibling_data=sibling_data)
-        #test
-        test= dtfr.format_generated_fitness(fitness,
-                                            parental_fitness,sibling_fitness,
-                                            (dtfr.FitnessInstanceDim.single,
-                                                                      dtfr.FitnessFuncDim.seperate),
-                                                                     dtfr.FitnessCombination.product)
-        print(np.array(test).shape)
-
 
         if verbose:
             print_result(fitness,parental_fitness,sibling_fitness,iteration)
@@ -157,7 +153,6 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
 
             #evaluate new model
             score=model_evaluation.evaluate(parent_node,parental_fitness,sibling_fitness)
-            print(score)
             gmm_vars_retry_eval.append((gmm_vars,score))
             #put original vars back
             for i in range(len(child_nodes)):
@@ -197,10 +192,10 @@ def print_result(fitness_values,parental_fitness,sibling_fitness,iteration):
     print("fitness before training iteration ", iteration)
     #print the first fitness func
     print("parent fitness")
-    ev.fitness_statistics(fitness_parent_child[:,0],verbose=True)
+    fn.fitness_statistics(fitness_parent_child[:,0],verbose=True)
     if fitness_parent_child.shape[0]>1:
         print("child fitness")
-        ev.fitness_statistics(fitness_parent_child[:,1],verbose=True)
+        fn.fitness_statistics(fitness_parent_child[:,1],verbose=True)
 
 def _train_weighted_sampling(gmm,data,fitness,infinite):
     gmm.fit(data,fitness,infinite=infinite,min_covar=0.01)

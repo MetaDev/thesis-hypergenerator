@@ -106,3 +106,5 @@ def extract_samples_vars(samples,sample_name:str=None,var_name:str=None,independ
 
 def normalise_array(arr):
     return (np.array(arr)-np.min(arr))/(np.max(arr)-np.min(arr))
+def format_float(f):
+    return format(f, '.5g')

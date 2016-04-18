@@ -35,7 +35,7 @@ def training_data_generation(n_data,parent_def,
     #generate sample data
 
     sample_fraction=1
-    min_children,max_children=parent_def.children_range(child_name)
+    min_children,max_children=parent_def.variable_range(child_name)
     n_sample_children=n_children
     if n_children>max_children:
         raise ValueError("Number of requested siblings in the data is larger than the possible number of children in the model.")
