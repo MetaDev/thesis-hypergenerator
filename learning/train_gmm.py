@@ -64,10 +64,10 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
 
     #this expliicitly also defines the format of the data
     #fitness func, order cap and regression target
-    sibling_fitness=[fn.Fitness(fn.fitness_min_dist,4,0,1)]
+    sibling_fitness=[fn.Fitness("Minimum distances",fn.fitness_min_dist,4,0,1)]
     #only the func order and cap is used for training
 
-    parental_fitness=[fn.Fitness(fn.fitness_polygon_overl,32,0,1)]
+    parental_fitness=[fn.Fitness("polygon overlap",fn.fitness_polygon_overl,32,0,1)]
 
     model_evaluation = mev.ModelEvaluation(100,parent_def,parent_var_names,parental_fitness,
                                                child_name,sibling_fitness,sibling_var_names,
@@ -97,9 +97,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
                                 sibling_data=sibling_data)
 
         if verbose:
-            print_result(fitness,parental_fitness,sibling_fitness,iteration)
-
-
+            model_evaluation.print_evaluation(fitness,iteration)
 
         if model_evaluation.converged(fitness):
             return
@@ -154,6 +152,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
             #evaluate new model
             score=model_evaluation.evaluate(parent_node,parental_fitness,sibling_fitness)
             gmm_vars_retry_eval.append((gmm_vars,score))
+            print(score)
             #put original vars back
             for i in range(len(child_nodes)):
                 child_nodes[i].delete_learned_variable(gmm_var_name)
@@ -180,22 +179,10 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=15,infinite=False,regres
     #show the result of nth iteration
     if verbose:
         print("final results")
-        print_result(fitness,parental_fitness,sibling_fitness,iteration)
+        model_evaluation.print_evaluation(fitness,iteration)
 
 
-def print_result(fitness_values,parental_fitness,sibling_fitness,iteration):
-    fitness_parent_child=dtfr.format_generated_fitness(fitness_values,parental_fitness,sibling_fitness,
-                                                               (dtfr.FitnessInstanceDim.parent_children,
-                                                                dtfr.FitnessFuncDim.single),
-                                                                dtfr.FitnessCombination.product)
-    fitness_parent_child=np.array(fitness_parent_child)
-    print("fitness before training iteration ", iteration)
-    #print the first fitness func
-    print("parent fitness")
-    fn.fitness_statistics(fitness_parent_child[:,0],verbose=True)
-    if fitness_parent_child.shape[0]>1:
-        print("child fitness")
-        fn.fitness_statistics(fitness_parent_child[:,1],verbose=True)
+
 
 def _train_weighted_sampling(gmm,data,fitness,infinite):
     gmm.fit(data,fitness,infinite=infinite,min_covar=0.01)

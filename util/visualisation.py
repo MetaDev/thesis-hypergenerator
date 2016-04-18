@@ -30,25 +30,23 @@ def draw_graph_path(ax,graph,path,color='b',with_labels=False,node_size=50,node_
     pos=dict([ (n, n) for n in graph.nodes() ])
     nx.draw_networkx_nodes(graph, nodelist=path,node_color=color,node_shape=node_shape,
                            pos=pos,with_labels=with_labels,ax=ax,node_size=node_size)
-def draw_node_sample_tree(root,ax=None):
+def draw_node_sample_tree(root,color,ax=None):
     samples=root.get_flat_list()
     polygons = mp.map_layoutsamples_to_geometricobjects(samples,"shape")
-    colors = [s.values["rel"]["color"] for s in samples]
-    draw_polygons(polygons=polygons,ax=ax,colors=colors,size=1.3,set_range=True)
+    draw_polygons(polygons=polygons,ax=ax,color=color,size=1.3,set_range=True)
 
 def get_ax(ax):
     if ax is None:
         return plt.gca()
     else:
         return ax
-def draw_polygons(polygons,ax=None,colors=[],size=1.2,show_edges=False,set_range=False):
+def draw_polygons(polygons,ax=None,color="b",size=1.2,show_edges=False,set_range=False):
     ax=get_ax(ax)
     ax.set_aspect(1)
     color="b"
     for i in range(len(polygons)):
         polygon=polygons[i]
-        if colors:
-            color=colors[i]
+
         #color=
         x, y = polygon.exterior.xy
         if show_edges:

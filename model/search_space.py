@@ -396,13 +396,13 @@ class LayoutTreeDefNode(TreeDefNode):
 
     default_origin=DeterministicVariable("origin",(0.5,0.5))
     #shape should be normalised in the unit cube, same counts for the origin
-    def __init__(self, name,position, rotation, size,shape,color, origin=None,children=[]):
-        position.set_func(LayoutTreeDefNode.position_rel)
-        rotation.set_func(LayoutTreeDefNode.rotation_rel)
+    def __init__(self, name,position, rotation, size,shape, origin=None,children=[]):
+#        position.set_func(LayoutTreeDefNode.position_rel)
+#        rotation.set_func(LayoutTreeDefNode.rotation_rel)
         if origin==None:
             origin=self.default_origin
         #size.func=self.size_rel
-        super().__init__(name,[origin,position,rotation,size,*shape,color],children)
+        super().__init__(name,[origin,position,rotation,size,*shape],children)
 
 
 

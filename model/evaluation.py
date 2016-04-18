@@ -46,9 +46,6 @@ class ModelEvaluation:
                                                       (dtfr.FitnessInstanceDim.single,
                                                                   dtfr.FitnessFuncDim.single),
                                                                   dtfr.FitnessCombination.average)
-        #TODO
-        #check quality of a GMM variable by checking how often it's sampling failed
-        #incorporate this in the score
 
         #expressiveness
 
@@ -62,10 +59,6 @@ class ModelEvaluation:
         for var_name in self.sibling_var_names:
             variables=[]
             for siblings,fitness in zip(sibling_samples,fitness_average):
-                if any(any(var>1 for var in siblings[i].get_normalised_value(var_name)) for i in range(len(siblings))):
-                    print("norm",[siblings[i].get_normalised_value(var_name) for i in range(len(siblings))])
-                    print("non norm",[siblings[i].values["ind"][var_name] for i in range(len(siblings))])
-                    print("name",var_name)
                 variables.append([siblings[i].get_normalised_value(var_name)*fitness for i in range(len(siblings))])
 
             #calculate variance per variable and sibling
@@ -90,10 +83,32 @@ class ModelEvaluation:
         #the expressiveness get's an additional order,calculated using the fitness average, to be able to compare both
         fitn_avg=np.average(fitness_average)
         expr_order=10*(1/fitn_avg)
-        print("avg",np.average(sibling_var_variance))
         ratio=expressive_performance_ratio[0]*np.average(sibling_var_variance)**expr_order + \
                                         expressive_performance_ratio[1]*np.average(fitness_average)
         return ratio
+
+    def print_evaluation(self,fitness_values,iteration):
+        print("fitness before training iteration ", iteration)
+
+        from model import fitness as fn
+
+        fitness_funcs=dtfr.format_generated_fitness(fitness_values,self.parental_fitness,self.sibling_fitness,
+                                                                   (dtfr.FitnessInstanceDim.single,
+                                                                    dtfr.FitnessFuncDim.seperate),
+                                                                    dtfr.FitnessCombination.average)
+        fitness_average=dtfr.format_generated_fitness(fitness_values,
+                                                      self.parental_fitness,self.sibling_fitness,
+                                                      (dtfr.FitnessInstanceDim.single,
+                                                                  dtfr.FitnessFuncDim.single),
+                                                                  dtfr.FitnessCombination.average)
+        print("average fitness")
+        fn.fitness_statistics(fitness_average,verbose=True,summary=False)
+        print("seperate fitness")
+        fitness_names=[fn.name for fn in self.parental_fitness+self.sibling_fitness]
+        for i in range(len(fitness_funcs)):
+            print(fitness_names[i])
+            fn.fitness_statistics(np.array(fitness_funcs)[:,i],verbose=True,summary=False)
+
 
 
     def converged(self,fitness_values,verbose=True):
@@ -109,8 +124,6 @@ class ModelEvaluation:
                                                                   dtfr.FitnessCombination.average)
         fitness_average=np.average(fitness_average,None)
         fitness_func_average=np.average(fitness_func_average,0)
-        print(fitness_average)
-        print(fitness_func_average)
         if fitness_average>self.fitness_average_threshhold or any(fn>self.fitness_func_threshhold
                                                                     for fn in fitness_func_average):
             if verbose:

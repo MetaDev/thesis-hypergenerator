@@ -1,28 +1,26 @@
-rejection sampling for gmm
 
 
 todo evaluation and test
 --------------------------
 
-test rejection sampling, make it optional to be able to detect whether a variable is of good quality in evaluation
-
-split model into seperate cases where constraints are grouped for a single parent-child and sibling relation
-it is allowed to have multiple constraints
-
-the connection between nodes should be done through string id's
-this allows grand-parent->child relations
-by passing the root sample everytime you create a new sample
-you can use the unique id to find the other existing sample from which
-the value can be used for conditioning
-
-implement fitness like in paper interative furniture layout
-
-encode new model, with new constraints
-
-evaluate model
+implement visualised sampling
+visualise gmm_variables for each unpack variable that is trained, show the sibling value on the plot
+and corresponding conditioned distr
 
 
-visualise gmm (variables in general) after each training round
+encode seperate models
+
+implement new constraints
+
+//sunday
+
+run test
+
+write methodology
+
+//sunday
+
+write evaluation
 
 
 

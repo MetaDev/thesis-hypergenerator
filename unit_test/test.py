@@ -14,7 +14,7 @@ import model.sampling.poisson as poisson
 from model.search_space import NumberChildrenVariable as CV
 
 n_children=CV("child",low=5,high=8)
-root_node,root_def = tm.test_model_var_child_position_parent_shape()
+root_node,root_def = tm.model_1()
 n=5
 root_samples = root_node.sample(n,expressive=False)
 
@@ -29,7 +29,7 @@ for i in range(n):
     #colors = [s.relative_vars["color"] for s in sample_list]
     (xrange,yrange) = ut.range_from_polygons(polygons,size=1.3)
     step=ut.nr_of_steps_from_range(xrange,yrange,step_size=0.5)
-    vis.draw_node_sample_tree(root_sample)
+    vis.draw_node_sample_tree(root_sample,color="b")
 
     #test visualisation of search space mapping
 #    graph = mp.map_polygons_to_neighbourhoud_graph(polygons,[xrange,yrange],step=step)
@@ -37,7 +37,7 @@ for i in range(n):
     children =[v for v in sample_list if v.name.startswith("child")]
     chairs = [polygons[i]  for i in range(len(sample_list)) if sample_list[i].name.startswith("child")]
     table = [polygons[i]  for i in range(len(sample_list)) if sample_list[i].name.startswith("parent")][0]
-    chair_paths = fn.polygon_path_sequence(graph,chairs)
+#    chair_paths = fn.polygon_path_sequence(graph,chairs)
 #    vis.draw_graph_path(ax,graph,chair_paths)
     #for child in chairs:
     #    print(child)

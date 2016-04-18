@@ -24,7 +24,6 @@ def test_model_var_child_position_parent_shape():
                         var_p3,DV("p4",(1, 0.5)),DV("p5",(1,0))])
     parent_pos=DV("position",(0,0))
     n_children=CV("child",low=5,high=8)
-    #n_children=DV("child",5)
     parent_size=DV("size",(1,1))
     colors = DV("color",(0,0,1))
     table_def = LN(size=parent_size,name="parent",rotation=DV("rotation",[0]),
@@ -32,3 +31,24 @@ def test_model_var_child_position_parent_shape():
                                     shape=parent_shapes,children=[(n_children,chair)],color=colors)
     table_node = table_def.build_tree()
     return table_node,table_def
+def model_1():
+    position = SV("position",low=(0,0),high=[5,3])
+    rotation=SV("rotation",low=0,high=359)
+    size=SV("size",(0.1,0.2),(0.2,0.4))
+
+
+    child = LN(name="child",size=size,position=position,
+                                    rotation=rotation,shape=LN.shape_exteriors["square"])
+
+    #irregular variable polygon parent
+    var_p0= SV("p0",low=(0,1),high=(2,2))
+    parent_shape = VVU.from_variable_list("shape",
+                       [var_p0, DV("p1",(1, 3)),DV("p2",(3, 3)),DV("p3",(3, 2)),DV("p4",(5, 2)),
+                        DV("p5",(5, 0)),DV("p6",(4, 0)),DV("p7",(4, 1)),DV("p8",(3, 1)),DV("p9",(3, 0)),DV("p10",(1, 0))])
+    n_children=CV("child",low=5,high=8)
+    parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
+                                    position=DV("position",(0,0)),
+                                    shape=parent_shape,children=[(n_children,child)])
+    return parent_room.build_tree(),parent_room
+
+

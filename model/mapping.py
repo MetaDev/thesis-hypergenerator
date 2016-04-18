@@ -44,9 +44,6 @@ def map_to_polygon(shape,origin,position,rotation,size):
     geom_obj=affinity.scale(geom_obj,size[0],size[1],origin=(0,0))
     geom_obj=affinity.rotate(geom_obj,rotation,origin=(0,0))
     geom_obj=affinity.translate(geom_obj, position[0],position[1],0)
-
-
-
     return geom_obj
 #map a sample to a shape of which it's center is at the position of the sample
 def map_layoutsamples_to_geometricobjects(layout_samples,shape_name):

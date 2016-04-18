@@ -12,7 +12,8 @@ import util.utility as ut
 #fitness 1 should mean good 0 bad
 
 class Fitness:
-    def __init__(self,func,order,threshhold,regression_target):
+    def __init__(self,name,func,order,threshhold,regression_target):
+        self.name=name
         self.func=func
         self.order=order
         self.threshhold=threshhold
