@@ -25,6 +25,7 @@ MSE likelihood
 //sunday
 
 define parameter set to run tests over (learning parameters)
+wrap all parameter combinations in timeit processes to time it
 run test
 
 writing

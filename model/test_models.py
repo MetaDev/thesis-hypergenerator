@@ -113,13 +113,6 @@ def model_var_rot(var_parent,var_pos,var_nr_children):
 #model to train balance
 #variable size
 def model_var_size(var_parent,var_pos,var_nr_children):
-    position = SV("position",low=(0,0),high=[4,3])
-    rotation=DV("rotation",0)
-    size=SV("size",(0.3,0.5),(0.6,1))
-
-
-    child = LN(name="child",size=size,position=position,
-                                    rotation=rotation,shape=LN.shape_exteriors["square"])
 
     #irregular variable polygon parent
     points=[None]*5
@@ -134,6 +127,10 @@ def model_var_size(var_parent,var_pos,var_nr_children):
     points[1]= DV("",(0,2))
     points[3]= DV("",(2,1))
     parent_shape = VVU.from_variable_list("shape",points)
+
+    position = SV("position",low=(0,0),high=[4,3])
+    rotation=DV("rotation",0)
+    size=SV("size",(0.3,0.5),(0.6,1))
     if var_nr_children:
         n_children=SV("child",low=3,high=7)
     else:
@@ -199,6 +196,51 @@ def model_var_parent():
                                     shape=parent_shape)
     parent_node = VarDefNode(parent)
     return parent_node,parent
+
 #model for reachability
-#long parent, var rot size
-#here it should be possible to have either fixed or not fixed position/size but the blocks should be big enough to block the path ()
+#long parent, var rot and/or var pos
+
+def model_reachabillity(var_pos):
+
+    #irregular variable polygon parent
+    points=[None]*4
+    points[0]= DV("",(0,0))
+    points[1]= DV("",(0,8))
+    points[2]= DV("",(2,8))
+    points[3]= DV("",(2,0))
+    parent_shape = VVU.from_variable_list("shape",points)
+
+
+    position = SV("position",low=(0,0),high=[4,3])
+    rotation=SV("rotation",low=0,high=359)
+    size=DV("size",(0.4,1))
+
+    n_children=DV("child",8)
+    if var_pos:
+        position = SV("position",low=(0,0),high=[2,8])
+        child = LN(name="child",size=size,position=position,
+                                        rotation=rotation,shape=LN.shape_exteriors["square"])
+
+        parent =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
+                                    position=DV("position",(0,0)),
+                                    shape=parent_shape)
+        children=[(n_children,child)]
+        parent_node=parent.build_child_nodes(children)
+    else:
+        parent =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
+                                    position=DV("position",(0,0)),
+                                    shape=parent_shape)
+
+        child_list=[None]* (8)
+        for i in range(4):
+            child= LN(name="child",size=size,position=DV("position",(0.5,1+2*i)),
+                                        rotation=rotation,shape=LN.shape_exteriors["square"])
+            child_list[2*i]=VarDefNode(child)
+            child= LN(name="child",size=size,position=DV("position",(1.5,1+2*i)),
+                                        rotation=rotation,shape=LN.shape_exteriors["square"])
+            child_list[2*i+1]=VarDefNode(child)
+
+        parent_node = VarDefNode(parent)
+        parent_node.add_children(child_list,n_children)
+
+    return parent_node,parent

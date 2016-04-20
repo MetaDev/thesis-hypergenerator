@@ -13,7 +13,7 @@ import model.sampling.poisson as poisson
 
 
 n_children=CV("child",low=5,high=8)
-root_node,root_def = tm.model_var_parent()
+root_node,root_def = tm.model_reachabillity(True)
 n=5
 root_samples = root_node.sample(n)
 
