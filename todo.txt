@@ -3,18 +3,39 @@
 todo evaluation and test
 --------------------------
 
+encode seperate models
+
+implement new constraints
+
+polygon convexity (see paper)
+balance = diff with centroid
+surface ratio (both for collision and occupation)
+alignment (see paper)
+reachability
+
 implement visualised sampling
 visualise gmm_variables for each unpack variable that is trained, show the sibling value on the plot
 and corresponding conditioned distr
 
 
-encode seperate models
+MSE
+MSE likelihood
 
-implement new constraints
 
 //sunday
 
+define parameter set to run tests over (learning parameters)
 run test
+
+writing
+
+link TD BU with controllability and certain constraints from the paper "progressive" in intro of related work
+
+chapter 2: part about other papers goes in related work
+            part about methodology in methodology
+
+explenation of componenets stays in related work but comparison goes in methodology
+
 
 write methodology
 
