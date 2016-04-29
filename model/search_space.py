@@ -247,9 +247,11 @@ class VarDefNode:
         if children:
             for n_children, child_list in children:
                 self.add_children(child_list,n_children)
+
     #n children is the variable depicting the number of children
     def add_children(self,child_list,n_children):
         #TODO check if all children have the same name
+        self.tree_def_node.children[n_children.name]=child_list[0].tree_def_node
         self.children[n_children.name]=child_list
         self.add_new_variable(n_children)
         for i,child in enumerate(child_list):
@@ -350,14 +352,12 @@ class VarDefNode:
 class TreeDefNode:
 
 
-    def get_child(self,name):
-        if name in self.children:
-            return self.children[name]
-
     def build_child_nodes(self,child_n_list):
         children=[]
         if child_n_list:
             for n_children,child_def in child_n_list:
+                self.children[child_def.name]=child_def
+                self.variables[child_def.name]=n_children
                 max_child=n_children.high
                 child_list=[]
                 #defines order of children
@@ -376,7 +376,7 @@ class TreeDefNode:
     def __init__(self,name,variables:List[Variable]):
         self.node_sample=None
         self.name=name
-
+        self.children={}
         self.variables=dict([(var.name,var) for var in variables])
 
 
@@ -386,7 +386,7 @@ class TreeDefNode:
 
 
 class LayoutTreeDefNode(TreeDefNode):
-    shape_exteriors={"square":                                         VectorVariableUtility.from_deterministic_list("shape",[(0, 0), (0, 1), (1, 1),(1,0)])}
+    shape_exteriors={"square":VectorVariableUtility.from_deterministic_list("shape",[(0, 0), (0, 1), (1, 1),(1,0)])}
 
     position_rel= lambda p , position: p+position
     rotation_rel = lambda r, rotation: r + rotation
@@ -402,10 +402,17 @@ class LayoutTreeDefNode(TreeDefNode):
         #size.func=self.size_rel
         super().__init__(name,[origin,position,rotation,size,*shape])
 
-
-
-
-
+    def visualise(root_sample,color_list,ax=None):
+        import model.mapping as mp
+        import util.visualisation as vis
+        samples=root_sample.get_flat_list()
+        #map list by name
+        polygon_dict=dict([(sample.name,[]) for sample in samples])
+        for sample in samples:
+            polygon_dict[sample.name].append(mp.map_layoutsample_to_geometricobject(sample,"shape"))
+        for name,color in color_list:
+            vis.draw_polygons(polygons=polygon_dict[name],ax=ax,color=color)
+        vis.set_poygon_range(list(ut.flatten(polygon_dict.values())))
 
 
 

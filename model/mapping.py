@@ -49,12 +49,17 @@ def map_to_polygon(shape,origin,position,rotation,size):
 def map_layoutsamples_to_geometricobjects(layout_samples,shape_name):
     geom_objs=[]
     for sample in layout_samples:
-        rel_vars=sample.values["rel"]
-        #extract points from vars and put in list ordered on their index saved in the name
-        shape=VectorVariableUtility.extract_ordered_list_vars_values(shape_name,rel_vars)
-        geom_objs.append(map_to_polygon(shape,rel_vars["origin"],rel_vars["position"],int(rel_vars["rotation"])
-        ,rel_vars["size"]))
+        geom_objs.append(map_layoutsample_to_geometricobject(sample,shape_name))
     return geom_objs
+
+def map_layoutsample_to_geometricobject(layout_sample,shape_name):
+    rel_vars=layout_sample.values["rel"]
+    #extract points from vars and put in list ordered on their index saved in the name
+    shape=VectorVariableUtility.extract_ordered_list_vars_values(shape_name,rel_vars)
+    polygon = map_to_polygon(shape,rel_vars["origin"],rel_vars["position"],
+                                                             int(rel_vars["rotation"])
+                                                             ,rel_vars["size"])
+    return polygon
 
 
 

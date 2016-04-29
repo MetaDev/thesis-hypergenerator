@@ -29,8 +29,9 @@ class SiblingData(Enum):
 
 
 def training_data_generation(n_data,parent_def,
-                                parent_node,parent_var_names,parental_fitness,
-                                child_name,sibling_fitness,sibling_var_names,n_children,
+                                parent_node,parent_var_names,
+                                child_name,sibling_var_names,n_children,
+                                fitness_funcs,
                                 sibling_data=SiblingData.combination):
     #generate sample data
 
@@ -70,18 +71,16 @@ def training_data_generation(n_data,parent_def,
             else:
                 sibling_collection=[siblings[:n_children]]
             for sibling_sub_collection in sibling_collection:
-                fitness_value=_fitness_calc(parent,parental_fitness,
-                                       sibling_sub_collection,sibling_fitness)
-                if fitness_value is not None:
-                    fitness.append(fitness_value)
-                    data.append(dtfr.format_data_for_training(parent,parent_var_names,
+                fitness_value=fn.fitness_calc(parent,
+                                       sibling_sub_collection,fitness_funcs)
+                fitness.append(fitness_value)
+                data.append(dtfr.format_data_for_training(parent,parent_var_names,
                                                               sibling_sub_collection,sibling_var_names))
         else:
-            fitness_value=_fitness_calc(parent,parental_fitness,
-                                       siblings,sibling_fitness)
-            if fitness_value is not None:
-                fitness.append(fitness_value)
-                data.append(dtfr.format_data_for_training(parent,parent_var_names,siblings,sibling_var_names))
+            fitness_value=fn.fitness_calc(parent,
+                                       siblings,fitness_funcs)
+            fitness.append(fitness_value)
+            data.append(dtfr.format_data_for_training(parent,parent_var_names,siblings,sibling_var_names))
 
         if len(data)>=n_data:
             break
@@ -89,75 +88,3 @@ def training_data_generation(n_data,parent_def,
     parent_node.freeze_n_children(child_name,None)
     return np.array(data),np.array(fitness)
 
-#calculate fitness of a given parent-children model
-def _fitness_calc(parent,parental_fitness,
-                       siblings,sibling_fitness):
-
-    #calcualte fitness parent->child
-    fitness_value_parent_child=dict([(child,[]) for child in siblings])
-    fitness_value_sibling=dict([(child,[]) for child in siblings[1:]])
-    for child in siblings:
-        fitness_value_parent_child[child]=[]
-        #the sibling fitness of the first child is always 1
-        fitness_value_sibling[child]=[]
-        for fitn in parental_fitness:
-            temp_fitness_parent_child=fitn.calc(parent,child)
-            capped =  temp_fitness_parent_child is None
-            if not capped:
-                fitness_value_parent_child[child].append(temp_fitness_parent_child)
-            else:
-                break
-    if capped:
-        return None
-    #when only a single child no sibling fitness aplies
-    fitness_func_value_sibling=None
-    if len(siblings)>1:
-        #calculate fitness between siblings, respecting the order of the fitness funcs
-        for fitn in sibling_fitness:
-            #add an index to children in siblings
-            sibling_pairs=combinations(zip(siblings,range(len(siblings))),2)
-
-            fitness_func_value_sibling=dict([(child,[])for child in siblings[1:]])
-            for indexed_child0,indexed_child1 in sibling_pairs:
-                #child0 is the child with the largest index and is the child for which the fitness value will be saved
-                child0=indexed_child0[0] if indexed_child0[1]>indexed_child1[1] else indexed_child1[0]
-                child1=indexed_child0[0] if indexed_child0[1]<indexed_child1[1] else indexed_child1[0]
-                temp_sibling_fitness= fitn.calc(child0,child1)
-                capped=temp_sibling_fitness is None
-                if not capped:
-                    fitness_func_value_sibling[child0].append(temp_sibling_fitness)
-                else:
-                    break
-            #a set of siblings is invalid if one of its fitness funcs is below the cap
-            if capped:
-                break
-            #save product of fitness with previous siblings
-            for child in siblings[1:]:
-                fitness_value_sibling[child].append(np.prod(fitness_func_value_sibling[child]))
-
-    if capped:
-        return None
-
-    #format the fitness according convention
-    parental_fitness_values,sibling_fitness_values=dtfr.format_fitness_values_training(fitness_value_parent_child,
-                                                                                       fitness_value_sibling,
-                                                                                      siblings)
-    #combine fitness functions
-    return [parental_fitness_values,sibling_fitness_values]
-
-
-
-
-
-
-def fitness_polygon_overl(sample0,sample1):
-    polygons=mp.map_layoutsamples_to_geometricobjects([sample0,sample1],shape_name="shape")
-    return fn.pairwise_overlap(polygons[0],polygons[1])
-
-def fitness_polygon_alignment(sample0,sample1):
-    polygons=mp.map_layoutsamples_to_geometricobjects([sample0,sample1],shape_name="shape")
-    return fn.pairwise_closest_line_alignment(polygons[0],polygons[1],threshold=30)
-def fitness_min_dist(sample0,sample1):
-    pos0=sample0.values["ind"]["position"]
-    pos1=sample1.values["ind"]["position"]
-    return fn.pairwise_min_dist(pos0,pos1,threshold=1)

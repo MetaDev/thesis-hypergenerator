@@ -8,8 +8,8 @@ from model.search_space import LayoutTreeDefNode as LN
 from model.search_space import VarDefNode
 
 #the hierarchy argument is to evaluate the ability to train conditionally on parent values
-#TODO make rotation variability optional
-#model to train collision
+
+#model to train polygon overlap
 def model_var_pos(hierarchy,var_rot,var_nr_children):
     position = SV("position",low=(0,0),high=[5,3])
     if var_rot:
@@ -40,7 +40,7 @@ def model_var_pos(hierarchy,var_rot,var_nr_children):
     children=[(n_children,child)]
     return parent_room.build_child_nodes(children),parent_room
 
-#model to train alignment (both between siblings and parent)
+#model to train closest side alignment (both between siblings and parent)
 #variable rotation
 
 def model_var_rot(var_parent,var_pos,var_nr_children):
@@ -109,8 +109,10 @@ def model_var_rot(var_parent,var_pos,var_nr_children):
 
 
     return parent_node,parent_room
+
 #model to train surface ratio
 #model to train balance
+
 #variable size
 def model_var_size(var_parent,var_pos,var_nr_children):
 
@@ -136,7 +138,7 @@ def model_var_size(var_parent,var_pos,var_nr_children):
     else:
         n_children=DV("child",5)
     if var_pos:
-        position = SV("position",low=(0,0),high=[4,3])
+        position = SV("position",low=(0,0),high=[3,2])
         child = LN(name="child",size=size,position=position,
                                         rotation=rotation,shape=LN.shape_exteriors["square"])
         parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
@@ -244,3 +246,7 @@ def model_reachabillity(var_pos):
         parent_node.add_children(child_list,n_children)
 
     return parent_node,parent
+#TODO
+#to show the scalability in number of children of the appraoach
+def model_var_children(nr_of_children):
+    pass

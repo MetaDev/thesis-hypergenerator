@@ -1,29 +1,27 @@
 done
 ---------------
-retraining
-evaluation of model
-->model selection
 
-for the generator  (to select between consecutive runs)
+related work
 
-- expressiveness
-             weighted emperical variance
+update fitness calculation for evaluation of differen models
+because implementation was not expressive enough to configure all desired constraints
+
+pieces of methodology
 
 
 still to do
 -------------------------
 
+finish evaluation (debugging constraints)
 
+complete methodology
+
+complete evaluation
 
 evaluation models
 ------------------
-extract info from neufert and combine with pattern language examples to create 3 scenes
-with different constraints, tree hierarchies
 
 for literature:
 writing methodology
 write related work
 15/04
-
-
-
