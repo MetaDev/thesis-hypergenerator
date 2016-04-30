@@ -1,11 +1,9 @@
-from shapely.geometry import *
+from shapely.geometry import Polygon,LineString,Point
 
 import networkx as nx
 from shapely import affinity
-import numpy as np
 import util.utility as ut
-from operator import itemgetter
-from model.search_space import VectorVariableUtility
+
 
 def map_polygons_to_neighbourhoud_graph(polygons,grid_range, step):
     """
@@ -52,10 +50,11 @@ def map_layoutsamples_to_geometricobjects(layout_samples,shape_name):
         geom_objs.append(map_layoutsample_to_geometricobject(sample,shape_name))
     return geom_objs
 
+import model
 def map_layoutsample_to_geometricobject(layout_sample,shape_name):
     rel_vars=layout_sample.values["rel"]
     #extract points from vars and put in list ordered on their index saved in the name
-    shape=VectorVariableUtility.extract_ordered_list_vars_values(shape_name,rel_vars)
+    shape=model.search_space.VectorVariableUtility.extract_ordered_list_vars_values(shape_name,rel_vars)
     polygon = map_to_polygon(shape,rel_vars["origin"],rel_vars["position"],
                                                              int(rel_vars["rotation"])
                                                              ,rel_vars["size"])

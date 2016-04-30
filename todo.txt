@@ -3,19 +3,8 @@
 todo evaluation and test
 --------------------------
 
-test fitness for each model
+debug training outside of training method
 
-
-
-
-regression
-
-
-implement visualised sampling
-every time a child is sampled visualise it's corresponding gmm on the same figure as the actual polygons
-
-visualise gmm_variables for each unpack variable that is trained (using a few samples), show the sibling value on the plot
-and corresponding conditioned distr
 
 write test suite
 
@@ -27,7 +16,11 @@ each constraint should be tested with their respective models and changing learn
 add simple model where the number of children is a parameter
 test the scalabililty by testing different number of children with different learning parameters
 
-run test and save results to file
+check if normalised vs non normalised fitness works better
+
+training
+
+run test and save results to file (csv) with parameters as columns and results next to it
 
 
 //sunday

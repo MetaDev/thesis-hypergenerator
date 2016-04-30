@@ -15,6 +15,7 @@ from operator import itemgetter
 from itertools import chain
 from copy import deepcopy
 import warnings
+import util.visualisation as vis
 
 from abc import ABCMeta, abstractmethod
 
@@ -90,10 +91,12 @@ class StochasticVariable(Variable):
         return True
     def freeze(self,value):
         self.freeze_value=np.array(value)
-    def thaw(self):
-        self.freeze(None)
+
     def frozen(self):
         return self.freeze_value
+
+
+
 
 
 
@@ -149,7 +152,7 @@ class GMMVariable(StochasticVariable):
     #the output variables of the GMM variable are the sibling_vars
     #TODO check validity of GMM, its dimension against the given X and Y vars
     #also add sibling name, if parent has multiple named siblings these can also be passed
-    def __init__(self,name,gmm: GMM, parent_vars:List[Variable],sibling_vars,sibling_order):
+    def __init__(self,name,gmm, parent_vars:List[Variable],sibling_vars,sibling_order):
         #non_cond_vars are save in attribute variables of VectorVariable
         Variable.__init__(self,name)
         self.unpack=True
@@ -164,6 +167,8 @@ class GMMVariable(StochasticVariable):
         #keep track of how sanpling quality, 0 is worst
         self.sample_quality=1
 
+        self.visualise_variable_names=None
+
     #when sampling, sample from a the distribution completely conditioned on the parent independent variable values
     #values on which is trained of course
     #group the values according the vector structure of the search space (given by dummy variables)
@@ -173,7 +178,14 @@ class GMMVariable(StochasticVariable):
         indices,values= dtfr.format_data_for_conditional(parent_sample,self.parent_vars,
                                                              sibling_samples,self.sibling_vars,
                                                              self.sibling_order)
+        print("ind",indices)
+        print("values",values)
         gmm_cond=self.gmm.condition(indices,values)
+
+        if self.visualise_variable_names:
+            vis.draw_1D_2D_GMM_variable_sampling(self,gmm_cond,parent_sample,sibling_samples)
+
+        #rejection sampling to stay within range
         for i in range(GMMVariable.max_tries):
             attempts+=1
             cond_values=gmm_cond.sample(1)[0]
@@ -198,12 +210,11 @@ class GMMVariable(StochasticVariable):
         for var in self.sibling_vars:
             if var.name is var_name:
                 var.freeze(value)
-    def thaw(self,var_name):
-        if var_name not in self.unpack_names:
-            raise ValueError("Variable to thaw not packed in GMM variable.")
-        for var in self.sibling_vars:
-            if var.name is var_name:
-                var.freeze(None)
+
+
+    def visualise_sampling(self, variable_names):
+        self.visualise_variable_names=variable_names
+
 class VarDefNode:
     class SampleNode:
 
@@ -402,10 +413,13 @@ class LayoutTreeDefNode(TreeDefNode):
         #size.func=self.size_rel
         super().__init__(name,[origin,position,rotation,size,*shape])
 
-    def visualise(root_sample,color_list,ax=None):
+    def visualise(root_layout_sample,color_list,child_samples=None,ax=None):
         import model.mapping as mp
         import util.visualisation as vis
-        samples=root_sample.get_flat_list()
+        if child_samples is None:
+            samples=root_layout_sample.get_flat_list()
+        else:
+            samples=[root_layout_sample]+child_samples
         #map list by name
         polygon_dict=dict([(sample.name,[]) for sample in samples])
         for sample in samples:

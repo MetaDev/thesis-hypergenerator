@@ -124,7 +124,7 @@ def combinatory_surface_ratio_absolute(parent,siblings,target_ratio):
     area_siblings_parent= sibling_union.intersection(parent_polygon).area
     area_diff=np.abs(area_siblings_parent/parent_polygon.area-target_ratio)
 
-    return -area_diff
+    return 1-area_diff
 
 
 
@@ -165,7 +165,7 @@ def centroid_dist_absolute(parent,siblings,dist_metric=np.linalg.norm):
     centr_dist_with_child=dist_metric(sibling_polygons_group_centr -parent_polygon_centr)
 
     #if the distance grows by adding a child it is bad
-    return centr_dist_with_child
+    return -centr_dist_with_child
 
 #alignment cosntraints
 

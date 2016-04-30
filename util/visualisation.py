@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+
 import networkx as nx
 
 from descartes.patch import PolygonPatch
+import matplotlib.patches as patches
 
 from matplotlib import pyplot as plt
 import matplotlib as mpl
@@ -22,6 +24,21 @@ def init(name="visualisation",n_plots=1):
     fig=plt.gcf()
     fig.clear()
 
+
+#return current or new ax
+def get_ax(ax,option="current"):
+    if ax is None:
+        if option is "current":
+            return plt.gca()
+        elif option is "new":
+            return plt.figure().add_subplot(111)
+        else:
+            raise ValueError("wrong option for get ax function.")
+
+    else:
+        return ax
+
+
 def draw_graph(ax,graph,with_labels=False,node_size=0):
     pos=dict([ (n, n) for n in graph.nodes() ])
     labels =dict([ (n,str(n)) for n in graph.nodes() ])
@@ -32,11 +49,8 @@ def draw_graph_path(ax,graph,path,color='b',with_labels=False,node_size=50,node_
                            pos=pos,with_labels=with_labels,ax=ax,node_size=node_size)
 
 
-def get_ax(ax):
-    if ax is None:
-        return plt.gca()
-    else:
-        return ax
+
+
 def draw_polygons(polygons,ax=None,color="b",show_edges=False):
     ax=get_ax(ax)
     ax.set_aspect(1)
@@ -58,16 +72,59 @@ def set_poygon_range(polygon_list,size=1.2,ax=None):
     (xrange,yrange)=ut.range_from_polygons(polygon_list, size)
     ax.set_xlim(*xrange)
     ax.set_ylim(*yrange)
-#plot marginal density of a single dimension in a GMM
-#this is can be used as indicator for expressivens of this dimension
-#it's limitation is that it assumes independence between vars but it is very hard to visualise multi dimensional data
 
-#TODO check dimensionality, move to gmm (where a dimension can be chosen)
-def visualise_gmm_marg_1D_density(ax,marg_index,gmm_weights,gmm_means,gmm_cov,
-                                 factor=2,xrange=None,verbose=False):
+def draw_1D_stoch_variable(var,ax):
+    ax.plot((var.low, var.low), (0, 1), 'r-')
+    ax.plot((var.high, var.high), (0, 1), 'r-')
+
+def draw_2D_stoch_variable(var,ax):
+    rect=patches.Rectangle(
+                (var.low[0],var.low[1]),   # (x,y)
+                var.low[0]-var.high[0],          # width
+                var.low[1]-var.high[1],          # height
+             fill=False)
+    rect.set_color("r")
+    ax.add_patch(rect)
+
+import util.data_format as dtfr
+import model.search_space as sp
+def draw_1D_2D_GMM_variable_sampling(gmmvar,gmm_cond,parent_sample,sibling_samples,ax=None):
+    #marginalise variables from gmm by name
+    indices=[index for index,name in zip(dtfr.variables_indices(gmmvar.sibling_vars),
+                                       gmmvar.unpack_names) if name in gmmvar.visualise_variable_names]
+    vis_vars=[var for var in gmmvar.sibling_vars if var.name in gmmvar.visualise_variable_names ]
+    for (index0,index1),var in zip(indices,vis_vars):
+        ax=get_ax(ax,"new")
+        if index1 - index0 == 1:
+            #visualise the sibling var range
+            draw_1D_stoch_variable(var,ax)
+            gmm_cond.visualise_gmm_marg_1D_density(index0,ax=ax)
+        elif index1-index0 == 2:
+            #visualise the sibling var range
+            draw_2D_stoch_variable(var,ax)
+            gmm_cond.visualise_gmm_marg_2D_density(np.arange(index0,index1),ax=get_ax(ax,"new"))
+        else:
+            raise ValueError("Only variables up to 2 dimensions can be visualised. Variable ",
+                                                                     var.name,"has indices: ",index0,index1 )
+    #visualise the model
+    color_list=[(parent_sample.name,"b")]
+    if len(sibling_samples)>0:
+        color_list.append((sibling_samples[0].name,"r"))
+    sp.LayoutTreeDefNode.visualise(parent_sample,color_list,sibling_samples,ax=get_ax(None,"new"))
+
+
+
+
+#TODO check dimensionality
+def visualise_gmm_marg_1D_density(gmm,marg_index,name="",ax=None,
+                                 factor=2,verbose=False):
+
+    gmm_weights,gmm_means,gmm_cov=gmm.get_params()
     means=[]
     weights=gmm_weights
     stdevs=[]
+    ax=get_ax(ax)
+    ax.set_aspect(1)
     for k in range(len(gmm_means)):
         means.append(gmm_means[k][marg_index])
         #calc std
@@ -80,52 +137,39 @@ def visualise_gmm_marg_1D_density(ax,marg_index,gmm_weights,gmm_means,gmm_cov,
     pdfs = [w * ss.norm.pdf(x, mu, sd) for mu, sd, w in zip(means, stdevs, weights)]
     density = np.sum(np.array(pdfs), axis=0)
     if verbose:
-        print("Expected mean value: "+ format_float(np.mean([ w*m for m,w in zip(means, weights)])))
-        print("Expected mean standard dev: " + format_float(np.mean([ w*sd for sd,w in zip(stdevs, weights)])))
+        print("Expected mean value: "+ ut.format_float(np.mean([ w*m for m,w in zip(means, weights)])))
+        print("Expected mean standard dev: " + ut.format_float(np.mean([ w*sd for sd,w in zip(stdevs, weights)])))
     #unfirom distribution line
     y=[1/(max_x-min_x)]*len(x)
     ax.plot(x, density)
     ax.plot(x,y,color="r")
-#same as above but for GMM from the gmr package
-def visualise_gmm_marg_density_1D_GMM(ax,marg_index,gmm,factor=3,verbose=False):
-    visualise_gmm_marg_1D_density(ax,marg_index,*gmm.get_params(),
-                                 factor,verbose)
-#to visualise the density of 2 dimensional data
-#respect covariance between the data
+
+#plot marginal density of a single dimension in a GMM
+#this is can be used as indicator for expressivens of this dimension
+#it's limitation is that it assumes independence between vars but it is very hard to visualise multi dimensional data
 
 #TODO check dimensionality
-def visualise_gmm_marg_2D_density(ax,gmm,
-                                  min_factor=.5,max_factor=3,steps=5, colors=["r","g","b"]):
+def visualise_gmm_marg_2D_density(gmm,marg_index,ax=None,
+                                  min_factor=.5,max_factor=3,steps=5, colors=["r"]):
+    ax=get_ax(ax)
+    ax.set_aspect(1)
     from matplotlib.patches import Ellipse
     from itertools import cycle
     if colors is not None:
         colors = cycle(colors)
     min_alpha=0.03
     max_alpha=0.4
-
+    ax_range=[]
+    gmm=gmm.marginalise(marg_index)
     for factor in np.linspace(min_factor, max_factor, steps):
         for (mean, (angle, width, height)),weight in zip(gmm.gmm_gmr.to_ellipses(factor),gmm.weights_):
             ell = Ellipse(xy=mean, width=width, height=height,
                           angle=np.degrees(angle))
+            max_size=max(width,height)
+            ax_range.append(((mean[0]-max_size,mean[0]+max_size),(mean[1]-max_size,mean[1]+max_size)))
             ell.set_alpha(min_alpha+(max_alpha-min_alpha)*weight)
             if colors is not None:
                 ell.set_color(next(colors))
             ax.add_artist(ell)
-def print_fitness_statistics(fitness_values,print_hist=False):
-    fitness_statistics_count, fitness_bin_edges,_ = binned_statistic(fitness_values, fitness_values,
-                                                                     statistic='count', bins=20)
-    if print_hist:
-        fitness_statistics_mean = binned_statistic(fitness_values, fitness_values,  statistic='mean'
-        , bins=20)[0]
-        for edges,count,mean,i in zip(ut.pairwise(fitness_bin_edges),fitness_statistics_count,
-            fitness_statistics_mean,range(len(fitness_statistics_count))):
-
-            edges ="bin nr. "+ str(i) + ": "+format(edges[0], '.5g') + " - "+format(edges[1], '.5g')
-            count = ": count= " + str(count)
-            mean=": mean= "+ format(mean, '.5g')
-            print(edges + count + mean)
-
-    print("total mean= {0:f}: variance= {1:f}".format(np.mean(fitness_values),np.var(fitness_values),'.5g'))
-
-def format_float(f):
-    return format(f, '.5g')
+    ax.set_xlim(min(np.array(ax_range)[:,0,0]),max(np.array(ax_range)[:,0,1]))
+    ax.set_ylim(min(np.array(ax_range)[:,1,0]),max(np.array(ax_range)[:,1,1]))

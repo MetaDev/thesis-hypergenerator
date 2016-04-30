@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #Centralise the ordering of variables and children for traing and sampling (marginalising, conditional)
 #and the order of the data as well (child and parent variables)
 #each variable definition and child definition (not sample) should have an id indicating it's order
@@ -54,7 +56,7 @@ def marginalise_gmm(gmms,child_index,parent_vars,sibling_vars):
     full_gmm=next(gmm for gmm in gmms[child_index:] if gmm is not None)
     #calculate indices
     #the order of the data is parent,sibling0,sibling1,..
-    indices=np.arange(0,variables_length(parent_vars)+(child_index+1)*variables_length(sibling_vars))
+    indices=np.arange(0,int(variables_length(parent_vars)+(child_index+1)*variables_length(sibling_vars)))
     gmm=full_gmm.marginalise(indices)
     return gmm
 
@@ -91,27 +93,33 @@ def _reduce_fitness_dimension(fitness_value_line,
     if fitness_dim[0] is FitnessInstanceDim.seperate and  fitness_dim[1] is FitnessFuncDim.single:
         #group the fitness values per siblings is not possible because some fitness functions can be filtered for certain siblings
         raise ValueError("Seperate siblings and single fitness function values is not supported.")
-
+def normalised_bounds(fn_func_bounds):
+    return not (0<=fn_func_bounds[0]<=1 and 0<=fn_func_bounds[1]<=1)
 def normalise_fitness(fitness_values):
     fn_bounds=np.array(fitness_value_bounds(fitness_values))
     normalised_fitness_values=[]
     for fn_value_lines in fitness_values:
-        normalised_fitness_values.append([(np.array(fn_values)-fn_func_bounds[0])/(fn_func_bounds[1]-fn_func_bounds[0]) for fn_values,fn_func_bounds in zip(fn_value_lines,fn_bounds)])
+        normalised_line=[]
+        for fn_values,fn_func_bounds in zip(fn_value_lines,fn_bounds):
+            if normalised_bounds(fn_func_bounds):
+                normalised_line.append((np.array(fn_values)-fn_func_bounds[0])/(fn_func_bounds[1]-fn_func_bounds[0]) )
+            else:
+                normalised_line.append(fn_values)
+        normalised_fitness_values.append(normalised_line)
 
     return np.array(normalised_fitness_values)
 
+def apply_fitness_order(fitness_values,fitness_funcs):
+    return [[np.array(fn_func_values)**fn_func.order for fn_func_values,fn_func in zip(fn_value_line,fitness_funcs)] for fn_value_line in fitness_values ]
 #works only on 2D fitness value arrays
 def fitness_value_bounds(fitness_values):
 
     return [(np.min(list(ut.flatten(np.array(fitness_values)[:,i]))),np.max(list(ut.flatten(np.array(fitness_values)[:,i])))) for i in range(len(fitness_values[0]))]
 
-def format_fitness_and_data_training(data,fitness_values,fitness_funcs):
+def filter_fitness_and_data_training(data,fitness_values,fitness_funcs):
     #normalise fitness
     fitness_values=normalise_fitness(fitness_values)
 
-    #TODO test order
-    #apply order
-    fitness_values=[[np.array(fn_func_values)**fn_func.order for fn_func_values,fn_func in zip(fn_value_line,fitness_funcs)] for fn_value_line in fitness_values ]
 
     filtered_data=[]
     filtered_fitness_values=[]
@@ -187,10 +195,13 @@ def format_data_for_training(parent,parent_var_names,siblings,sibling_var_names)
 
 #all variables need to be of type numpy array
 def split_variables(variables,joint_data):
-    sizes=[v.size for v in variables]
-    sizes.insert(0,0)
-    lengths=np.cumsum(sizes)
+    indices=variables_indices(variables)
     #this is for calculating the edges of the vector to be return in relative value
     return [np.array(joint_data[l1:l2]) if not var.frozen() else var.freeze_value
-    for (l1,l2),var in zip(ut.pairwise(lengths),variables)]
+    for (l1,l2),var in zip(indices,variables)]
+
+def variables_indices(variables):
+    sizes=[v.size for v in variables]
+    sizes.insert(0,0)
+    return ut.pairwise(np.cumsum(sizes))
 
