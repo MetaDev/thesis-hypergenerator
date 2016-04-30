@@ -64,6 +64,7 @@ model_evaluation = mev.ModelEvaluation(n_model_eval_data,parent_def,parent_node,
 
 
 model_evaluation.print_evaluation(fitness_values,0)
+gmm = GMM(n_components=15)
 
 regression=False
 if regression:

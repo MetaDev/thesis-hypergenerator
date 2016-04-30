@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 Created on Tue Feb  9 17:30:20 2016
 
@@ -6,13 +7,13 @@ Created on Tue Feb  9 17:30:20 2016
 """
 import scipy.stats
 import numpy as np
-from util import setting_values
+
 from gmr import GMM
 from typing import List
 import util.utility as ut
 from typing import  TypeVar
 from operator import itemgetter
-from itertools import chain
+
 from copy import deepcopy
 import warnings
 import util.visualisation as vis
@@ -178,8 +179,7 @@ class GMMVariable(StochasticVariable):
         indices,values= dtfr.format_data_for_conditional(parent_sample,self.parent_vars,
                                                              sibling_samples,self.sibling_vars,
                                                              self.sibling_order)
-        print("ind",indices)
-        print("values",values)
+
         gmm_cond=self.gmm.condition(indices,values)
 
         if self.visualise_variable_names:

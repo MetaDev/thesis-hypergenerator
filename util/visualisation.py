@@ -16,6 +16,8 @@ import model.mapping as mp
 
 
 from gmr import MVN,GMM
+import util.data_format as dtfr
+
 import util.utility as ut
 
 def init(name="visualisation",n_plots=1):
@@ -86,8 +88,7 @@ def draw_2D_stoch_variable(var,ax):
     rect.set_color("r")
     ax.add_patch(rect)
 
-import util.data_format as dtfr
-import model.search_space as sp
+import model
 def draw_1D_2D_GMM_variable_sampling(gmmvar,gmm_cond,parent_sample,sibling_samples,ax=None):
     #marginalise variables from gmm by name
     indices=[index for index,name in zip(dtfr.variables_indices(gmmvar.sibling_vars),
@@ -98,11 +99,11 @@ def draw_1D_2D_GMM_variable_sampling(gmmvar,gmm_cond,parent_sample,sibling_sampl
         if index1 - index0 == 1:
             #visualise the sibling var range
             draw_1D_stoch_variable(var,ax)
-            gmm_cond.visualise_gmm_marg_1D_density(index0,ax=ax)
+            visualise_gmm_marg_1D_density(gmm_cond,index0,ax=ax)
         elif index1-index0 == 2:
             #visualise the sibling var range
             draw_2D_stoch_variable(var,ax)
-            gmm_cond.visualise_gmm_marg_2D_density(np.arange(index0,index1),ax=get_ax(ax,"new"))
+            visualise_gmm_marg_2D_density(gmm_cond,np.arange(index0,index1),ax=get_ax(ax,"new"))
         else:
             raise ValueError("Only variables up to 2 dimensions can be visualised. Variable ",
                                                                      var.name,"has indices: ",index0,index1 )
@@ -110,7 +111,7 @@ def draw_1D_2D_GMM_variable_sampling(gmmvar,gmm_cond,parent_sample,sibling_sampl
     color_list=[(parent_sample.name,"b")]
     if len(sibling_samples)>0:
         color_list.append((sibling_samples[0].name,"r"))
-    sp.LayoutTreeDefNode.visualise(parent_sample,color_list,sibling_samples,ax=get_ax(None,"new"))
+    model.search_space.LayoutTreeDefNode.visualise(parent_sample,color_list,sibling_samples,ax=get_ax(None,"new"))
 
 
 
