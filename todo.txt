@@ -4,17 +4,7 @@ todo evaluation and test
 --------------------------
 
 
-define parameter set to run tests over (learning parameters)
-wrap all parameter combinations in timeit processes to time it
 
-each constraint should be tested with their respective models and changing learning parameters
-
-add simple model where the number of children is a parameter
-test the scalabililty by testing different number of children with different learning parameters
-
-check if normalised vs non normalised fitness works better
-
-training
 
 run test and save results to file (csv) with parameters as columns and results next to it
 

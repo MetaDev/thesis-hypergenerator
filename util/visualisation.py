@@ -82,8 +82,8 @@ def draw_1D_stoch_variable(var,ax):
 def draw_2D_stoch_variable(var,ax):
     rect=patches.Rectangle(
                 (var.low[0],var.low[1]),   # (x,y)
-                var.low[0]-var.high[0],          # width
-                var.low[1]-var.high[1],          # height
+                var.high[0]-var.low[0],          # width
+                var.high[1]-var.low[1],          # height
              fill=False)
     rect.set_color("r")
     ax.add_patch(rect)

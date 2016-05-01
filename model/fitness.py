@@ -1,7 +1,6 @@
 from shapely.geometry import LineString,MultiPolygon
 from shapely.ops import cascaded_union
-from itertools import combinations
-import networkx as nx
+
 import numpy as np
 import model.mapping as mp
 import util.utility as ut
@@ -60,7 +59,7 @@ def fitness_calc(parent,siblings,fitness_list):
                 if fitn.fitness_relation is Fitness_Relation.pairwise_parent_child:
                     sibling_fitness.append(fitn.calc(parent,child,None))
                 #one seperate case where the fitness is between siblings and there are no siblings yet
-                elif not (len(previous_siblings) is 0 and fitn.fitness_relation is Fitness_Relation.pairwise_siblings):
+                elif fitn.fitness_relation is Fitness_Relation.pairwise_siblings and not len(previous_siblings) == 0 :
                     sibling_fitness.append(fitn.calc(parent,child,previous_siblings))
 
 
@@ -75,12 +74,12 @@ def fitness_calc(parent,siblings,fitness_list):
 
 #only usable if the pairwise_fitn is normalised between 0 and 1
 def _calc_pairwise_sibling(child,siblings,pairwise_norm_fitn):
-    fitness_func_value_sibling=[]
+    fitness_func_value_sibling=1
     for sibling in siblings:
-        fitness_func_value_sibling.append(pairwise_norm_fitn(child,sibling))
+        fitness_func_value_sibling*=(pairwise_norm_fitn(child,sibling))
 
     #the fitness of a child relative to its existing siblings is the average of its pairwise fitness
-    return np.prod(fitness_func_value_sibling) if len(siblings) >0 else 1
+    return fitness_func_value_sibling
 
 def _calc_pairwise_sibling_target(child,siblings,pairwise_norm_fitn,target):
     fitness_func_value_sibling=[]
@@ -139,6 +138,8 @@ def min_dist_norm(sample0,sample1,target_dist,dist_metric=np.linalg.norm):
 
 def min_dist_sb(parent,child,siblings,target_dist):
     return _calc_pairwise_sibling_target(child,siblings,min_dist_norm,target_dist)
+def min_dist_pc(parent,child,target_dist):
+    return min_dist_norm(parent,child,target_dist)
 
 #difference between centroid of parent and grouped children
 def centroid_dist_sb(parent,child,siblings,dist_metric=np.linalg.norm):

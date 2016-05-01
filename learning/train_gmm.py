@@ -41,7 +41,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #True->train full joint
     #False->derive (marginalise) from closest higher order
 
-    gmm_full=[False,True,False,True]
+    gmm_full=[False,True,True,True]
     #the largest sibling order always has to be calculated
     gmm_full.append(True)
 
@@ -70,7 +70,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #this expliicitly also defines the format of the data
     #fitness func, order cap and regression target
     #fitness_funcs=[fn.Targetting_Fitness("Minimum distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,1,0,1,target=1),fn.Fitness("polygon overlap",fn.negative_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,1,0,1)]
-    fitness_funcs=[fn.Targetting_Fitness("Minimum distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,1,0,1,target=1)]
+    fitness_funcs=[fn.Targetting_Fitness("Minimum distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,1,0,1,target=3)]
     #only the func order and cap is used for training
 
     model_evaluation = mev.ModelEvaluation(n_model_eval_data,parent_def,parent_node,parent_var_names,
@@ -128,6 +128,8 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
                 if regression:
                     data,fitness_values=dtfr.filter_fitness_and_data_training(data,fitness_values,
                                                                                   fitness_funcs)
+                    fitness_values=dtfr.apply_fitness_order(fitness_values,fitness_funcs)
+
                     fitness_regression=dtfr.reduce_fitness_dimension(fitness_values,fitness_dim,
                                                                         dtfr.FitnessCombination.product)
                     #renormalise
@@ -151,6 +153,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
                 else:
                     data,fitness_values=dtfr.filter_fitness_and_data_training(data,fitness_values,
                                                                               fitness_funcs)
+                    fitness_values=dtfr.apply_fitness_order(fitness_values,fitness_funcs)
                     #reduce fitness to a single dimension
                     fitness_single=dtfr.reduce_fitness_dimension(fitness_values,(dtfr.FitnessInstanceDim.single,
                                                                          dtfr.FitnessFuncDim.single),
@@ -175,16 +178,16 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
             for k in range(len(child_nodes)):
                 child_nodes[k].set_learned_variable(gmm_vars[sibling_order_sequence[k]])
 
-            #visualise new model
-
-            for gmm_var in gmm_vars:
-                gmm_var.visualise_sampling(["position"])
-            #sample once
-            _,max_children=parent_def.variable_range(child_name)
-            parent_node.freeze_n_children(child_name,max_children)
-            parent_node.sample(1)
-            for gmm_var in gmm_vars:
-                gmm_var.visualise_sampling(None)
+#            #visualise new model
+#
+#            for gmm_var in gmm_vars:
+#                gmm_var.visualise_sampling(["position"])
+#            #sample once
+#            _,max_children=parent_def.variable_range(child_name)
+#            parent_node.freeze_n_children(child_name,max_children)
+#            parent_node.sample(1)
+#            for gmm_var in gmm_vars:
+#                gmm_var.visualise_sampling(None)
 
 
             #evaluate new model
