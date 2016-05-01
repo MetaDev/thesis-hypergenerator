@@ -92,6 +92,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     if len(gmm_full) != n_children:
         raise ValueError("the array defining which sibling order to train seperately should have the same length as the maximum amount of children for a given sibling order. \n length array: ",len(gmm_full),", expected: ",n_children)
     #do n_iter number of retrainings using previously best model
+    max_gmm_vars=None
     for iteration in range(n_iter):
         #find out the performance of the current model
 
@@ -178,16 +179,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
             for k in range(len(child_nodes)):
                 child_nodes[k].set_learned_variable(gmm_vars[sibling_order_sequence[k]])
 
-#            #visualise new model
-#
-#            for gmm_var in gmm_vars:
-#                gmm_var.visualise_sampling(["position"])
-#            #sample once
-#            _,max_children=parent_def.variable_range(child_name)
-#            parent_node.freeze_n_children(child_name,max_children)
-#            parent_node.sample(1)
-#            for gmm_var in gmm_vars:
-#                gmm_var.visualise_sampling(None)
+
 
 
             #evaluate new model
@@ -200,10 +192,10 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
                 child_nodes[i].delete_learned_variable(gmm_var_name)
         #check which gmm performed best
 
-        max_gmm_vars=None
         for gmm_vars,gmm_score in gmm_vars_retry_eval:
             if gmm_score>iteration_gmm_score:
                 max_gmm_vars=gmm_vars
+                iteration_gmm_score=gmm_score
         #if it is better as the previous iteration-
         #inject new variable
         #else print that training didn't help
@@ -213,6 +205,16 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
         else:
             print("The model did not improve over consecutive training iteration.")
             break
+        #            #visualise new model
+#
+#            for gmm_var in gmm_vars:
+#                gmm_var.visualise_sampling(["position"])
+#            #sample once
+#            _,max_children=parent_def.variable_range(child_name)
+#            parent_node.freeze_n_children(child_name,max_children)
+#            parent_node.sample(1)
+#            for gmm_var in gmm_vars:
+#                gmm_var.visualise_sampling(None)
 
     _,fitness_values=dg.training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,

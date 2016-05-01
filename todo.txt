@@ -4,7 +4,9 @@ todo evaluation and test
 --------------------------
 
 
+fix that the last model is replaced by the worse model
 
+do tests by hand
 
 run test and save results to file (csv) with parameters as columns and results next to it
 
