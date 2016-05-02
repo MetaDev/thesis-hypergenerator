@@ -41,7 +41,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #True->train full joint
     #False->derive (marginalise) from closest higher order
 
-    gmm_full=[False,True,True,True]
+    gmm_full=[False,True,False,False]
     #the largest sibling order always has to be calculated
     gmm_full.append(True)
 
