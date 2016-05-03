@@ -208,10 +208,6 @@ def closest_side_alignment_pc(parent,child):
 #TODO
 #reachibility
 
-#TODO test filtering on constraints which is always 1
-def test_1_constraint_pc(parent,child):
-    return 1
-
 
 
 #print

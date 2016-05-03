@@ -30,7 +30,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     sibling_order_sequence=[0,1,2,3,4,4,4]
 
     sibling_data=dg.SiblingData.combination
-    fitness_dim=(dtfr.FitnessInstanceDim.single,dtfr.FitnessFuncDim.single)
+    fitness_dim=(dtfr.FitnessInstanceDim.seperate,dtfr.FitnessFuncDim.seperate)
 
     #the sibling order defines the size of the joint distribution that will be trained
     sibling_order=np.max(sibling_order_sequence)
@@ -92,8 +92,10 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     if len(gmm_full) != n_children:
         raise ValueError("the array defining which sibling order to train seperately should have the same length as the maximum amount of children for a given sibling order. \n length array: ",len(gmm_full),", expected: ",n_children)
     #do n_iter number of retrainings using previously best model
-    max_gmm_vars=None
+    #before iterating set the variable that will control whether a new model is an improvement
+    iteration_gmm_score=score
     for iteration in range(n_iter):
+
         #find out the performance of the current model
 
         data,fitness_values=dg.training_data_generation(n_data,parent_def,
@@ -179,9 +181,6 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
             for k in range(len(child_nodes)):
                 child_nodes[k].set_learned_variable(gmm_vars[sibling_order_sequence[k]])
 
-
-
-
             #evaluate new model
 
             score=model_evaluation.evaluate()
@@ -191,7 +190,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
             for i in range(len(child_nodes)):
                 child_nodes[i].delete_learned_variable(gmm_var_name)
         #check which gmm performed best
-
+        max_gmm_vars=None
         for gmm_vars,gmm_score in gmm_vars_retry_eval:
             if gmm_score>iteration_gmm_score:
                 max_gmm_vars=gmm_vars
@@ -200,6 +199,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
         #inject new variable
         #else print that training didn't help
         if max_gmm_vars:
+            print("improved model selected with score: ",iteration_gmm_score )
             for i in range(len(child_nodes)):
                 child_nodes[i].set_learned_variable(max_gmm_vars[sibling_order_sequence[i]])
         else:
