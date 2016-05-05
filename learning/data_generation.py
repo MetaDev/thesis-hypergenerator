@@ -32,7 +32,7 @@ def training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,
                                 child_name,sibling_var_names,n_children,
                                 fitness_funcs,
-                                sibling_data=SiblingData.combination):
+                                sibling_data):
     #generate sample data
 
     sample_fraction=1
@@ -60,13 +60,10 @@ def training_data_generation(n_data,parent_def,
     for parent in parent_samples:
         siblings=parent.children[child_name]
         #if the requested amount of children is lower than the lowest amount of children defined in the parent
-        #you have 3 options: either respect the order of the children and train on a windowed view of the children
+        #you have 2 options: either respect the order of the children and train on a windowed view of the children
         #or only the first n
-        #or don't respect the order (the order is not real anyway it is only implied by the trained variable)
         if min_children>2 and n_children>=2 and n_children<min_children:
-            if sibling_data is SiblingData.combination:
-                sibling_collection=combinations(siblings,n_children)
-            elif sibling_data is SiblingData.window:
+            if sibling_data is SiblingData.window:
                 sibling_collection=ut.window(siblings,n_children)
             else:
                 sibling_collection=[siblings[:n_children]]
@@ -86,5 +83,5 @@ def training_data_generation(n_data,parent_def,
             break
     #unfreeze model children
     parent_node.freeze_n_children(child_name,None)
-    return np.array(data),np.array(fitness)
+    return np.array(data[:n_data]),np.array(fitness[:n_data])
 

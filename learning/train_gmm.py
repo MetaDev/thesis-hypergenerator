@@ -29,7 +29,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #the first child is always independent
     sibling_order_sequence=[0,1,2,3,4,4,4]
 
-    sibling_data=dg.SiblingData.combination
+    sibling_data=dg.SiblingData.window
     fitness_dim=(dtfr.FitnessInstanceDim.seperate,dtfr.FitnessFuncDim.seperate)
 
     #the sibling order defines the size of the joint distribution that will be trained
@@ -42,7 +42,11 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #False->derive (marginalise) from closest higher order
 
     gmm_full=[False,True,False,False]
+
+    #the first child is always derived
+    gmm_full[0]=False
     #the largest sibling order always has to be calculated
+
     gmm_full.append(True)
 
 
