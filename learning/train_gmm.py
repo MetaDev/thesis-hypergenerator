@@ -130,9 +130,10 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
                                 fitness_funcs,
                                sibling_data)
                 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
-                if regression:
-                    data,fitness_values=dtfr.filter_fitness_and_data_training(data,fitness_values,
+                data,fitness_values=dtfr.filter_fitness_and_data_training(data,fitness_values,
                                                                                   fitness_funcs)
+                if regression:
+
                     fitness_values=dtfr.apply_fitness_order(fitness_values,fitness_funcs)
 
                     fitness_regression=dtfr.reduce_fitness_dimension(fitness_values,fitness_dim,
@@ -156,8 +157,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
                     gmm= gmm.condition(indices,targets)
 
                 else:
-                    data,fitness_values=dtfr.filter_fitness_and_data_training(data,fitness_values,
-                                                                              fitness_funcs)
+
                     fitness_values=dtfr.apply_fitness_order(fitness_values,fitness_funcs)
                     #reduce fitness to a single dimension
                     fitness_single=dtfr.reduce_fitness_dimension(fitness_values,(dtfr.FitnessInstanceDim.single,
@@ -218,15 +218,6 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
 #            for gmm_var in gmm_vars:
 #                gmm_var.visualise_sampling(None)
 
-    _,fitness_values=dg.training_data_generation(n_data,parent_def,
-                                parent_node,parent_var_names,
-                                child_name,sibling_var_names,n_children,
-                                fitness_funcs,
-                               sibling_data)
-    #show the result of nth iteration
-    if verbose:
-        print("final results")
-        model_evaluation.print_evaluation(fitness_values,iteration)
 
 
 

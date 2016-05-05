@@ -142,7 +142,6 @@ def filter_fitness_and_data_training(data,fitness_values,fitness_funcs):
             if not all(fn_value_line[i][j]>0.99 for fn_value_line in filtered_fitness_values ):
                 #save index of column
                 non_max_fn_indices[i].append(j)
-    #TODO
 
     #if the fitness is always 1 for each sibling it should be warned to the user to remove it from the learning
     #filter rows that contain outliers, because there is not much information in outliers, or is their?
