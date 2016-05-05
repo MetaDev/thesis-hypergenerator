@@ -5,4 +5,4 @@
 
 import learning.train_gmm as tgmm
 
-tgmm.training(n_data=100,n_iter=5,n_trial=5,regression=True)
+tgmm.training(n_data=100,n_iter=5,n_trial=5,regression=False)

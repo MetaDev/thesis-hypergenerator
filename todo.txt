@@ -3,9 +3,7 @@
 todo evaluation and test
 --------------------------
 
-fix windowed training
 
-fix that the last model is replaced by the worse model
 
 do tests by hand
 

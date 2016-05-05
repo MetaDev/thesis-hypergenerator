@@ -116,8 +116,6 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
 
         #combine fitness per func
         #evaluate model at the start of every iteration
-        iteration_gmm_score=model_evaluation.evaluate()
-
 
         gmm_vars_retry_eval=[]
         #do n trials to find a better gmm for the model
