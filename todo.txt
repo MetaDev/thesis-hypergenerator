@@ -33,6 +33,11 @@ reachability is implemented as the closest node to the target that can be reache
 write evaluation
 
 
+//afterwards
+
+try to use the hierachy recursively to make a gmm fractal
+
+
 
 evaluation and tests
 -------------------------------

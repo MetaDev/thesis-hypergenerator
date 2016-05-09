@@ -250,3 +250,19 @@ def model_reachabillity(var_pos):
 #to show the scalability in number of children of the appraoach
 def model_var_children(nr_of_children):
     pass
+def model_methodology():
+    position = SV("position",low=(2,3),high=[6,7])
+
+    rotation=DV("rotation",0)
+    size=SV("size",(0.2,0.2),(1,2))
+
+    child = LN(name="child",size=size,position=position,
+                                    rotation=rotation,shape=LN.shape_exteriors["square"])
+
+
+    n_children=SV("child",low=2,high=4)
+    parent_room =  LN(name="parent",size=DV("size",(3,5)),rotation=SV("rotation",low=0,high=180),
+                                    position=SV("position",low=(1,1),high=[2,2]),
+                                    shape=LN.shape_exteriors["square"])
+    children=[(n_children,child)]
+    return parent_room.build_child_nodes(children),parent_room

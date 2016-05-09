@@ -67,7 +67,7 @@ def draw_polygons(polygons,ax=None,color="b",show_edges=False):
         patch = PolygonPatch(polygon, facecolor=color, edgecolor=color, alpha=0.5, zorder=1)
         ax.add_patch(patch)
     #finalise figure properties
-    ax.set_title('Layout visualisation')
+    ax.set_title('Polygon representation')
 
 def set_poygon_range(polygon_list,size=1.2,ax=None):
     ax=get_ax(ax)

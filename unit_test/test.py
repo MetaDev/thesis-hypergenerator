@@ -12,7 +12,7 @@ from itertools import combinations
 import model.sampling.poisson as poisson
 
 
-root_node,root_def = tm.model_var_rot(True,True,True)
+root_node,root_def = tm.model_methodology()
 n=5
 root_samples = root_node.sample(n)
 
@@ -41,10 +41,10 @@ for i in range(n):
     #print fitness
     fitness = [fn.Fitness("Minimum distances",fn.closest_side_alignment_pc,fn.Fitness_Relation.pairwise_parent_child,1,0,1)]
 
-    print(fn.fitness_calc(root_sample,child_samples,fitness))
+    print([ str(sample.values["rel"]) for sample in sample_list])
 
-    x,y=zip(*points)
-    ax.scatter(x,y,color="g")
-    ax.scatter((*np.array(sibling_polygons_group_centr)),color="b")
-    ax.scatter(*zip(*centroids),color="r")
+#    x,y=zip(*points)
+#    ax.scatter(x,y,color="g")
+#    ax.scatter((*np.array(sibling_polygons_group_centr)),color="b")
+#    ax.scatter(*zip(*centroids),color="r")
     vis.plt.show()
