@@ -23,7 +23,6 @@ from enum import Enum
 
 #in the case that the number of requested siblings is smaller than
 class SiblingData(Enum):
-    combination=1
     window=2
     first=3
 
@@ -45,9 +44,7 @@ def training_data_generation(n_data,parent_def,
     if min_children>2 and n_children>=2 and n_children<min_children:
         #generate for smallest possible amount of children
         n_sample_children=min_children
-        if sibling_data is SiblingData.combination:
-            sample_fraction=comb(min_children,n_children)
-        elif sibling_data is SiblingData.window:
+        if sibling_data is SiblingData.window:
             sample_fraction=min_children+1-n_children
 
     parent_node.freeze_n_children(child_name,n_sample_children)

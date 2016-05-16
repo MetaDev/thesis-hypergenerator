@@ -5,4 +5,13 @@
 
 import learning.train_gmm as tgmm
 
-tgmm.training(n_data=100,n_iter=5,n_trial=5,regression=False)
+
+#print("model_2")
+#
+#tgmm.training_model_2()
+#print("model_3")
+#
+#tgmm.training_model_3()
+print("model_4")
+
+tgmm.training_model_4()

@@ -108,10 +108,16 @@ class DeterministicVariable(Variable):
         self.size=ut.size(self._value)
         self.high=value
         self.low=value
+        self.freeze_value=None
     def stochastic(self):
         return False
     def sample(self, parent_sample,sibling_sample,i,n_samples,expressive):
-        return self._value
+        return self._value if not self.frozen() else self.freeze_value
+    def freeze(self,value):
+        self.freeze_value=np.array(value)
+
+    def frozen(self):
+        return self.freeze_value
 
 class VectorVariableUtility():
     #using the naming convention of a vector variable p1, p2,...
@@ -179,7 +185,6 @@ class GMMVariable(StochasticVariable):
         indices,values= dtfr.format_data_for_conditional(parent_sample,self.parent_vars,
                                                              sibling_samples,self.sibling_vars,
                                                              self.sibling_order)
-
         gmm_cond=self.gmm.condition(indices,values)
 
         if self.visualise_variable_names:
@@ -263,6 +268,7 @@ class VarDefNode:
     def add_children(self,child_list,n_children):
         #TODO check if all children have the same name
         self.tree_def_node.children[n_children.name]=child_list[0].tree_def_node
+        self.tree_def_node.variables[n_children.name]=n_children
         self.children[n_children.name]=child_list
         self.add_new_variable(n_children)
         for i,child in enumerate(child_list):
@@ -286,6 +292,7 @@ class VarDefNode:
                 #put all original vars back
                 for var_name in var.unpack_names:
                     self.variable_assignment[var_name]=self.variables[var_name]
+        self._update_sample_variables()
 
     def set_learned_variable(self, gmmvar: GMMVariable):
         #set variables that will be replaced to unactive

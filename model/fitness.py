@@ -96,7 +96,10 @@ def negative_overlap(sample0,sample1):
 #avoid collision with parent
 def negative_overlap_pc(parent,child):
     return negative_overlap(parent,child)
-
+def norm_overlap_pc(parent,child):
+    polygons=mp.map_layoutsamples_to_geometricobjects([parent,child],shape_name="shape")
+    noemer=min(polygons[0].area,polygons[1].area)
+    return 1-((polygons[0].intersection(polygons[1])).area)/noemer
 def union_negative_overlap_sb(parent,child,siblings):
     sibling_polygons=mp.map_layoutsamples_to_geometricobjects(siblings,shape_name="shape")
     child_polygon=mp.map_layoutsamples_to_geometricobjects([child],shape_name="shape")[0]
@@ -123,7 +126,7 @@ def combinatory_surface_ratio_absolute(parent,siblings,target_ratio):
     area_siblings_parent= sibling_union.intersection(parent_polygon).area
     area_diff=np.abs(area_siblings_parent/parent_polygon.area-target_ratio)
 
-    return 1-area_diff
+    return -area_diff
 
 
 
@@ -220,15 +223,16 @@ def fitness_statistics(fitness_values,summary=True):
     fitness_statistics_count, fitness_bin_edges,_ = binned_statistic(fitness_values, fitness_values,
                                                                      statistic='count', bins=20)
     if not summary:
+        print("bin nr. and size ,count ,mean")
         fitness_statistics_mean = binned_statistic(fitness_values, fitness_values,  statistic='mean'
         , bins=20)[0]
         for edges,count,mean,i in zip(ut.pairwise(fitness_bin_edges),fitness_statistics_count,
             fitness_statistics_mean,range(len(fitness_statistics_count))):
 
-            edges ="bin nr. "+ str(i) + ": "+format(edges[0], '.5g') + " - "+format(edges[1], '.5g')
-            count = ": count= " + str(count)
-            mean=": mean= "+ format(mean, '.5g')
-            print(edges + count + mean)
-    else:
-        print("total mean= {0:f}: variance= {1:f}".format(np.mean(fitness_values),np.var(fitness_values),'.5g'))
+            edges = str(i) + ": "+format(edges[0], '.5g') + " - "+format(edges[1], '.5g')
+            count =  str(count)
+            mean= format(mean, '.5g')
+            print(edges + ","+ count + ","+ mean)
+
+    print("total mean= {0:f}: variance= {1:f}".format(np.mean(fitness_values),np.var(fitness_values),'.5g'))
 

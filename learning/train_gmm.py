@@ -14,10 +14,111 @@ import model.evaluation as mev
 from model import fitness as fn
 import util.data_format as dtfr
 
+from util import visualisation
+
+def training_model_1():
+    fitness_funcs=[fn.Targetting_Fitness("Minimum distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,32,0,1,target=2),fn.Fitness("polygon overlap",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,4,0,1)]
+    #hierarchy,var_rot,var_nr_children)
+    model=tm.model_var_pos(True,False,True)
+    sibling_var_names=["position"]
+
+    parent_var_names=["shape0"]
+
+    sibling_order_sequence=[0,1,2,3,4,4,4]
+    gmm_full=[False,False,True,False]
+    #the first child is always derived
+    gmm_full[0]=False
+    #the largest sibling order always has to be calculated
+
+    gmm_full.append(True)
+
+    training(model=model,fitness_funcs=fitness_funcs,
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names,
+             sibling_order_sequence=sibling_order_sequence,gmm_full=gmm_full,
+             n_data=100,n_iter=1,n_trial=3)
+
+def training_model_2(hierarchy=True,var_pos=True,var_nr_children=True):
+    fitness_funcs=[fn.Fitness("side alignment",fn.closest_side_alignment_pc,fn.Fitness_Relation.pairwise_parent_child,1,0,1)]
+    #hierarchy,var_rot,var_nr_children)
+    model=tm.model_var_rot(hierarchy,var_pos,var_nr_children)
+    if var_pos:
+        sibling_var_names=["rotation","position"]
+    else:
+        sibling_var_names=["rotation"]
+    if hierarchy:
+        parent_var_names=["shape0","shape3","shape6","shape9"]
+    else:
+        parent_var_names=[]
+    sibling_order_sequence=[0,1,2,3,4,4,4]
+    gmm_full=[False,False,False,False]
+    #the first child is always derived
+    gmm_full[0]=False
+    #the largest sibling order always has to be calculated
+
+    gmm_full.append(True)
+
+    training(model=model,fitness_funcs=fitness_funcs,
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names,
+             sibling_order_sequence=sibling_order_sequence,gmm_full=gmm_full,
+             n_data=500,n_iter=3,n_trial=5)
+
+def training_model_3(hierarchy=True,var_pos=True,var_nr_children=True):
+    fitness_funcs=[
+                   fn.Fitness("surface ration",fn.centroid_dist_absolute,fn.Fitness_Relation.absolute,1,0,1)]
+    #hierarchy,var_rot,var_nr_children)
+    model=tm.model_var_size(hierarchy,var_pos,var_nr_children)
+    if var_pos:
+        sibling_var_names=["size","position"]
+    else:
+        sibling_var_names=["size"]
+    if hierarchy:
+        parent_var_names=["shape2","shape4"]
+    else:
+        parent_var_names=[]
+    sibling_order_sequence=[0,1,2,3,4,4,4]
+    gmm_full=[False,True,True,True]
+    #the first child is always derived
+    gmm_full[0]=False
+    #the largest sibling order always has to be calculated
+
+    gmm_full.append(True)
+
+    training(model=model,fitness_funcs=fitness_funcs,
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names,
+             sibling_order_sequence=sibling_order_sequence,gmm_full=gmm_full,
+             n_data=500,n_iter=3,n_trial=5)
+def training_model_4(hierarchy=True,var_pos=True,var_nr_children=True):
+    fitness_funcs=[
+                   fn.Targetting_Fitness("surface ration",fn.combinatory_surface_ratio_absolute,fn.Fitness_Relation.absolute,8,0,1,target=0.8)]
+    #hierarchy,var_rot,var_nr_children)
+    model=tm.model_var_size(hierarchy,var_pos,var_nr_children)
+    if var_pos:
+        sibling_var_names=["size","position"]
+    else:
+        sibling_var_names=["size"]
+    if hierarchy:
+        parent_var_names=["shape2","shape4"]
+    else:
+        parent_var_names=[]
+    sibling_order_sequence=[0,1,2,3,4,4,4]
+    gmm_full=[False,True,False,True]
+    #the first child is always derived
+    gmm_full[0]=False
+    #the largest sibling order always has to be calculated
+
+    gmm_full.append(True)
+
+    training(model=model,fitness_funcs=fitness_funcs,
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names,
+             sibling_order_sequence=sibling_order_sequence,gmm_full=gmm_full,
+             n_data=500,n_iter=3,n_trial=5)
 
 
-def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regression=False,verbose=True):
-
+def training(model,fitness_funcs,sibling_var_names,parent_var_names,
+             sibling_order_sequence,gmm_full,
+             n_data=500,n_iter=1,n_trial=1,n_components=30,
+             infinite=False,regression=False):
+    verbose=True
 
     #experiment hyperparameters:
 
@@ -27,9 +128,8 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #this sequence indicates the order of the markov chain between siblings [1,2]-> second child depends on the first
     #the third on the first and second
     #the first child is always independent
-    sibling_order_sequence=[0,1,2,3,4,4,4]
 
-    sibling_data=dg.SiblingData.window
+    sibling_data=dg.SiblingData.first
     fitness_dim=(dtfr.FitnessInstanceDim.seperate,dtfr.FitnessFuncDim.seperate)
 
     #the sibling order defines the size of the joint distribution that will be trained
@@ -41,24 +141,15 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #True->train full joint
     #False->derive (marginalise) from closest higher order
 
-    gmm_full=[False,True,False,False]
-
-    #the first child is always derived
-    gmm_full[0]=False
-    #the largest sibling order always has to be calculated
-
-    gmm_full.append(True)
 
 
     child_name="child"
     #model to train on
-    parent_node,parent_def=tm.model_var_pos(True,True,True)
+    parent_node,parent_def=model
     child_nodes=parent_node.children[child_name]
 
     #training variables and fitness functions
     #this expliicitly also defines the format of the data
-    sibling_var_names=["position","rotation"]
-    parent_var_names=["shape0"]
 
     n_model_eval_data=200
 
@@ -74,7 +165,6 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #this expliicitly also defines the format of the data
     #fitness func, order cap and regression target
     #fitness_funcs=[fn.Targetting_Fitness("Minimum distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,1,0,1,target=1),fn.Fitness("polygon overlap",fn.negative_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,1,0,1)]
-    fitness_funcs=[fn.Targetting_Fitness("Minimum distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,1,0,1,target=3)]
     #only the func order and cap is used for training
 
     model_evaluation = mev.ModelEvaluation(n_model_eval_data,parent_def,parent_node,parent_var_names,
@@ -88,6 +178,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #check sibling sequence
     wrong_sequence = any(sibling_order_sequence[i]>i for i in range(len(sibling_order_sequence)))
     if wrong_sequence:
+        print(sibling_order_sequence)
         raise ValueError("Some orders of the sibling order sequence exceed the number of previous siblings.")
     max_children=parent_def.variable_range(child_name)[1]
     if len(sibling_order_sequence) != max_children:
@@ -98,6 +189,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
     #do n_iter number of retrainings using previously best model
     #before iterating set the variable that will control whether a new model is an improvement
     iteration_gmm_score=score
+    print_eval=True
     for iteration in range(n_iter):
 
         #find out the performance of the current model
@@ -108,8 +200,9 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
                                 fitness_funcs,
                                 sibling_data=sibling_data)
 
-        if verbose:
-            model_evaluation.print_evaluation(fitness_values,iteration)
+        if verbose and print_eval:
+            print_eval=False
+            model_evaluation.print_evaluation(fitness_values,iteration,summary=False)
 
         if model_evaluation.converged(fitness_values):
             return
@@ -186,6 +279,7 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
             #evaluate new model
 
             score=model_evaluation.evaluate()
+
             gmm_vars_retry_eval.append((gmm_vars,score))
             print("iteration: ", iteration," score: ",score)
             #put original vars back
@@ -207,16 +301,20 @@ def training(n_data=100,n_iter=1,n_trial=1,n_components=20,infinite=False,regres
         else:
             print("The model did not improve over consecutive training iteration.")
             break
-        #            #visualise new model
-#
-#            for gmm_var in gmm_vars:
-#                gmm_var.visualise_sampling(["position"])
-#            #sample once
-#            _,max_children=parent_def.variable_range(child_name)
-#            parent_node.freeze_n_children(child_name,max_children)
-#            parent_node.sample(1)
-#            for gmm_var in gmm_vars:
-#                gmm_var.visualise_sampling(None)
+    if verbose:
+        print("final evaluation of fitness" )
+        data,fitness_values=dg.training_data_generation(n_data,parent_def,
+                                parent_node,parent_var_names,
+                                child_name,sibling_var_names,n_children,
+                                fitness_funcs,
+                                sibling_data=sibling_data)
+        model_evaluation.print_evaluation(fitness_values,-1,summary=False)
+    #TODO add visualisation of the variables of each gmm var
+        #used for playing with parameters
+    visual=False
+    if visual:
+        for gmmvar in max_gmm_vars:
+            visualisation.draw_1D_2D_GMM_variable_sampling(gmmvar,visualisation.get_new_ax())
 
 
 
