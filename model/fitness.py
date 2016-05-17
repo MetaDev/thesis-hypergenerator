@@ -31,6 +31,8 @@ class Fitness:
             return self.func(parent,siblings)
         else:
             return self.func(parent,child,siblings)
+    def __str__(self):
+        return "\n".join(key + ": " + str(value) for key, value in vars(self).items())
 
 #if the fitness has an extra option that acts as target
 class Targetting_Fitness(Fitness):
@@ -44,6 +46,8 @@ class Targetting_Fitness(Fitness):
             return self.func(parent,siblings,self.target)
         else:
             return self.func(parent,child,siblings,self.target)
+    def __str__(self):
+        return Fitness.__str__(self)
 
 
 #calculate fitness of a given parent-children model

@@ -174,7 +174,6 @@ class GMMVariable(StochasticVariable):
         #keep track of how sanpling quality, 0 is worst
         self.sample_quality=1
 
-        self.visualise_variable_names=None
 
     #when sampling, sample from a the distribution completely conditioned on the parent independent variable values
     #values on which is trained of course
@@ -187,8 +186,7 @@ class GMMVariable(StochasticVariable):
                                                              self.sibling_order)
         gmm_cond=self.gmm.condition(indices,values)
 
-        if self.visualise_variable_names:
-            vis.draw_1D_2D_GMM_variable_sampling(self,gmm_cond,parent_sample,sibling_samples)
+
 
         #rejection sampling to stay within range
         for i in range(GMMVariable.max_tries):
@@ -215,10 +213,11 @@ class GMMVariable(StochasticVariable):
         for var in self.sibling_vars:
             if var.name is var_name:
                 var.freeze(value)
+    def get_dim(self):
+        return len(self.gmm.means_[0])
 
 
-    def visualise_sampling(self, variable_names):
-        self.visualise_variable_names=variable_names
+
 
 class VarDefNode:
     class SampleNode:
@@ -422,7 +421,6 @@ class LayoutTreeDefNode(TreeDefNode):
 
     def visualise(root_layout_sample,color_list,child_samples=None,ax=None):
         import model.mapping as mp
-        import util.visualisation as vis
         if child_samples is None:
             samples=root_layout_sample.get_flat_list()
         else:
@@ -432,8 +430,12 @@ class LayoutTreeDefNode(TreeDefNode):
         for sample in samples:
             polygon_dict[sample.name].append(mp.map_layoutsample_to_geometricobject(sample,"shape"))
         for name,color in color_list:
+            print()
             vis.draw_polygons(polygons=polygon_dict[name],ax=ax,color=color)
-        vis.set_poygon_range(list(ut.flatten(polygon_dict.values())))
+        xrange,yrange=ut.range_from_polygons(list(ut.flatten(polygon_dict.values())))
+        ax=vis.get_ax(ax)
+        ax.set_xlim(*xrange)
+        ax.set_ylim(*yrange)
 
 
 

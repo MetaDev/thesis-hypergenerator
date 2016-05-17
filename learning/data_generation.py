@@ -31,7 +31,7 @@ def training_data_generation(n_data,parent_def,
                                 parent_node,parent_var_names,
                                 child_name,sibling_var_names,n_children,
                                 fitness_funcs,
-                                sibling_data):
+                                sibling_data,poisson):
     #generate sample data
 
     sample_fraction=1
@@ -50,7 +50,7 @@ def training_data_generation(n_data,parent_def,
     parent_node.freeze_n_children(child_name,n_sample_children)
     #the sample fraction is necessary because the number to generate samples is used to generate in poisson disk sampling
     #to generate diversified samples
-    parent_samples=parent_node.sample(math.ceil(n_data/sample_fraction),expressive=True)
+    parent_samples=parent_node.sample(math.ceil(n_data/sample_fraction),expressive=poisson)
     #generate data with n_siblings
     data=[]
     fitness=[]

@@ -14,111 +14,139 @@ import model.evaluation as mev
 from model import fitness as fn
 import util.data_format as dtfr
 
-from util import visualisation
+from util import visualisation as vis
+class print_params:
+    verbose_trial=False
+    verbose_iter=True
+    verbose_final_extra=True
+    visual=True
+    print_parameters_set=True
+    print_fitness_bins=False
+class training_params:
+    sibling_order_sequence=[0,1,2,3,4,4,4]
+    gmm_full=[False,False,True,False,True]
 
-def training_model_1():
-    fitness_funcs=[fn.Targetting_Fitness("Minimum distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,32,0,1,target=2),fn.Fitness("polygon overlap",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,4,0,1)]
+    sibling_data=dg.SiblingData.first
+    fitness_dim=(dtfr.FitnessInstanceDim.seperate,dtfr.FitnessFuncDim.seperate)
+    n_data=500
+    poisson=False
+
+    n_iter=1
+    n_trial=3
+    n_model_eval_data=500
+
+    n_components=30
+    min_covar=0.02
+
+    regression=False
+
+
+def fitness_order_MO_test():
+    print("test for fitness order")
+    print_params.verbose_iter=True
+    print_params.verbose_final_extra=True
+
+    for fo0 in range(4,32,2):
+        for fo1 in range(4,32,2):
+            print("fitness orders ",fo0,fo1)
+            fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,fo0,0,1,target=2),fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,fo1,0,1)]
+            #hierarchy,var_rot,var_nr_children)
+            model=tm.model_var_pos(True,False,True)
+            sibling_var_names=["position"]
+
+            parent_var_names=["shape0"]
+
+
+
+            training(model=model,fitness_funcs=fitness_funcs,
+                 sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
+
+def training_model_0(var_rot=False):
+    fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,0,1,target=2)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_pos(True,False,True)
+    model=tm.model_var_pos(True,var_rot,True)
     sibling_var_names=["position"]
 
     parent_var_names=["shape0"]
 
-    sibling_order_sequence=[0,1,2,3,4,4,4]
-    gmm_full=[False,False,True,False]
-    #the first child is always derived
-    gmm_full[0]=False
-    #the largest sibling order always has to be calculated
-
-    gmm_full.append(True)
 
     training(model=model,fitness_funcs=fitness_funcs,
-             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names,
-             sibling_order_sequence=sibling_order_sequence,gmm_full=gmm_full,
-             n_data=100,n_iter=1,n_trial=3)
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
-def training_model_2(hierarchy=True,var_pos=True,var_nr_children=True):
+def training_model_1(var_rot=False):
+    fitness_funcs=[fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,32,0,1)]
+    #hierarchy,var_rot,var_nr_children)
+    model=tm.model_var_pos(True,var_rot,True)
+    sibling_var_names=["position"]
+
+    parent_var_names=["shape0"]
+
+
+    training(model=model,fitness_funcs=fitness_funcs,
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
+
+def training_model_2(var_pos=True):
     fitness_funcs=[fn.Fitness("side alignment",fn.closest_side_alignment_pc,fn.Fitness_Relation.pairwise_parent_child,1,0,1)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_rot(hierarchy,var_pos,var_nr_children)
+    model=tm.model_var_rot(True,var_pos,True)
     if var_pos:
         sibling_var_names=["rotation","position"]
     else:
         sibling_var_names=["rotation"]
-    if hierarchy:
-        parent_var_names=["shape0","shape3","shape6","shape9"]
-    else:
-        parent_var_names=[]
-    sibling_order_sequence=[0,1,2,3,4,4,4]
-    gmm_full=[False,False,False,False]
-    #the first child is always derived
-    gmm_full[0]=False
-    #the largest sibling order always has to be calculated
+    parent_var_names=["shape0","shape3","shape6","shape9"]
 
-    gmm_full.append(True)
 
     training(model=model,fitness_funcs=fitness_funcs,
-             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names,
-             sibling_order_sequence=sibling_order_sequence,gmm_full=gmm_full,
-             n_data=500,n_iter=3,n_trial=5)
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
-def training_model_3(hierarchy=True,var_pos=True,var_nr_children=True):
+def training_model_3(var_pos=True):
     fitness_funcs=[
-                   fn.Fitness("surface ration",fn.centroid_dist_absolute,fn.Fitness_Relation.absolute,1,0,1)]
+                   fn.Fitness("centroid difference",fn.centroid_dist_absolute,fn.Fitness_Relation.absolute,1,0,1)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_size(hierarchy,var_pos,var_nr_children)
+    model=tm.model_var_size(True,var_pos,True)
     if var_pos:
         sibling_var_names=["size","position"]
     else:
         sibling_var_names=["size"]
-    if hierarchy:
-        parent_var_names=["shape2","shape4"]
-    else:
-        parent_var_names=[]
-    sibling_order_sequence=[0,1,2,3,4,4,4]
-    gmm_full=[False,True,True,True]
-    #the first child is always derived
-    gmm_full[0]=False
-    #the largest sibling order always has to be calculated
+    parent_var_names=["shape2","shape4"]
 
-    gmm_full.append(True)
+
 
     training(model=model,fitness_funcs=fitness_funcs,
-             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names,
-             sibling_order_sequence=sibling_order_sequence,gmm_full=gmm_full,
-             n_data=500,n_iter=3,n_trial=5)
-def training_model_4(hierarchy=True,var_pos=True,var_nr_children=True):
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
+def training_model_4(var_pos=True):
     fitness_funcs=[
                    fn.Targetting_Fitness("surface ration",fn.combinatory_surface_ratio_absolute,fn.Fitness_Relation.absolute,8,0,1,target=0.8)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_size(hierarchy,var_pos,var_nr_children)
+    model=tm.model_var_size(True,var_pos,True)
     if var_pos:
         sibling_var_names=["size","position"]
     else:
         sibling_var_names=["size"]
-    if hierarchy:
-        parent_var_names=["shape2","shape4"]
-    else:
-        parent_var_names=[]
-    sibling_order_sequence=[0,1,2,3,4,4,4]
-    gmm_full=[False,True,False,True]
-    #the first child is always derived
-    gmm_full[0]=False
-    #the largest sibling order always has to be calculated
-
-    gmm_full.append(True)
+    parent_var_names=["shape2","shape4"]
 
     training(model=model,fitness_funcs=fitness_funcs,
-             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names,
-             sibling_order_sequence=sibling_order_sequence,gmm_full=gmm_full,
-             n_data=500,n_iter=3,n_trial=5)
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
 
-def training(model,fitness_funcs,sibling_var_names,parent_var_names,
-             sibling_order_sequence,gmm_full,
-             n_data=500,n_iter=1,n_trial=1,n_components=30,
-             infinite=False,regression=False):
-    verbose=True
+def training(model,fitness_funcs,sibling_var_names,parent_var_names):
+
+    sibling_order_sequence=training_params.sibling_order_sequence
+    gmm_full=training_params.gmm_full
+
+    sibling_data=training_params.sibling_data
+    fitness_dim=training_params.sibling_data
+    n_data=training_params.n_data
+    poisson=training_params.poisson
+
+    n_iter=training_params.n_iter
+    n_trial=training_params.n_trial
+    n_model_eval_data=training_params.n_model_eval_data
+
+    n_components=training_params.n_components
+    min_covar=training_params.min_covar
+
+    regression=training_params.regression
 
     #experiment hyperparameters:
 
@@ -151,7 +179,7 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
     #training variables and fitness functions
     #this expliicitly also defines the format of the data
 
-    n_model_eval_data=200
+    n_model_eval_data=400
 
     sibling_vars=[parent_def.children[child_name].variables[name] for name in sibling_var_names]
     parent_vars=[parent_def.variables[name] for name in parent_var_names]
@@ -189,7 +217,6 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
     #do n_iter number of retrainings using previously best model
     #before iterating set the variable that will control whether a new model is an improvement
     iteration_gmm_score=score
-    print_eval=True
     for iteration in range(n_iter):
 
         #find out the performance of the current model
@@ -198,11 +225,10 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
                                 parent_node,parent_var_names,
                                 child_name,sibling_var_names,n_children,
                                 fitness_funcs,
-                                sibling_data=sibling_data)
+                                sibling_data=sibling_data,poisson=poisson)
 
-        if verbose and print_eval:
-            print_eval=False
-            model_evaluation.print_evaluation(fitness_values,iteration,summary=False)
+        if print_params.verbose_iter:
+            model_evaluation.print_evaluation(fitness_values,iteration,summary=not print_params.print_fitness_bins)
 
         if model_evaluation.converged(fitness_values):
             return
@@ -221,7 +247,7 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
                                 parent_node,parent_var_names,
                                 child_name,sibling_var_names,child_index+1,
                                 fitness_funcs,
-                               sibling_data)
+                               sibling_data,poisson)
                 gmm = GMM(n_components=n_components,random_state=setting_values.random_state)
                 data,fitness_values=dtfr.filter_fitness_and_data_training(data,fitness_values,
                                                                                   fitness_funcs)
@@ -240,7 +266,7 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
 
 
                     #for regression calculate full joint
-                    gmm.fit(train_data,infinite=infinite,min_covar=0.01)
+                    gmm.fit(train_data,infinite=False,min_covar=min_covar)
 
                     indices,targets = dtfr.format_target_indices_for_regression_conditioning(data,fitness_values,
                                                                                              fitness_funcs,
@@ -259,7 +285,7 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
                     #renormalise
                     fitness_single=dtfr.normalise_fitness(fitness_single)
 
-                    gmm.fit(data,np.array(fitness_single)[:,0],infinite=infinite,min_covar=0.01)
+                    gmm.fit(data,np.array(fitness_single)[:,0],infinite=False,min_covar=min_covar)
                 gmms[child_index]=gmm
 
             #marginalise gmms, starting from the largest
@@ -281,7 +307,9 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
             score=model_evaluation.evaluate()
 
             gmm_vars_retry_eval.append((gmm_vars,score))
-            print("iteration: ", iteration," score: ",score)
+            if print_params.verbose_trial:
+                print()
+                print("iteration: ", iteration," score: ",score)
             #put original vars back
             for i in range(len(child_nodes)):
                 child_nodes[i].delete_learned_variable(gmm_var_name)
@@ -294,6 +322,7 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
         #if it is better as the previous iteration-
         #inject new variable
         #else print that training didn't help
+        print()
         if max_gmm_vars:
             print("improved model selected with score: ",iteration_gmm_score )
             for i in range(len(child_nodes)):
@@ -301,20 +330,51 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names,
         else:
             print("The model did not improve over consecutive training iteration.")
             break
-    if verbose:
+    if print_params.verbose_final_extra:
+        print()
         print("final evaluation of fitness" )
-        data,fitness_values=dg.training_data_generation(n_data,parent_def,
+        data,fitness_values=dg.training_data_generation(n_model_eval_data,parent_def,
                                 parent_node,parent_var_names,
                                 child_name,sibling_var_names,n_children,
                                 fitness_funcs,
-                                sibling_data=sibling_data)
-        model_evaluation.print_evaluation(fitness_values,-1,summary=False)
-    #TODO add visualisation of the variables of each gmm var
-        #used for playing with parameters
-    visual=False
-    if visual:
-        for gmmvar in max_gmm_vars:
-            visualisation.draw_1D_2D_GMM_variable_sampling(gmmvar,visualisation.get_new_ax())
+                                sibling_data=sibling_data,poisson=False)
+        model_evaluation.print_evaluation(fitness_values,-1,summary=not print_params.print_fitness_bins)
+    if print_params.visual:
+        for gmm_var in max_gmm_vars:
+           vis.draw_1D_2D_GMM_variable_sampling(gmm_var)
+    if print_params.print_parameters_set:
+        print("parameter configuration")
+        print()
+
+        print("fitness parameters,")
+        for fitn in fitness_funcs:
+            print(str(fitn))
+            print(",")
+        print()
+
+        print("model parameters")
+        print("parent variables,",str(parent_var_names))
+
+        print("sibling variables,", str(sibling_var_names))
+
+        print()
+
+        print("model hierarchy parameters")
+        print("sibling order list,", training_params.sibling_order_sequence)
+        print("non marginalisation list,",gmm_full)
+
+        print("data generation parameters")
+        print("sibling data,",sibling_data)
+        print("fitness dimension,",fitness_dim)
+        print("poisson sampling,", poisson)
+        print()
+
+        print("retraining")
+        print("number of trials,", n_trial)
+        print("number of iterations,", n_iter)
+        print("number of samples for evaluations,", n_model_eval_data)
+        print()
+
 
 
 
