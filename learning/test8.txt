@@ -1,4 +1,4 @@
-test for gmm full, marginalisation, 
+test for gmm full training, marginalisation, 
 gmm full:  [False, True, True, True, True]
 model 0
 score before training:  0.615533307873
@@ -9,13 +9,13 @@ total mean= 0.608456: variance= 0.018718
 
 improved selected with score:  0.717790946124
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_siblings
 threshhold: 0
-name: Target distances
 order: 4
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_siblings
-func: <function min_dist_sb at 0x11aa0d1e0>
+name: Target distances
 target: 2
+func: <function min_dist_sb at 0x11aa0d378>
 ,
 
 model parameters
@@ -31,12 +31,12 @@ total mean= 0.400590: variance= 0.046117
 
 improved selected with score:  0.767915515185
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_parent_child
 threshhold: 0
-name: polygon overlay
 order: 32
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function norm_overlap_pc at 0x11aa02e18>
+name: polygon overlay
+func: <function norm_overlap_pc at 0x11aa0d048>
 ,
 
 model parameters
@@ -44,20 +44,20 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 model 2
-score before training:  0.632731320078
+score before training:  0.64575819618
 fitness before training iteration  0
 seperate fitness
 side alignment
-total mean= 0.635254: variance= 0.020939
+total mean= 0.629641: variance= 0.018106
 
-improved selected with score:  0.727600761207
+improved selected with score:  0.731114987049
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_parent_child
 threshhold: 0
-name: side alignment
 order: 1
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function closest_side_alignment_pc at 0x11aa0d510>
+name: side alignment
+func: <function closest_side_alignment_pc at 0x11aa0d6a8>
 ,
 
 model parameters
@@ -65,20 +65,20 @@ parent variables, ['shape0', 'shape3', 'shape6', 'shape9']
 sibling variables, ['rotation', 'position']
 
 model 3
-score before training:  -0.5146336641
+score before training:  -0.498134508044
 fitness before training iteration  0
 seperate fitness
 centroid difference
-total mean= -0.482151: variance= 0.060950
+total mean= -0.485400: variance= 0.056812
 
-improved selected with score:  -0.339380933112
+improved selected with score:  -0.337940670175
 fitness parameters,
+fitness_relation: Fitness_Relation.absolute
 threshhold: 0
-name: centroid difference
 order: 1
 regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function centroid_dist_absolute at 0x11aa0d378>
+name: centroid difference
+func: <function centroid_dist_absolute at 0x11aa0d510>
 ,
 
 model parameters
@@ -86,47 +86,47 @@ parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
 model 4
-score before training:  -0.641619427711
+score before training:  -0.640608644313
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.642698: variance= 0.002329
+total mean= -0.639109: variance= 0.002290
 
-improved selected with score:  -0.622736894761
+improved selected with score:  -0.625820521682
 fitness parameters,
+fitness_relation: Fitness_Relation.absolute
 threshhold: 0
-name: surface ration
 order: 8
 regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function combinatory_surface_ratio_absolute at 0x11aa0d0d0>
+name: surface ration
 target: 0.8
+func: <function combinatory_surface_ratio_absolute at 0x11aa0d268>
 ,
 
 model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-model average computation time 139.506270974
-model average score gain 0.148410465163
+model average computation time 151.140772618
+model average score gain 0.142677274424
 
 gmm full:  [False, True, True, False, True]
 model 0
-score before training:  0.621422712277
+score before training:  0.611047424243
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.613213: variance= 0.018767
+total mean= 0.607767: variance= 0.018967
 
-improved selected with score:  0.707175722834
+improved selected with score:  0.702623889346
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_siblings
 threshhold: 0
-name: Target distances
 order: 4
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_siblings
-func: <function min_dist_sb at 0x11aa0d1e0>
+name: Target distances
 target: 2
+func: <function min_dist_sb at 0x11aa0d378>
 ,
 
 model parameters
@@ -134,20 +134,20 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 model 1
-score before training:  0.431061783296
+score before training:  0.42891017934
 fitness before training iteration  0
 seperate fitness
 polygon overlay
-total mean= 0.427276: variance= 0.047518
+total mean= 0.432120: variance= 0.048824
 
-improved selected with score:  0.869349376184
+improved selected with score:  0.903182545078
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_parent_child
 threshhold: 0
-name: polygon overlay
 order: 32
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function norm_overlap_pc at 0x11aa02e18>
+name: polygon overlay
+func: <function norm_overlap_pc at 0x11aa0d048>
 ,
 
 model parameters
@@ -155,20 +155,20 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 model 2
-score before training:  0.640305037997
+score before training:  0.641031564247
 fitness before training iteration  0
 seperate fitness
 side alignment
-total mean= 0.637556: variance= 0.018260
+total mean= 0.632543: variance= 0.018983
 
-improved selected with score:  0.723093000023
+improved selected with score:  0.722994254969
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_parent_child
 threshhold: 0
-name: side alignment
 order: 1
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function closest_side_alignment_pc at 0x11aa0d510>
+name: side alignment
+func: <function closest_side_alignment_pc at 0x11aa0d6a8>
 ,
 
 model parameters
@@ -176,20 +176,20 @@ parent variables, ['shape0', 'shape3', 'shape6', 'shape9']
 sibling variables, ['rotation', 'position']
 
 model 3
-score before training:  -0.490781927233
+score before training:  -0.494862629013
 fitness before training iteration  0
 seperate fitness
 centroid difference
-total mean= -0.495447: variance= 0.068759
+total mean= -0.513904: variance= 0.071513
 
-improved selected with score:  -0.322055652578
+improved selected with score:  -0.312826375858
 fitness parameters,
+fitness_relation: Fitness_Relation.absolute
 threshhold: 0
-name: centroid difference
 order: 1
 regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function centroid_dist_absolute at 0x11aa0d378>
+name: centroid difference
+func: <function centroid_dist_absolute at 0x11aa0d510>
 ,
 
 model parameters
@@ -197,47 +197,47 @@ parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
 model 4
-score before training:  -0.640279441878
+score before training:  -0.640040439027
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.638988: variance= 0.002164
+total mean= -0.643470: variance= 0.001924
 
-improved selected with score:  -0.627780436023
+improved selected with score:  -0.633792867527
 fitness parameters,
+fitness_relation: Fitness_Relation.absolute
 threshhold: 0
-name: surface ration
 order: 8
 regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function combinatory_surface_ratio_absolute at 0x11aa0d0d0>
+name: surface ration
 target: 0.8
+func: <function combinatory_surface_ratio_absolute at 0x11aa0d268>
 ,
 
 model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-model average computation time 126.730090602
-model average score gain 0.157610769196
+model average computation time 140.000985576
+model average score gain 0.167219069244
 
 gmm full:  [False, True, False, True, True]
 model 0
-score before training:  0.605413454733
+score before training:  0.62587214627
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.613033: variance= 0.018787
+total mean= 0.607454: variance= 0.021131
 
-improved selected with score:  0.753142887288
+improved selected with score:  0.744647862073
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_siblings
 threshhold: 0
-name: Target distances
 order: 4
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_siblings
-func: <function min_dist_sb at 0x11aa0d1e0>
+name: Target distances
 target: 2
+func: <function min_dist_sb at 0x11aa0d378>
 ,
 
 model parameters
@@ -245,20 +245,20 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 model 1
-score before training:  0.411719768458
+score before training:  0.42537308653
 fitness before training iteration  0
 seperate fitness
 polygon overlay
-total mean= 0.409314: variance= 0.042400
+total mean= 0.437024: variance= 0.046924
 
-improved selected with score:  0.794498855886
+improved selected with score:  0.694283557882
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_parent_child
 threshhold: 0
-name: polygon overlay
 order: 32
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function norm_overlap_pc at 0x11aa02e18>
+name: polygon overlay
+func: <function norm_overlap_pc at 0x11aa0d048>
 ,
 
 model parameters
@@ -266,20 +266,20 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 model 2
-score before training:  0.629397155625
+score before training:  0.631556892693
 fitness before training iteration  0
 seperate fitness
 side alignment
-total mean= 0.635057: variance= 0.019372
+total mean= 0.638505: variance= 0.018159
 
-improved selected with score:  0.693081383765
+improved selected with score:  0.757871109893
 fitness parameters,
+fitness_relation: Fitness_Relation.pairwise_parent_child
 threshhold: 0
-name: side alignment
 order: 1
 regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function closest_side_alignment_pc at 0x11aa0d510>
+name: side alignment
+func: <function closest_side_alignment_pc at 0x11aa0d6a8>
 ,
 
 model parameters
@@ -287,20 +287,20 @@ parent variables, ['shape0', 'shape3', 'shape6', 'shape9']
 sibling variables, ['rotation', 'position']
 
 model 3
-score before training:  -0.500511330187
+score before training:  -0.495716711484
 fitness before training iteration  0
 seperate fitness
 centroid difference
-total mean= -0.498960: variance= 0.068636
+total mean= -0.494045: variance= 0.063359
 
-improved selected with score:  -0.285505412029
+improved selected with score:  -0.340022592225
 fitness parameters,
+fitness_relation: Fitness_Relation.absolute
 threshhold: 0
-name: centroid difference
 order: 1
 regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function centroid_dist_absolute at 0x11aa0d378>
+name: centroid difference
+func: <function centroid_dist_absolute at 0x11aa0d510>
 ,
 
 model parameters
@@ -308,600 +308,36 @@ parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
 model 4
-score before training:  -0.640484653985
+score before training:  -0.643011329424
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.639029: variance= 0.002379
+total mean= -0.636264: variance= 0.002266
 
-improved selected with score:  -0.63561393211
+improved selected with score:  -0.634242092297
 fitness parameters,
+fitness_relation: Fitness_Relation.absolute
 threshhold: 0
-name: surface ration
 order: 8
 regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function combinatory_surface_ratio_absolute at 0x11aa0d0d0>
+name: surface ration
 target: 0.8
+func: <function combinatory_surface_ratio_absolute at 0x11aa0d268>
 ,
 
 model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-model average computation time 129.568153184
-model average score gain 0.162813877631
+model average computation time 135.796829323
+model average score gain 0.135692752148
 
 gmm full:  [False, True, False, False, True]
 model 0
-score before training:  0.614111419957
+score before training:  0.635797885729
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.618019: variance= 0.019372
+total mean= 0.605034: variance= 0.021092
 
-improved selected with score:  0.626248324953
-fitness parameters,
-threshhold: 0
-name: Target distances
-order: 4
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_siblings
-func: <function min_dist_sb at 0x11aa0d1e0>
-target: 2
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 1
-score before training:  0.416291824771
-fitness before training iteration  0
-seperate fitness
-polygon overlay
-total mean= 0.422189: variance= 0.044797
-
-improved selected with score:  0.676880520398
-fitness parameters,
-threshhold: 0
-name: polygon overlay
-order: 32
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function norm_overlap_pc at 0x11aa02e18>
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 2
-score before training:  0.631925773479
-fitness before training iteration  0
-seperate fitness
-side alignment
-total mean= 0.629766: variance= 0.017328
-
-improved selected with score:  0.745600180785
-fitness parameters,
-threshhold: 0
-name: side alignment
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function closest_side_alignment_pc at 0x11aa0d510>
-,
-
-model parameters
-parent variables, ['shape0', 'shape3', 'shape6', 'shape9']
-sibling variables, ['rotation', 'position']
-
-model 3
-score before training:  -0.505368327895
-fitness before training iteration  0
-seperate fitness
-centroid difference
-total mean= -0.486699: variance= 0.067012
-
-improved selected with score:  -0.309257172487
-fitness parameters,
-threshhold: 0
-name: centroid difference
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function centroid_dist_absolute at 0x11aa0d378>
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model 4
-score before training:  -0.640839157625
-fitness before training iteration  0
-seperate fitness
-surface ration
-total mean= -0.639494: variance= 0.002073
-
-The did not improve over consecutive training iteration.
-fitness parameters,
-threshhold: 0
-name: surface ration
-order: 8
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function combinatory_surface_ratio_absolute at 0x11aa0d0d0>
-target: 0.8
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model average computation time 116.464658778
-model average score gain 0.116502232668
-
-gmm full:  [False, False, True, True, True]
-model 0
-score before training:  0.600356392956
-fitness before training iteration  0
-seperate fitness
-Target distances
-total mean= 0.604018: variance= 0.018182
-
-improved selected with score:  0.753036206329
-fitness parameters,
-threshhold: 0
-name: Target distances
-order: 4
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_siblings
-func: <function min_dist_sb at 0x11aa0d1e0>
-target: 2
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 1
-score before training:  0.438230651491
-fitness before training iteration  0
-seperate fitness
-polygon overlay
-total mean= 0.411824: variance= 0.045562
-
-improved selected with score:  0.743273703285
-fitness parameters,
-threshhold: 0
-name: polygon overlay
-order: 32
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function norm_overlap_pc at 0x11aa02e18>
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 2
-score before training:  0.630277198926
-fitness before training iteration  0
-seperate fitness
-side alignment
-total mean= 0.635394: variance= 0.019884
-
-improved selected with score:  0.824746298499
-fitness parameters,
-threshhold: 0
-name: side alignment
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function closest_side_alignment_pc at 0x11aa0d510>
-,
-
-model parameters
-parent variables, ['shape0', 'shape3', 'shape6', 'shape9']
-sibling variables, ['rotation', 'position']
-
-model 3
-score before training:  -0.501100356507
-fitness before training iteration  0
-seperate fitness
-centroid difference
-total mean= -0.498514: variance= 0.067397
-
-improved selected with score:  -0.343099667929
-fitness parameters,
-threshhold: 0
-name: centroid difference
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function centroid_dist_absolute at 0x11aa0d378>
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model 4
-score before training:  -0.641877895285
-fitness before training iteration  0
-seperate fitness
-surface ration
-total mean= -0.637325: variance= 0.002446
-
-improved selected with score:  -0.63505307429
-fitness parameters,
-threshhold: 0
-name: surface ration
-order: 8
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function combinatory_surface_ratio_absolute at 0x11aa0d0d0>
-target: 0.8
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model average computation time 131.256277389
-model average score gain 0.163403494863
-
-gmm full:  [False, False, True, False, True]
-model 0
-score before training:  0.607210056971
-fitness before training iteration  0
-seperate fitness
-Target distances
-total mean= 0.616175: variance= 0.019409
-
-improved selected with score:  0.737609379802
-fitness parameters,
-threshhold: 0
-name: Target distances
-order: 4
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_siblings
-func: <function min_dist_sb at 0x11aa0d1e0>
-target: 2
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 1
-score before training:  0.427885850594
-fitness before training iteration  0
-seperate fitness
-polygon overlay
-total mean= 0.402836: variance= 0.045817
-
-improved selected with score:  0.7795368818
-fitness parameters,
-threshhold: 0
-name: polygon overlay
-order: 32
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function norm_overlap_pc at 0x11aa02e18>
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 2
-score before training:  0.62981869087
-fitness before training iteration  0
-seperate fitness
-side alignment
-total mean= 0.615891: variance= 0.019045
-
-improved selected with score:  0.722317349344
-fitness parameters,
-threshhold: 0
-name: side alignment
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function closest_side_alignment_pc at 0x11aa0d510>
-,
-
-model parameters
-parent variables, ['shape0', 'shape3', 'shape6', 'shape9']
-sibling variables, ['rotation', 'position']
-
-model 3
-score before training:  -0.500354511901
-fitness before training iteration  0
-seperate fitness
-centroid difference
-total mean= -0.486120: variance= 0.059498
-
-improved selected with score:  -0.384242939169
-fitness parameters,
-threshhold: 0
-name: centroid difference
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function centroid_dist_absolute at 0x11aa0d378>
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model 4
-score before training:  -0.645279320408
-fitness before training iteration  0
-seperate fitness
-surface ration
-total mean= -0.640066: variance= 0.002214
-
-improved selected with score:  -0.64147823264
-fitness parameters,
-threshhold: 0
-name: surface ration
-order: 8
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function combinatory_surface_ratio_absolute at 0x11aa0d0d0>
-target: 0.8
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model average computation time 119.383447818
-model average score gain 0.138892334602
-
-gmm full:  [False, False, False, True, True]
-model 0
-score before training:  0.614299690884
-fitness before training iteration  0
-seperate fitness
-Target distances
-total mean= 0.613796: variance= 0.017904
-
-improved selected with score:  0.841912362038
-fitness parameters,
-threshhold: 0
-name: Target distances
-order: 4
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_siblings
-func: <function min_dist_sb at 0x11aa0d1e0>
-target: 2
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 1
-score before training:  0.406945628408
-fitness before training iteration  0
-seperate fitness
-polygon overlay
-total mean= 0.408142: variance= 0.041051
-
-improved selected with score:  0.484625126238
-fitness parameters,
-threshhold: 0
-name: polygon overlay
-order: 32
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function norm_overlap_pc at 0x11aa02e18>
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 2
-score before training:  0.639033667686
-fitness before training iteration  0
-seperate fitness
-side alignment
-total mean= 0.642345: variance= 0.017891
-
-improved selected with score:  0.746354748536
-fitness parameters,
-threshhold: 0
-name: side alignment
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function closest_side_alignment_pc at 0x11aa0d510>
-,
-
-model parameters
-parent variables, ['shape0', 'shape3', 'shape6', 'shape9']
-sibling variables, ['rotation', 'position']
-
-model 3
-score before training:  -0.497088325968
-fitness before training iteration  0
-seperate fitness
-centroid difference
-total mean= -0.499161: variance= 0.057109
-
-improved selected with score:  -0.357233148374
-fitness parameters,
-threshhold: 0
-name: centroid difference
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function centroid_dist_absolute at 0x11aa0d378>
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model 4
-score before training:  -0.641154816279
-fitness before training iteration  0
-seperate fitness
-surface ration
-total mean= -0.641850: variance= 0.002274
-
-improved selected with score:  -0.63574848507
-fitness parameters,
-threshhold: 0
-name: surface ration
-order: 8
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function combinatory_surface_ratio_absolute at 0x11aa0d0d0>
-target: 0.8
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model average computation time 121.76933739
-model average score gain 0.111574951727
-
-gmm full:  [False, False, False, False, True]
-model 0
-score before training:  0.617787018149
-fitness before training iteration  0
-seperate fitness
-Target distances
-total mean= 0.611833: variance= 0.019714
-
-The did not improve over consecutive training iteration.
-fitness parameters,
-threshhold: 0
-name: Target distances
-order: 4
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_siblings
-func: <function min_dist_sb at 0x11aa0d1e0>
-target: 2
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 1
-score before training:  0.422768692142
-fitness before training iteration  0
-seperate fitness
-polygon overlay
-total mean= 0.426144: variance= 0.044081
-
-improved selected with score:  0.799251171387
-fitness parameters,
-threshhold: 0
-name: polygon overlay
-order: 32
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function norm_overlap_pc at 0x11aa02e18>
-,
-
-model parameters
-parent variables, ['shape0']
-sibling variables, ['position']
-
-model 2
-score before training:  0.622842316785
-fitness before training iteration  0
-seperate fitness
-side alignment
-total mean= 0.641221: variance= 0.017190
-
-improved selected with score:  0.724261589579
-fitness parameters,
-threshhold: 0
-name: side alignment
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.pairwise_parent_child
-func: <function closest_side_alignment_pc at 0x11aa0d510>
-,
-
-model parameters
-parent variables, ['shape0', 'shape3', 'shape6', 'shape9']
-sibling variables, ['rotation', 'position']
-
-model 3
-score before training:  -0.523834993696
-fitness before training iteration  0
-seperate fitness
-centroid difference
-total mean= -0.487033: variance= 0.069172
-
-improved selected with score:  -0.33192390493
-fitness parameters,
-threshhold: 0
-name: centroid difference
-order: 1
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function centroid_dist_absolute at 0x11aa0d378>
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model 4
-score before training:  -0.642159507005
-fitness before training iteration  0
-seperate fitness
-surface ration
-total mean= -0.636388: variance= 0.002172
-
-improved selected with score:  -0.637297839716
-fitness parameters,
-threshhold: 0
-name: surface ration
-order: 8
-regression_target: 1
-fitness_relation: Fitness_Relation.absolute
-func: <function combinatory_surface_ratio_absolute at 0x11aa0d0d0>
-target: 0.8
-,
-
-model parameters
-parent variables, ['shape2', 'shape4']
-sibling variables, ['size', 'position']
-
-model average computation time 109.05567956
-model average score gain 0.134934901619
-
-parameter configuration
-test for gmm full, marginalisation, 
-model hierarchy parameters
-sibling order list, [0, 1, 2, 3, 4, 4, 4]
-non marginalisation list, [False, False, False, False, True]
-data generation parameters
-sibling data, SiblingData.first
-fitness dimension, (<FitnessInstanceDim.seperate: 2>, <FitnessFuncDim.seperate: 2>)
-poisson sampling, False
-
-GMM parameters
-minimum covariance,  0.02
-number of components,  30
-retraining
-number of trials, 3
-number of iterations, 1
-number of samples for evaluations, 200
-
+improved selected with score:  0.690809472781

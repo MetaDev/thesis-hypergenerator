@@ -29,17 +29,18 @@ class training_params:
 
         training_params.sibling_data=dg.SiblingData.first
         training_params.fitness_dim=(dtfr.FitnessInstanceDim.seperate,dtfr.FitnessFuncDim.seperate)
-        training_params.n_data=100
+        training_params.n_data=500
         training_params.poisson=False
 
         training_params.n_iter=1
-        training_params.n_trial=3
+        training_params.n_trial=5
         training_params.n_model_eval_data=500
 
         training_params.n_components=30
         training_params.min_covar=0.02
 
         training_params.regression=False
+        training_params.extra_info=""
 
 
     sibling_order_sequence=[0,1,2,3,4,4,4]
@@ -60,6 +61,7 @@ class training_params:
     regression=False
 
     title="test"
+    extra_info=""
 
 import timeit
 
@@ -78,18 +80,65 @@ def time_score_all_models():
 
 def time_score_training(training_model_function,times,scores):
     try:
+        extra_info = training_params.extra_info
+        training_params.extra_info= extra_info +  " ," + training_model_function.__name__
         start_time = timeit.default_timer()
         score = training_model_function()
         elapsed = timeit.default_timer() - start_time
         scores.append(score)
         times.append(elapsed)
+        #the title is different for each model, revert to old string
+        training_params.extra_info=extra_info
     except KeyboardInterrupt:
         raise
     except:
         print("error")
+def test_model_var():
+    training_params.title="test for model with additional variable "
+    print(training_params.title)
+    print("single stochastic variable")
+    methods=[training_model_0,training_model_1,training_model_2,training_model_3,training_model_4]
+    for i,method in enumerate(methods):
+        training_params.extra_info="single stochastic variable, model " + str(i)
+        scores=[]
+        times=[]
+        try:
+            start_time = timeit.default_timer()
+            score = method(False)
+            elapsed = timeit.default_timer() - start_time
+            scores.append(score)
+            times.append(elapsed)
+        except KeyboardInterrupt:
+            raise
+        except:
+            print("error")
+        print("model average computation time", np.average(times))
+        print("model average score gain", np.average(scores))
+        print()
+    print("double stochastic variable")
+    for i,method in enumerate(methods):
+        training_params.extra_info="double stochastic variable, model " + str(i)
+        scores=[]
+        times=[]
+        try:
+            start_time = timeit.default_timer()
+            score = method(True)
+            elapsed = timeit.default_timer() - start_time
+            scores.append(score)
+            times.append(elapsed)
+        except KeyboardInterrupt:
+            raise
+        except Exception as e:
+            print(e)
+        print("model average computation time", np.average(times))
+        print("model average score gain", np.average(scores))
+        print()
+    print_train_parameters()
+    training_params.reset()
+
 def test_fitness_dim_regression():
     #regression true and different dims
-    training_params.title="test for poisson disk sampling "
+    training_params.title="test for fitness dimensionality regression sampling "
     print(training_params.title)
     print()
     print("with regression")
@@ -99,6 +148,8 @@ def test_fitness_dim_regression():
     fitness_dims.append((dtfr.FitnessInstanceDim.single,dtfr.FitnessFuncDim.seperate))
     fitness_dims.append((dtfr.FitnessInstanceDim.single,dtfr.FitnessFuncDim.single))
     for fitness_dim in fitness_dims:
+        training_params.extra_info="fitness dimensionality, " + str(fitness_dim)
+
         print("fitness dimensionality, ",fitness_dim)
         training_params.fitness_dim=fitness_dim
 
@@ -120,11 +171,14 @@ def test_poisson():
     print(training_params.title)
     print()
     print("with poison")
+    training_params.extra_info="with poison"
     training_params.poisson=True
     time_score_all_models()
 
 
     print("without poisson")
+    training_params.extra_info="without poison"
+
     training_params.poisson=False
 
     time_score_all_models()
@@ -142,6 +196,8 @@ def test_n_iter_n_trial():
             training_params.n_iter=n_iter
             training_params.n_trial=n_trial
             print("number of iterations, trials: ",n_iter,n_trial)
+            training_params.extra_info="number of iterations, trials: " + str(n_iter) + str(n_trial)
+
             time_score_all_models()
 
     print_train_parameters()
@@ -153,6 +209,7 @@ def test_n_component():
     print()
     for n_components in np.arange(10,50,10):
         training_params.n_components=n_components
+        training_params.extra_info="GMM number of components: " + str(n_components)
         print("GMM number of components: ",n_components)
         time_score_all_models()
 
@@ -164,6 +221,7 @@ def test_min_covar():
     print()
     for covar_fact in np.arange(1,100,10):
         training_params.min_covar=0.01*covar_fact
+        training_params.extra_info="GMM min covar: "+ str(training_params.min_covar)
         print("GMM min covar: ",training_params.min_covar)
         time_score_all_models()
 
@@ -174,6 +232,7 @@ def test_n_data():
     print(training_params.title)
     for n_data in range(200,1000,100):
         training_params.n_data=n_data
+        training_params.extra_info="number of training samples: "+ str(n_data)
         print("number of training sample: ",n_data)
         time_score_all_models()
 
@@ -182,7 +241,7 @@ def test_n_data():
 
 def test_marginal_gmm():
     import itertools
-    training_params.title="test for gmm full, marginalisation, "
+    training_params.title="test for gmm full training, marginalisation, "
     print(training_params.title)
 
     gmm_fulls=[]
@@ -200,7 +259,9 @@ def test_marginal_gmm():
 
 
     for gmm_full_part in itertools.product([True,False], repeat=3):
+
         gmm_full=[False]+list(gmm_full_part)+[True]
+        training_params.extra_info="GMM full training: "+ str(gmm_full)
         training_params.gmm_full=gmm_full
         training_params.sibling_order_sequence=sibling_order_sequence
         print("gmm full: ",gmm_full)
@@ -227,6 +288,7 @@ def test_sibling_order_seq():
     gmm_fulls.append([False,True,True,True,True])
 
     for sibling_order_sequence,gmm_full in zip(sibling_order_sequences,gmm_fulls):
+        training_params.extra_info="sibling order sequence: "+ str(sibling_order_sequence)
         training_params.gmm_full=gmm_full
         training_params.sibling_order_sequence=sibling_order_sequence
         print("gmm full: ",gmm_full)
@@ -239,8 +301,9 @@ def test_sibling_order_seq():
 def fitness_regression_target_test():
     training_params.title="test for regression condition, model fitness target distance"
     print(training_params.title)
-    for target in np.arange(0.7,1.2,0.1):
-        fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,0,target,target=2)]
+    for cond in np.arange(0.6,1.3,0.1):
+        training_params.extra_info="condition: "+ str(cond)
+        fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,0,cond,target=2)]
         #hierarchy,var_rot,var_nr_children)
         model=tm.model_var_pos(True,False,True)
         sibling_var_names=["position"]
@@ -251,16 +314,18 @@ def fitness_regression_target_test():
             training(model=model,fitness_funcs=fitness_funcs,     sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
         except KeyboardInterrupt:
             raise
-        except:
-            print("error")
+        except Exception as e:
+            print(e)
     print_train_parameters()
     training_params.reset()
 
 def fitness_cap_test():
-    training_params.title="test for regression targets, model fitness target distance"
+    training_params.n_data=800
+    training_params.title="test for fitness caps, model fitness target distance"
     print(training_params.title)
-    for cap in np.arange(0,0.6,0.1):
+    for cap in np.arange(0,0.4,0.05):
         print("cap: ",cap)
+        training_params.extra_info="cap: "+ str(cap)
         fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,cap,1,target=2)]
         #hierarchy,var_rot,var_nr_children)
         model=tm.model_var_pos(True,False,True)
@@ -273,8 +338,8 @@ def fitness_cap_test():
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
         except KeyboardInterrupt:
             raise
-        except:
-            print("error")
+        except Exception as e:
+            print(e)
     print_train_parameters()
     training_params.reset()
 
@@ -283,9 +348,10 @@ def fitness_order_MO_test():
     print_params.verbose_iter=True
     print_params.verbose_final_extra=True
 
-    for fo0 in range(4,16,2):
-        for fo1 in range(4,16,2):
+    for fo0 in range(4,32,4):
+        for fo1 in range(4,32,4):
             print("fitness orders TD PO:",fo0,fo1)
+            training_params.extra_info="TD order: " + str(fo0) + "  PO order: " + str(fo1)
             fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,fo0,0,1,target=2),fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,fo1,0,1)]
             #hierarchy,var_rot,var_nr_children)
             model=tm.model_var_pos(True,False,True)
@@ -299,8 +365,8 @@ def fitness_order_MO_test():
                  sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
             except KeyboardInterrupt:
                 raise
-            except:
-                print("error")
+            except Exception as e:
+                print(e)
     print_train_parameters()
     training_params.reset()
 
@@ -595,7 +661,7 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
         print("score gain: ", str(delta_score))
     if print_params.visual and max_gmm_vars:
         for gmm_var in max_gmm_vars:
-           vis.draw_1D_2D_GMM_variable_sampling(gmm_var,training_params.title)
+           vis.draw_1D_2D_GMM_variable_sampling(gmm_var,training_params.title,training_params.extra_info)
     if print_params.print_parameters_set:
 
         print("fitness parameters,")
@@ -623,6 +689,7 @@ def print_train_parameters():
     print("non marginalisation list,",training_params.gmm_full)
 
     print("data generation parameters")
+    print("number of data samples, ", training_params.n_data)
     print("sibling data,",training_params.sibling_data)
     print("fitness dimension,",training_params.fitness_dim)
     print("poisson sampling,", training_params.poisson)

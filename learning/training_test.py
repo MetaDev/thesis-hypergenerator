@@ -22,6 +22,7 @@ def save_test_out(test_method,test_id):
     for i in plt.get_fignums():
         plt.figure(i)
         pdf.savefig( plt.gcf() )
+
     pdf.close()
     plt.close("all")
 
@@ -35,6 +36,10 @@ save_test_out(tgmm.test_sibling_order_seq,5)
 save_test_out(tgmm.test_sibling_order_seq,6)
 
 save_test_out(tgmm.test_sibling_order_seq,7)
+
+save_test_out(tgmm.test_model_var,16)
+
+
 
 
 #print back to normal

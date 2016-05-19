@@ -38,7 +38,8 @@ def draw_node_sample_tree(root,color,ax=None):
     draw_polygons(polygons=polygons,ax=ax,color=color,size=1.3,set_range=True)
 
 def get_new_ax():
-    return plt.figure().add_subplot(111)
+    fig=plt.figure()
+    return fig,fig.add_subplot(111)
 #return current or new ax
 def get_ax(ax,option="current"):
     if ax is None:
@@ -112,7 +113,7 @@ def draw_2D_stoch_variable(var,ax):
     ax.set_ylim([var.low[1]- (height*0.1), var.high[1] + (height*0.1)])
 from textwrap import wrap
 
-def draw_1D_2D_GMM_variable_sampling(gmmvar,title,ax=None):
+def draw_1D_2D_GMM_variable_sampling(gmmvar,title,ax_title,ax=None):
     #marginalise variables from gmm by name
 
     #gives indices (tuples) starting from 0
@@ -123,10 +124,12 @@ def draw_1D_2D_GMM_variable_sampling(gmmvar,title,ax=None):
     indices = [(i[0]+ind_diff,i[1]+ind_diff) for i in indices]
     vis_vars= gmmvar.sibling_vars
     for (index0,index1),var in zip(indices,vis_vars):
-        ax=get_new_ax()
-        title=title+", variable name: " + var.name + " sibling order: "+ str(gmmvar.sibling_order)
+        fig,ax=get_new_ax()
         title='\n'.join(wrap(title,60))
-        ax.set_title(title)
+        fig.suptitle(title)
+        ax_title=ax_title+", variable name: " + var.name + " sibling order: "+ str(gmmvar.sibling_order)
+        ax_title='\n'.join(wrap(ax_title,60))
+        ax.set_title(ax_title)
         if index1 - index0 == 1:
             #visualise the sibling var range
             draw_1D_stoch_variable(var,ax)
@@ -138,6 +141,8 @@ def draw_1D_2D_GMM_variable_sampling(gmmvar,title,ax=None):
         else:
             raise ValueError("Only variables up to 2 dimensions can be visualised. Variable ",
                                                                      var.name,"has indices: ",index0,index1 )
+#        fig.subplots_adjust(top=0.85)
+        fig.tight_layout( rect=[0, 0.05, 1, 0.9])
 
 
 

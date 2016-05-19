@@ -1,4 +1,4 @@
-test for regression targets, model fitness target distance
+test for fitness caps, model fitness target distance
 cap:  0.0
 score before training:  0.613840053443
 fitness before training iteration  0
