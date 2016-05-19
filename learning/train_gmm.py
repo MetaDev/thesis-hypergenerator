@@ -18,11 +18,30 @@ from util import visualisation as vis
 class print_params:
     verbose_trial=False
     verbose_iter=True
-    verbose_final_extra=True
+    verbose_final_extra=False
     visual=True
     print_parameters_set=True
     print_fitness_bins=False
 class training_params:
+    def reset():
+        training_params.sibling_order_sequence=[0,1,2,3,4,4,4]
+        training_params.gmm_full=[False,False,True,False,True]
+
+        training_params.sibling_data=dg.SiblingData.first
+        training_params.fitness_dim=(dtfr.FitnessInstanceDim.seperate,dtfr.FitnessFuncDim.seperate)
+        training_params.n_data=100
+        training_params.poisson=False
+
+        training_params.n_iter=1
+        training_params.n_trial=3
+        training_params.n_model_eval_data=500
+
+        training_params.n_components=30
+        training_params.min_covar=0.02
+
+        training_params.regression=False
+
+
     sibling_order_sequence=[0,1,2,3,4,4,4]
     gmm_full=[False,False,True,False,True]
 
@@ -33,22 +52,240 @@ class training_params:
 
     n_iter=1
     n_trial=3
-    n_model_eval_data=500
+    n_model_eval_data=200
 
     n_components=30
     min_covar=0.02
 
     regression=False
 
+    title="test"
+
+import timeit
+
+
+def time_score_all_models():
+    scores=[]
+    times=[]
+    time_score_training(training_model_0,times,scores)
+    time_score_training(training_model_1,times,scores)
+    time_score_training(training_model_2,times,scores)
+    time_score_training(training_model_3,times,scores)
+    time_score_training(training_model_4,times,scores)
+    print("model average computation time", np.average(times))
+    print("model average score gain", np.average(scores))
+    print()
+
+def time_score_training(training_model_function,times,scores):
+    try:
+        start_time = timeit.default_timer()
+        score = training_model_function()
+        elapsed = timeit.default_timer() - start_time
+        scores.append(score)
+        times.append(elapsed)
+    except KeyboardInterrupt:
+        raise
+    except:
+        print("error")
+def test_fitness_dim_regression():
+    #regression true and different dims
+    training_params.title="test for poisson disk sampling "
+    print(training_params.title)
+    print()
+    print("with regression")
+    training_params.regression=True
+    fitness_dims=[]
+    fitness_dims.append((dtfr.FitnessInstanceDim.seperate,dtfr.FitnessFuncDim.seperate))
+    fitness_dims.append((dtfr.FitnessInstanceDim.single,dtfr.FitnessFuncDim.seperate))
+    fitness_dims.append((dtfr.FitnessInstanceDim.single,dtfr.FitnessFuncDim.single))
+    for fitness_dim in fitness_dims:
+        print("fitness dimensionality, ",fitness_dim)
+        training_params.fitness_dim=fitness_dim
+
+        time_score_all_models()
+
+
+
+    #regresion false
+    print("without regression")
+    training_params.regression=False
+
+    time_score_all_models()
+
+
+    print_train_parameters()
+    training_params.reset()
+def test_poisson():
+    training_params.title="test for poisson disk sampling "
+    print(training_params.title)
+    print()
+    print("with poison")
+    training_params.poisson=True
+    time_score_all_models()
+
+
+    print("without poisson")
+    training_params.poisson=False
+
+    time_score_all_models()
+
+
+    print_train_parameters()
+    training_params.reset()
+def test_n_iter_n_trial():
+    print_params.verbose_trial=True
+    training_params.title="test for retraining number of iterations and number of trials "
+    print(training_params.title)
+    print()
+    for n_iter in range(1,4):
+        for n_trial in range(1,6):
+            training_params.n_iter=n_iter
+            training_params.n_trial=n_trial
+            print("number of iterations, trials: ",n_iter,n_trial)
+            time_score_all_models()
+
+    print_train_parameters()
+    training_params.reset()
+    print_params.verbose_trial=False
+def test_n_component():
+    training_params.title="test for number of components in gmm "
+    print(training_params.title)
+    print()
+    for n_components in np.arange(10,50,10):
+        training_params.n_components=n_components
+        print("GMM number of components: ",n_components)
+        time_score_all_models()
+
+    print_train_parameters()
+    training_params.reset()
+def test_min_covar():
+    training_params.title="test for min covar of gmm "
+    print(training_params.title)
+    print()
+    for covar_fact in np.arange(1,100,10):
+        training_params.min_covar=0.01*covar_fact
+        print("GMM min covar: ",training_params.min_covar)
+        time_score_all_models()
+
+    print_train_parameters()
+    training_params.reset()
+def test_n_data():
+    training_params.title="test for number of training samples "
+    print(training_params.title)
+    for n_data in range(200,1000,100):
+        training_params.n_data=n_data
+        print("number of training sample: ",n_data)
+        time_score_all_models()
+
+    print_train_parameters()
+    training_params.reset()
+
+def test_marginal_gmm():
+    import itertools
+    training_params.title="test for gmm full, marginalisation, "
+    print(training_params.title)
+
+    gmm_fulls=[]
+
+    sibling_order_sequence=[0,1,2,3,4,4,4]
+    gmm_fulls.append([False,True,True,True,True])
+    gmm_fulls.append([False,False,True,True,True])
+    gmm_fulls.append([False,False,False,True,True])
+    gmm_fulls.append([False,False,False,False,True])
+
+    gmm_fulls.append([False,True,False,False,True])
+    gmm_fulls.append([False,True,True,False,True])
+    gmm_fulls.append([False,True,False,True,True])
+    gmm_fulls.append([False,False,True,False,True])
+
+
+    for gmm_full_part in itertools.product([True,False], repeat=3):
+        gmm_full=[False]+list(gmm_full_part)+[True]
+        training_params.gmm_full=gmm_full
+        training_params.sibling_order_sequence=sibling_order_sequence
+        print("gmm full: ",gmm_full)
+        time_score_all_models()
+
+    print_train_parameters()
+    training_params.reset()
+
+
+def test_sibling_order_seq():
+    training_params.title="test for sibling order seq"
+    print(training_params.title)
+
+    sibling_order_sequences=[]
+    gmm_fulls=[]
+
+    sibling_order_sequences.append([0,1,1,1,1,1,1])
+    gmm_fulls.append([False,True])
+    sibling_order_sequences.append([0,1,2,2,2,2,2])
+    gmm_fulls.append([False,True,True])
+    sibling_order_sequences.append([0,1,2,3,3,3,3])
+    gmm_fulls.append([False,True,True,True])
+    sibling_order_sequences.append([0,1,2,3,4,4,4])
+    gmm_fulls.append([False,True,True,True,True])
+
+    for sibling_order_sequence,gmm_full in zip(sibling_order_sequences,gmm_fulls):
+        training_params.gmm_full=gmm_full
+        training_params.sibling_order_sequence=sibling_order_sequence
+        print("gmm full: ",gmm_full)
+        print("sibling_order_sequence:",sibling_order_sequence)
+        time_score_all_models()
+
+    print_train_parameters()
+    training_params.reset()
+
+def fitness_regression_target_test():
+    training_params.title="test for regression condition, model fitness target distance"
+    print(training_params.title)
+    for target in np.arange(0.7,1.2,0.1):
+        fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,0,target,target=2)]
+        #hierarchy,var_rot,var_nr_children)
+        model=tm.model_var_pos(True,False,True)
+        sibling_var_names=["position"]
+
+        parent_var_names=["shape0"]
+
+        try:
+            training(model=model,fitness_funcs=fitness_funcs,     sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
+        except KeyboardInterrupt:
+            raise
+        except:
+            print("error")
+    print_train_parameters()
+    training_params.reset()
+
+def fitness_cap_test():
+    training_params.title="test for regression targets, model fitness target distance"
+    print(training_params.title)
+    for cap in np.arange(0,0.6,0.1):
+        print("cap: ",cap)
+        fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,cap,1,target=2)]
+        #hierarchy,var_rot,var_nr_children)
+        model=tm.model_var_pos(True,False,True)
+        sibling_var_names=["position"]
+
+        parent_var_names=["shape0"]
+
+        try:
+            training(model=model,fitness_funcs=fitness_funcs,
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
+        except KeyboardInterrupt:
+            raise
+        except:
+            print("error")
+    print_train_parameters()
+    training_params.reset()
 
 def fitness_order_MO_test():
-    print("test for fitness order")
+    training_params.title="test for fitness order, fitness target distance, polgygon overlay"
     print_params.verbose_iter=True
     print_params.verbose_final_extra=True
 
-    for fo0 in range(4,32,2):
-        for fo1 in range(4,32,2):
-            print("fitness orders ",fo0,fo1)
+    for fo0 in range(4,16,2):
+        for fo1 in range(4,16,2):
+            print("fitness orders TD PO:",fo0,fo1)
             fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,fo0,0,1,target=2),fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,fo1,0,1)]
             #hierarchy,var_rot,var_nr_children)
             model=tm.model_var_pos(True,False,True)
@@ -57,11 +294,19 @@ def fitness_order_MO_test():
             parent_var_names=["shape0"]
 
 
-
-            training(model=model,fitness_funcs=fitness_funcs,
+            try:
+                training(model=model,fitness_funcs=fitness_funcs,
                  sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
+            except KeyboardInterrupt:
+                raise
+            except:
+                print("error")
+    print_train_parameters()
+    training_params.reset()
+
 
 def training_model_0(var_rot=False):
+    print("model 0")
     fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,0,1,target=2)]
     #hierarchy,var_rot,var_nr_children)
     model=tm.model_var_pos(True,var_rot,True)
@@ -70,10 +315,11 @@ def training_model_0(var_rot=False):
     parent_var_names=["shape0"]
 
 
-    training(model=model,fitness_funcs=fitness_funcs,
+    return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
 def training_model_1(var_rot=False):
+    print("model 1")
     fitness_funcs=[fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,32,0,1)]
     #hierarchy,var_rot,var_nr_children)
     model=tm.model_var_pos(True,var_rot,True)
@@ -82,10 +328,11 @@ def training_model_1(var_rot=False):
     parent_var_names=["shape0"]
 
 
-    training(model=model,fitness_funcs=fitness_funcs,
+    return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
 def training_model_2(var_pos=True):
+    print("model 2")
     fitness_funcs=[fn.Fitness("side alignment",fn.closest_side_alignment_pc,fn.Fitness_Relation.pairwise_parent_child,1,0,1)]
     #hierarchy,var_rot,var_nr_children)
     model=tm.model_var_rot(True,var_pos,True)
@@ -96,10 +343,12 @@ def training_model_2(var_pos=True):
     parent_var_names=["shape0","shape3","shape6","shape9"]
 
 
-    training(model=model,fitness_funcs=fitness_funcs,
+    return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
 def training_model_3(var_pos=True):
+    print("model 3")
+
     fitness_funcs=[
                    fn.Fitness("centroid difference",fn.centroid_dist_absolute,fn.Fitness_Relation.absolute,1,0,1)]
     #hierarchy,var_rot,var_nr_children)
@@ -112,9 +361,10 @@ def training_model_3(var_pos=True):
 
 
 
-    training(model=model,fitness_funcs=fitness_funcs,
+    return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 def training_model_4(var_pos=True):
+    print("model 4")
     fitness_funcs=[
                    fn.Targetting_Fitness("surface ration",fn.combinatory_surface_ratio_absolute,fn.Fitness_Relation.absolute,8,0,1,target=0.8)]
     #hierarchy,var_rot,var_nr_children)
@@ -125,7 +375,7 @@ def training_model_4(var_pos=True):
         sibling_var_names=["size"]
     parent_var_names=["shape2","shape4"]
 
-    training(model=model,fitness_funcs=fitness_funcs,
+    return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
 
@@ -201,6 +451,8 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
                                                fitness_average_threshhold,fitness_func_threshhold)
 
     score=model_evaluation.evaluate()
+    startscore=score
+    delta_score=0
     print("score before training: ", score)
 
     #check sibling sequence
@@ -324,11 +576,12 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
         #else print that training didn't help
         print()
         if max_gmm_vars:
-            print("improved model selected with score: ",iteration_gmm_score )
+            print("improved selected with score: ",iteration_gmm_score )
+            delta_score=iteration_gmm_score-startscore
             for i in range(len(child_nodes)):
                 child_nodes[i].set_learned_variable(max_gmm_vars[sibling_order_sequence[i]])
         else:
-            print("The model did not improve over consecutive training iteration.")
+            print("The did not improve over consecutive training iteration.")
             break
     if print_params.verbose_final_extra:
         print()
@@ -339,12 +592,11 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
                                 fitness_funcs,
                                 sibling_data=sibling_data,poisson=False)
         model_evaluation.print_evaluation(fitness_values,-1,summary=not print_params.print_fitness_bins)
-    if print_params.visual:
+        print("score gain: ", str(delta_score))
+    if print_params.visual and max_gmm_vars:
         for gmm_var in max_gmm_vars:
-           vis.draw_1D_2D_GMM_variable_sampling(gmm_var)
+           vis.draw_1D_2D_GMM_variable_sampling(gmm_var,training_params.title)
     if print_params.print_parameters_set:
-        print("parameter configuration")
-        print()
 
         print("fitness parameters,")
         for fitn in fitness_funcs:
@@ -358,23 +610,33 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
         print("sibling variables,", str(sibling_var_names))
 
         print()
+    return delta_score
 
-        print("model hierarchy parameters")
-        print("sibling order list,", training_params.sibling_order_sequence)
-        print("non marginalisation list,",gmm_full)
 
-        print("data generation parameters")
-        print("sibling data,",sibling_data)
-        print("fitness dimension,",fitness_dim)
-        print("poisson sampling,", poisson)
-        print()
 
-        print("retraining")
-        print("number of trials,", n_trial)
-        print("number of iterations,", n_iter)
-        print("number of samples for evaluations,", n_model_eval_data)
-        print()
 
+def print_train_parameters():
+    print("parameter configuration")
+    print(training_params.title)
+    print("model hierarchy parameters")
+    print("sibling order list,", training_params.sibling_order_sequence)
+    print("non marginalisation list,",training_params.gmm_full)
+
+    print("data generation parameters")
+    print("sibling data,",training_params.sibling_data)
+    print("fitness dimension,",training_params.fitness_dim)
+    print("poisson sampling,", training_params.poisson)
+    print()
+
+    print("GMM parameters")
+    print("minimum covariance, ",training_params.min_covar)
+    print("number of components, ", training_params.n_components)
+
+    print("retraining")
+    print("number of trials,", training_params.n_trial)
+    print("number of iterations,", training_params.n_iter)
+    print("number of samples for evaluations,", training_params.n_model_eval_data)
+    print()
 
 
 

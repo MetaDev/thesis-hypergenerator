@@ -1,0 +1,127 @@
+test for regression targets, model fitness target distance
+cap:  0.0
+score before training:  0.613840053443
+fitness before training iteration  0
+seperate fitness
+Target distances
+total mean= 0.620834: variance= 0.022266
+
+improved selected with score:  0.695997035507
+
+final evaluation of fitness
+fitness before training iteration  -1
+seperate fitness
+Target distances
+total mean= 0.690748: variance= 0.010824
+score gain:  0.0821569820642
+fitness parameters,
+regression_target: 1
+threshhold: 0.0
+func: <function min_dist_sb at 0x11aa52158>
+name: Target distances
+fitness_relation: Fitness_Relation.pairwise_siblings
+order: 4
+target: 2
+,
+
+model parameters
+parent variables, ['shape0']
+sibling variables, ['position']
+
+cap:  0.1
+score before training:  0.60197690471
+fitness before training iteration  0
+seperate fitness
+Target distances
+total mean= 0.592846: variance= 0.014826
+
+improved selected with score:  0.758451680748
+
+final evaluation of fitness
+fitness before training iteration  -1
+seperate fitness
+Target distances
+total mean= 0.764647: variance= 0.006435
+score gain:  0.156474776038
+fitness parameters,
+regression_target: 1
+threshhold: 0.1
+func: <function min_dist_sb at 0x11aa52158>
+name: Target distances
+fitness_relation: Fitness_Relation.pairwise_siblings
+order: 4
+target: 2
+,
+
+model parameters
+parent variables, ['shape0']
+sibling variables, ['position']
+
+cap:  0.2
+score before training:  0.609121659868
+fitness before training iteration  0
+seperate fitness
+Target distances
+total mean= 0.616117: variance= 0.011449
+
+improved selected with score:  0.773046323932
+
+final evaluation of fitness
+fitness before training iteration  -1
+seperate fitness
+Target distances
+total mean= 0.765343: variance= 0.014543
+score gain:  0.163924664065
+fitness parameters,
+regression_target: 1
+threshhold: 0.2
+func: <function min_dist_sb at 0x11aa52158>
+name: Target distances
+fitness_relation: Fitness_Relation.pairwise_siblings
+order: 4
+target: 2
+,
+
+model parameters
+parent variables, ['shape0']
+sibling variables, ['position']
+
+cap:  0.3
+score before training:  0.614146851854
+fitness before training iteration  0
+seperate fitness
+Target distances
+total mean= 0.587172: variance= 0.017847
+error
+cap:  0.4
+score before training:  0.618448857904
+fitness before training iteration  0
+seperate fitness
+Target distances
+total mean= 0.617446: variance= 0.016281
+error
+cap:  0.5
+score before training:  0.609215907465
+fitness before training iteration  0
+seperate fitness
+Target distances
+total mean= 0.604971: variance= 0.019783
+error
+parameter configuration
+test for regression targets, model fitness target distance
+model hierarchy parameters
+sibling order list, [0, 1, 2, 3, 4, 4, 4]
+non marginalisation list, [False, False, True, False, True]
+data generation parameters
+sibling data, SiblingData.first
+fitness dimension, (<FitnessInstanceDim.seperate: 2>, <FitnessFuncDim.seperate: 2>)
+poisson sampling, False
+
+GMM parameters
+minimum covariance,  0.02
+number of components,  30
+retraining
+number of trials, 3
+number of iterations, 1
+number of samples for evaluations, 500
+

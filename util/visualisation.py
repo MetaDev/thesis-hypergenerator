@@ -110,8 +110,9 @@ def draw_2D_stoch_variable(var,ax):
     height=var.high[1]-var.low[1]
     ax.set_xlim([var.low[0]- (width*0.1), var.high[0] + (width*0.1)])
     ax.set_ylim([var.low[1]- (height*0.1), var.high[1] + (height*0.1)])
+from textwrap import wrap
 
-def draw_1D_2D_GMM_variable_sampling(gmmvar,ax=None):
+def draw_1D_2D_GMM_variable_sampling(gmmvar,title,ax=None):
     #marginalise variables from gmm by name
 
     #gives indices (tuples) starting from 0
@@ -123,7 +124,9 @@ def draw_1D_2D_GMM_variable_sampling(gmmvar,ax=None):
     vis_vars= gmmvar.sibling_vars
     for (index0,index1),var in zip(indices,vis_vars):
         ax=get_new_ax()
-        ax.set_title("variable name: " + var.name + " sibling order: "+ str(gmmvar.sibling_order))
+        title=title+", variable name: " + var.name + " sibling order: "+ str(gmmvar.sibling_order)
+        title='\n'.join(wrap(title,60))
+        ax.set_title(title)
         if index1 - index0 == 1:
             #visualise the sibling var range
             draw_1D_stoch_variable(var,ax)
