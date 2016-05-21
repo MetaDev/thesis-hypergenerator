@@ -130,7 +130,7 @@ def model_var_size(var_parent,var_pos,var_nr_children):
     points[3]= DV("",(2,1))
     parent_shape = VVU.from_variable_list("shape",points)
 
-    position = SV("position",low=(0,0),high=[4,3])
+    position = SV("position",low=(-1,-1),high=[4,3])
     rotation=DV("rotation",0)
     size=SV("size",(0.3,0.5),(0.6,1))
     if var_nr_children:

@@ -22,6 +22,6 @@ def save_test_out(test_method,test_id):
     pdf.close()
     plt.close("all")
 
-save_test_out(tgmm.fitness_cap_test,3)
+save_test_out(tgmm.training_model_3,3)
 
 

@@ -41,10 +41,15 @@ class training_params:
 
         training_params.regression=False
         training_params.extra_info=""
+        training_params.fitness_regr_cond=1
+        training_params.fitness_cap=0
+        training_params.model_4_target=0.6
 
 
     sibling_order_sequence=[0,1,2,3,4,4,4]
     gmm_full=[False,False,True,False,True]
+    fitness_regr_cond=1
+    fitness_cap=0
 
     sibling_data=dg.SiblingData.first
     fitness_dim=(dtfr.FitnessInstanceDim.seperate,dtfr.FitnessFuncDim.seperate)
@@ -57,6 +62,7 @@ class training_params:
 
     n_components=30
     min_covar=0.02
+    model_4_target=0.6
 
     regression=False
 
@@ -91,8 +97,21 @@ def time_score_training(training_model_function,times,scores):
         training_params.extra_info=extra_info
     except KeyboardInterrupt:
         raise
-    except:
-        print("error")
+    except Exception as e:
+        training_params.reset()
+        print(e)
+def test_n_model_eval():
+    training_params.title="test for number of number of model evaluations between trials "
+    print(training_params.title)
+    print()
+    for n_model_eval_data in np.arange(200,1000,200):
+        training_params.n_model_eval_data=n_model_eval_data
+        training_params.extra_info="number of model evaluation: " + str(n_model_eval_data)
+        print("number of model evaluation: ",n_model_eval_data)
+        time_score_all_models()
+
+    print_train_parameters()
+    training_params.reset()
 def test_model_var():
     training_params.title="test for model with additional variable "
     print(training_params.title)
@@ -112,9 +131,9 @@ def test_model_var():
             raise
         except:
             print("error")
-        print("model average computation time", np.average(times))
-        print("model average score gain", np.average(scores))
-        print()
+    print("model average computation time", np.average(times))
+    print("model average score gain", np.average(scores))
+    print()
     print("double stochastic variable")
     for i,method in enumerate(methods):
         training_params.extra_info="double stochastic variable, model " + str(i)
@@ -130,9 +149,9 @@ def test_model_var():
             raise
         except Exception as e:
             print(e)
-        print("model average computation time", np.average(times))
-        print("model average score gain", np.average(scores))
-        print()
+    print("model average computation time", np.average(times))
+    print("model average score gain", np.average(scores))
+    print()
     print_train_parameters()
     training_params.reset()
 
@@ -159,6 +178,7 @@ def test_fitness_dim_regression():
 
     #regresion false
     print("without regression")
+    training_params.extra_info="without regression"
     training_params.regression=False
 
     time_score_all_models()
@@ -219,8 +239,8 @@ def test_min_covar():
     training_params.title="test for min covar of gmm "
     print(training_params.title)
     print()
-    for covar_fact in np.arange(1,100,10):
-        training_params.min_covar=0.01*covar_fact
+    for covar_fact in np.arange(1,7,1):
+        training_params.min_covar=0.1**covar_fact
         training_params.extra_info="GMM min covar: "+ str(training_params.min_covar)
         print("GMM min covar: ",training_params.min_covar)
         time_score_all_models()
@@ -244,18 +264,9 @@ def test_marginal_gmm():
     training_params.title="test for gmm full training, marginalisation, "
     print(training_params.title)
 
-    gmm_fulls=[]
 
     sibling_order_sequence=[0,1,2,3,4,4,4]
-    gmm_fulls.append([False,True,True,True,True])
-    gmm_fulls.append([False,False,True,True,True])
-    gmm_fulls.append([False,False,False,True,True])
-    gmm_fulls.append([False,False,False,False,True])
 
-    gmm_fulls.append([False,True,False,False,True])
-    gmm_fulls.append([False,True,True,False,True])
-    gmm_fulls.append([False,True,False,True,True])
-    gmm_fulls.append([False,False,True,False,True])
 
 
     for gmm_full_part in itertools.product([True,False], repeat=3):
@@ -298,48 +309,28 @@ def test_sibling_order_seq():
     print_train_parameters()
     training_params.reset()
 
-def fitness_regression_target_test():
+def fitness_regression_condition_test():
     training_params.title="test for regression condition, model fitness target distance"
     print(training_params.title)
+
+    training_params.regression=True
     for cond in np.arange(0.6,1.3,0.1):
-        training_params.extra_info="condition: "+ str(cond)
-        fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,0,cond,target=2)]
-        #hierarchy,var_rot,var_nr_children)
-        model=tm.model_var_pos(True,False,True)
-        sibling_var_names=["position"]
+        training_params.extra_info="regression with condition: "+ str(cond)
+        print("condition: "+ str(cond))
+        time_score_all_models()
 
-        parent_var_names=["shape0"]
-
-        try:
-            training(model=model,fitness_funcs=fitness_funcs,     sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
-        except KeyboardInterrupt:
-            raise
-        except Exception as e:
-            print(e)
     print_train_parameters()
     training_params.reset()
 
 def fitness_cap_test():
-    training_params.n_data=800
     training_params.title="test for fitness caps, model fitness target distance"
     print(training_params.title)
     for cap in np.arange(0,0.4,0.05):
         print("cap: ",cap)
         training_params.extra_info="cap: "+ str(cap)
-        fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,cap,1,target=2)]
-        #hierarchy,var_rot,var_nr_children)
-        model=tm.model_var_pos(True,False,True)
-        sibling_var_names=["position"]
 
-        parent_var_names=["shape0"]
+        time_score_all_models()
 
-        try:
-            training(model=model,fitness_funcs=fitness_funcs,
-             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
-        except KeyboardInterrupt:
-            raise
-        except Exception as e:
-            print(e)
     print_train_parameters()
     training_params.reset()
 
@@ -370,13 +361,26 @@ def fitness_order_MO_test():
     print_train_parameters()
     training_params.reset()
 
+def test_model_4_target():
+    training_params.title="test for model 4 optimal fitness target"
+    print(training_params.title)
+    for target in np.arange(0.05,1,0.1):
+        print("target: ",target)
+        training_params.model_4_target=target
+        training_params.extra_info="target: "+ str(target)
+        print("score gain: ",training_model_4())
 
+    print_train_parameters()
+    training_params.reset()
 def training_model_0(var_rot=False):
     print("model 0")
-    fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,0,1,target=2)]
+    fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,training_params.fitness_cap,training_params.fitness_regr_cond,target=2)]
     #hierarchy,var_rot,var_nr_children)
     model=tm.model_var_pos(True,var_rot,True)
-    sibling_var_names=["position"]
+    if var_rot:
+        sibling_var_names=["position","rotation"]
+    else:
+        sibling_var_names=["position"]
 
     parent_var_names=["shape0"]
 
@@ -386,11 +390,12 @@ def training_model_0(var_rot=False):
 
 def training_model_1(var_rot=False):
     print("model 1")
-    fitness_funcs=[fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,32,0,1)]
-    #hierarchy,var_rot,var_nr_children)
+    fitness_funcs=[fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,32,training_params.fitness_cap,training_params.fitness_regr_cond)]
     model=tm.model_var_pos(True,var_rot,True)
-    sibling_var_names=["position"]
-
+    if var_rot:
+        sibling_var_names=["position","rotation"]
+    else:
+        sibling_var_names=["position"]
     parent_var_names=["shape0"]
 
 
@@ -399,7 +404,7 @@ def training_model_1(var_rot=False):
 
 def training_model_2(var_pos=True):
     print("model 2")
-    fitness_funcs=[fn.Fitness("side alignment",fn.closest_side_alignment_pc,fn.Fitness_Relation.pairwise_parent_child,1,0,1)]
+    fitness_funcs=[fn.Fitness("side alignment",fn.closest_side_alignment_pc,fn.Fitness_Relation.pairwise_parent_child,1,training_params.fitness_cap,training_params.fitness_regr_cond)]
     #hierarchy,var_rot,var_nr_children)
     model=tm.model_var_rot(True,var_pos,True)
     if var_pos:
@@ -416,7 +421,7 @@ def training_model_3(var_pos=True):
     print("model 3")
 
     fitness_funcs=[
-                   fn.Fitness("centroid difference",fn.centroid_dist_absolute,fn.Fitness_Relation.absolute,1,0,1)]
+                   fn.Fitness("centroid difference",fn.centroid_dist_absolute,fn.Fitness_Relation.absolute,1,training_params.fitness_cap,training_params.fitness_regr_cond)]
     #hierarchy,var_rot,var_nr_children)
     model=tm.model_var_size(True,var_pos,True)
     if var_pos:
@@ -432,7 +437,7 @@ def training_model_3(var_pos=True):
 def training_model_4(var_pos=True):
     print("model 4")
     fitness_funcs=[
-                   fn.Targetting_Fitness("surface ration",fn.combinatory_surface_ratio_absolute,fn.Fitness_Relation.absolute,8,0,1,target=0.8)]
+                   fn.Targetting_Fitness("surface ration",fn.combinatory_surface_ratio_absolute,fn.Fitness_Relation.absolute,8,training_params.fitness_cap,training_params.fitness_regr_cond,target=training_params.model_4_target)]
     #hierarchy,var_rot,var_nr_children)
     model=tm.model_var_size(True,var_pos,True)
     if var_pos:
@@ -627,7 +632,8 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
             gmm_vars_retry_eval.append((gmm_vars,score))
             if print_params.verbose_trial:
                 print()
-                print("iteration: ", iteration," score: ",score)
+                print("trial: ", trial," score: ",score)
+
             #put original vars back
             for i in range(len(child_nodes)):
                 child_nodes[i].delete_learned_variable(gmm_var_name)
@@ -640,7 +646,8 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
         #if it is better as the previous iteration-
         #inject new variable
         #else print that training didn't help
-        print()
+        gmm_scores=[gmm_score for gmm_vars,gmm_score in gmm_vars_retry_eval ]
+        print("iteration ",iteration, " trial score mean: ", np.mean(gmm_scores)," variance: ",np.var(gmm_scores))
         if max_gmm_vars:
             print("improved selected with score: ",iteration_gmm_score )
             delta_score=iteration_gmm_score-startscore

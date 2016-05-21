@@ -123,13 +123,14 @@ def draw_1D_2D_GMM_variable_sampling(gmmvar,title,ax_title,ax=None):
     ind_diff= (gmm_dim)-indices[-1][1]
     indices = [(i[0]+ind_diff,i[1]+ind_diff) for i in indices]
     vis_vars= gmmvar.sibling_vars
+    title='\n'.join(wrap(title,60))
     for (index0,index1),var in zip(indices,vis_vars):
         fig,ax=get_new_ax()
-        title='\n'.join(wrap(title,60))
         fig.suptitle(title)
-        ax_title=ax_title+", variable name: " + var.name + " sibling order: "+ str(gmmvar.sibling_order)
-        ax_title='\n'.join(wrap(ax_title,60))
-        ax.set_title(ax_title)
+
+        new_ax_title=ax_title+", variable name: " + var.name + " sibling order: "+ str(gmmvar.sibling_order)
+        new_ax_title='\n'.join(wrap(new_ax_title,60))
+        ax.set_title(new_ax_title)
         if index1 - index0 == 1:
             #visualise the sibling var range
             draw_1D_stoch_variable(var,ax)
