@@ -40,7 +40,7 @@ def map_to_polygon(shape,origin,position,rotation,size):
     geom_obj=Polygon(shape)
     geom_obj=affinity.translate(geom_obj, -origin[0],-origin[1],0)
     geom_obj=affinity.scale(geom_obj,size[0],size[1],origin=(0,0))
-    geom_obj=affinity.rotate(geom_obj,rotation,origin=(0,0))
+    geom_obj=affinity.rotate(geom_obj,int(rotation*360),origin=(0,0))
     geom_obj=affinity.translate(geom_obj, position[0],position[1],0)
     return geom_obj
 #map a sample to a shape of which it's center is at the position of the sample
@@ -56,7 +56,7 @@ def map_layoutsample_to_geometricobject(layout_sample,shape_name):
     #extract points from vars and put in list ordered on their index saved in the name
     shape=model.search_space.VectorVariableUtility.extract_ordered_list_vars_values(shape_name,rel_vars)
     polygon = map_to_polygon(shape,rel_vars["origin"],rel_vars["position"],
-                                                             int(rel_vars["rotation"])
+                                                             rel_vars["rotation"]
                                                              ,rel_vars["size"])
     return polygon
 

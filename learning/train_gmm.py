@@ -98,7 +98,7 @@ def time_score_training(training_model_function,times,scores):
     except KeyboardInterrupt:
         raise
     except Exception as e:
-        training_params.reset()
+        training_params.extra_info=extra_info
         print(e)
 def test_n_model_eval():
     training_params.title="test for number of number of model evaluations between trials "
@@ -345,7 +345,7 @@ def fitness_order_MO_test():
             training_params.extra_info="TD order: " + str(fo0) + "  PO order: " + str(fo1)
             fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,fo0,0,1,target=2),fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,fo1,0,1)]
             #hierarchy,var_rot,var_nr_children)
-            model=tm.model_var_pos(True,False,True)
+            model=tm.model_var_pos(False)
             sibling_var_names=["position"]
 
             parent_var_names=["shape0"]
@@ -388,10 +388,10 @@ def training_model_0(var_rot=False):
     return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
-def training_model_1(var_rot=False):
+def training_model_1(var_rot=True):
     print("model 1")
     fitness_funcs=[fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,32,training_params.fitness_cap,training_params.fitness_regr_cond)]
-    model=tm.model_var_pos(True,var_rot,True)
+    model=tm.model_var_pos(var_rot)
     if var_rot:
         sibling_var_names=["position","rotation"]
     else:
@@ -406,7 +406,7 @@ def training_model_2(var_pos=True):
     print("model 2")
     fitness_funcs=[fn.Fitness("side alignment",fn.closest_side_alignment_pc,fn.Fitness_Relation.pairwise_parent_child,1,training_params.fitness_cap,training_params.fitness_regr_cond)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_rot(True,var_pos,True)
+    model=tm.model_var_rot(var_pos)
     if var_pos:
         sibling_var_names=["rotation","position"]
     else:
@@ -423,7 +423,7 @@ def training_model_3(var_pos=True):
     fitness_funcs=[
                    fn.Fitness("centroid difference",fn.centroid_dist_absolute,fn.Fitness_Relation.absolute,1,training_params.fitness_cap,training_params.fitness_regr_cond)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_size(True,var_pos,True)
+    model=tm.model_var_size(var_pos)
     if var_pos:
         sibling_var_names=["size","position"]
     else:
@@ -439,7 +439,7 @@ def training_model_4(var_pos=True):
     fitness_funcs=[
                    fn.Targetting_Fitness("surface ration",fn.combinatory_surface_ratio_absolute,fn.Fitness_Relation.absolute,8,training_params.fitness_cap,training_params.fitness_regr_cond,target=training_params.model_4_target)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_size(True,var_pos,True)
+    model=tm.model_var_size(var_pos)
     if var_pos:
         sibling_var_names=["size","position"]
     else:

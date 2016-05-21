@@ -67,7 +67,7 @@ def draw_polygons(polygons,ax=None,color="b",size=1.2,show_edges=False,set_range
         patch = PolygonPatch(polygon, facecolor=color, edgecolor=color, alpha=0.5, zorder=1)
         ax.add_patch(patch)
     #finalise figure properties
-    ax.set_title('Layout visualisation')
+    ax.set_title('Polygon representation')
     if set_range:
         (xrange,yrange)=ut.range_from_polygons(polygons, size)
         ax.set_xlim(*xrange)
@@ -97,7 +97,6 @@ def draw_1D_stoch_variable(var,ax):
     ax.plot((var.high, var.high), (0, 1), 'r-')
     width=var.high-var.low
     ax.set_xlim([var.low- (width*0.1), var.high+(width*0.1)])
-    ax.set_ylim([0, 1])
 
 def draw_2D_stoch_variable(var,ax):
     rect=patches.Rectangle(
@@ -171,7 +170,6 @@ def visualise_gmm_marg_1D_density(gmm,marg_index,name="",ax=None,
     if verbose:
         print("Expected mean value: "+ ut.format_float(np.mean([ w*m for m,w in zip(means, weights)])))
         print("Expected mean standard dev: " + ut.format_float(np.mean([ w*sd for sd,w in zip(stdevs, weights)])))
-    #unfirom distribution line
     ax.plot(x, density,color="g")
 
 #plot marginal density of a single dimension in a GMM

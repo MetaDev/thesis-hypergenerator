@@ -12,7 +12,7 @@ from itertools import combinations
 import model.sampling.poisson as poisson
 
 
-root_node,root_def = tm.model_var_pos(True,False,True)
+root_node,root_def = tm.model_var_size(False)
 n=5
 root_samples = root_node.sample(n)
 
