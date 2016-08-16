@@ -1,10 +1,12 @@
 # Hyper-generator
 
-The hyper-generator is a prototype for the generative system proposed in my master thesis (master computer science, 2016 University of Ghent) [thesis book, 100 pages](https://drive.google.com/open?id=0B_i173N50feyWDFBQWltODdZSDQ) [thesis extended abstract, 5 pages](https://drive.google.com/open?id=0B_i173N50feyM2pjNGZBUVlLbWs).
+The hyper-generator is a prototype for the generative system proposed in my master thesis (master computer science, 2016 University of Ghent). 
 In the system the user has to define the objects to be generated in two ways.
 First, the objects search space is defined as a hiearchical model of its parameters (prior knowledge) and secondly with objective functions on these parameters (posterior knowledge).
 If the user defines a relation between parameters as probabilistic (binary choice), than the system will learn the specific conditional probability between parameters based on their respective objective functions.
 These conditional relations are modelled with Gaussian mixture models and fitted with the EM algorithm.
+
+The [thesis book](https://github.com/MetaDev/thesis-hypergenerator/blob/master/doc/HaraldDeBondt_2016_Thesis.pdf) contains all relevant information surrounding my thesis (100 pages), the [thesis extended abstract](https://github.com/MetaDev/thesis-hypergenerator/blob/master/doc/extended_abstract_HDB.pdf) is a 5 page summary in "scientific paper" format.
 
 ## Installation
 
@@ -21,6 +23,7 @@ The result is a collection of figures visualising the trained probabilistic mode
 The figures and information are respectively saved in *pdf* and *txt* files.
 
 An example configuration method and sample output:
+
 ```python
 def test_n_component():
     training_params.title="test for number of components in gmm "
@@ -37,7 +40,6 @@ def test_n_component():
 ```
 Snippet from *test11.txt*:
 
--------------------
 ```
 test for number of components in gmm 
 
@@ -84,11 +86,7 @@ regression_target: 1
 ,
 ```
 
--------------------
-
 Snapchots from *test11.pdf*:
 
--------------------
-
-images
--------------------
+![](https://github.com/MetaDev/thesis-hypergenerator/blob/master/doc/example_output_0.png)
+![](https://github.com/MetaDev/thesis-hypergenerator/blob/master/doc/example_output_2.png)
