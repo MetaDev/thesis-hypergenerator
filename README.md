@@ -22,7 +22,7 @@ These are respectively located in *model/test_models.py* and *training/train_gmm
 The result is a collection of figures visualising the trained probabilistic models and relevant run-time and training information.
 The figures and information are respectively saved in *pdf* and *txt* files.
 
-An example configuration method and sample output:
+An example configuration method and sample output (I refer to the thesis book for an elaborate explenation of experiments and results):
 
 ```python
 def test_n_component():
