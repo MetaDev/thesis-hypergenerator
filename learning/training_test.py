@@ -26,20 +26,20 @@ def save_test_out(test_method,test_id):
     pdf.close()
     plt.close("all")
 
-save_test_out(tgmm.fitness_order_MO_test,2)
+#save_test_out(tgmm.fitness_order_MO_test,2)
 
-save_test_out(tgmm.fitness_cap_test,3)
-
-save_test_out(tgmm.fitness_regression_condition_test,4)
-
-save_test_out(tgmm.test_sibling_order_seq,5)
-
-save_test_out(tgmm.test_model_4_target,7)
-
-
-save_test_out(tgmm.test_marginal_gmm,8)
-
-save_test_out(tgmm.test_n_data,9)
+#save_test_out(tgmm.fitness_cap_test,3)
+#
+#save_test_out(tgmm.fitness_regression_condition_test,4)
+#
+#save_test_out(tgmm.test_sibling_order_seq,5)
+#
+#save_test_out(tgmm.test_model_4_target,7)
+#
+#
+#save_test_out(tgmm.test_marginal_gmm,8)
+#
+#save_test_out(tgmm.test_n_data,9)
 
 
 

@@ -174,9 +174,13 @@ def centroid_dist_absolute(parent,siblings,dist_metric=np.linalg.norm):
 
     #if the distance grows by adding a child it is bad
     return -centr_dist_with_child
-
+def rotation_alignment_sb(parent,child,siblings):
+    return _calc_pairwise_sibling(child,siblings,rotation_alignment)
 #alignment cosntraints
-
+def rotation_alignment(sample0,sample1):
+    rotation0=sample0.values["rel"]["rotation"]*2*np.pi
+    rotation1=sample1.values["rel"]["rotation"]*2*np.pi
+    return (1+np.cos(4*(rotation0-rotation1)))/2
 def closest_side_alignment_norm(sample0,sample1):
     polygons=mp.map_layoutsamples_to_geometricobjects([sample0,sample1],shape_name="shape")
     min_dist=float("inf")
@@ -196,7 +200,7 @@ def closest_side_alignment_norm(sample0,sample1):
     #the difference is defined over 90 degrees
     angle0=_angle(min_l0)
     angle1=_angle(min_l1)
-    return np.abs(np.cos(4*(angle0-angle1)))
+    return (1+np.cos(4*(angle0-angle1)))/2
 
 #angle between line segments in radians
 def _angle(line_segment):
@@ -206,7 +210,8 @@ def _angle(line_segment):
 
 def closest_side_alignment_pc(parent,child):
     return closest_side_alignment_norm(parent,child)
-
+def closest_side_alignment_sb(parent,child,siblings):
+    return _calc_pairwise_sibling(child,siblings,rotation_alignment)
 
 
 #TODO

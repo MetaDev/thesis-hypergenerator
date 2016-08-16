@@ -10,12 +10,10 @@ from model.search_space import VarDefNode
 #the hierarchy argument is to evaluate the ability to train conditionally on parent values
 
 #model to train polygon overlap
-def model_var_pos(var_rot):
+def model_var_pos():
     position = SV("position",low=(0,0),high=[5,3])
-    if var_rot:
-        rotation=SV("rotation",low=0,high=1)
-    else:
-        rotation=DV("rotation",0)
+    rotation=SV("rotation",low=0,high=1)
+
     size=DV("size",(0.2,0.4))
 
 
@@ -28,7 +26,6 @@ def model_var_pos(var_rot):
     parent_shape = VVU.from_variable_list("shape",
                        [var_p0, DV("p1",(1, 3)),DV("p2",(3, 3)),DV("p3",(3, 2)),DV("p4",(5, 2)),
                         DV("p5",(5, 0)),DV("p6",(4, 0)),DV("p7",(4, 1)),DV("p8",(3, 1)),DV("p9",(3, 0)),DV("p10",(1, 0))])
-
     n_children=SV("child",low=3,high=7)
 
     parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
@@ -40,7 +37,7 @@ def model_var_pos(var_rot):
 #model to train closest side alignment (both between siblings and parent)
 #variable rotation
 
-def model_var_rot(var_pos):
+def model_var_rot():
 
 
     #irregular variable polygon parent, in the form of a "<>"
@@ -64,52 +61,15 @@ def model_var_rot(var_pos):
 
     rotation=SV("rotation",low=0,high=1)
     size=DV("size",(0.2,0.4))
-    if var_pos:
-        position = SV("position",low=(0,0),high=[4,4])
-        child = LN(name="child",size=size,position=position,
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
-                                    position=DV("position",(0,0)),
-                                    shape=parent_shape)
-        children=[(n_children,child)]
-        parent_node=parent_room.build_child_nodes(children)
-    else:
-        parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
-                                    position=DV("position",(0,0)),
-                                    shape=parent_shape)
+    position = SV("position",low=(0,0),high=[4,4])
+    child = LN(name="child",size=size,position=position,
+                                    rotation=rotation,shape=LN.shape_exteriors["square"])
+    parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
+                                position=DV("position",(0,0)),
+                                shape=parent_shape)
+    children=[(n_children,child)]
+    parent_node=parent_room.build_child_nodes(children)
 
-        child_list=[None]* (7)
-        child= LN(name="child",size=size,position=DV("position",(1.5,2.5)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[0]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(2.5,2.5)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[1]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(1.5,1.5)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[2]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(2.5,1.5)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[3]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(2,1)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[4]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(1,2)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[5]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(0.5,1.5)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[6]=VarDefNode(child)
-        parent_node = VarDefNode(parent_room)
-
-        n_children= (SV("child",low=3,high=7))
-        parent_node.add_children(child_list,n_children)
 
 
 
@@ -119,7 +79,7 @@ def model_var_rot(var_pos):
 #model to train balance
 
 #variable size
-def model_var_size(var_pos):
+def model_var_size():
 
     #irregular variable polygon parent
     points=[None]*5
@@ -137,49 +97,14 @@ def model_var_size(var_pos):
     size=SV("size",(0.3,0.5),(0.6,1))
     n_children=SV("child",low=3,high=7)
 
-    if var_pos:
-        child = LN(name="child",size=size,position=position,
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
-                                    position=DV("position",(0,0)),
-                                    shape=parent_shape)
-        children=[(n_children,child)]
-        parent_node=parent_room.build_child_nodes(children)
-    else:
-        parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
-                                    position=DV("position",(0,0)),
-                                    shape=parent_shape)
+    child = LN(name="child",size=size,position=position,
+                                    rotation=rotation,shape=LN.shape_exteriors["square"])
+    parent_room =  LN(name="parent",origin=DV("origin",(0,0)),size=DV("size",(1,1)),rotation=DV("rotation",[0]),
+                                position=DV("position",(0,0)),
+                                shape=parent_shape)
+    children=[(n_children,child)]
+    parent_node=parent_room.build_child_nodes(children)
 
-        child_list=[None]* (7)
-        child= LN(name="child",size=size,position=DV("position",(1,2)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[0]=VarDefNode(child)
-        child= LN(name="child",size=size,position=DV("position",(2,2)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[1]=VarDefNode(child)
-        child= LN(name="child",size=size,position=DV("position",(1,0)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[2]=VarDefNode(child)
-        child= LN(name="child",size=size,position=DV("position",(2,0)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[3]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(-0.5,0)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[4]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(3.5,1.5)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[5]=VarDefNode(child)
-
-        child= LN(name="child",size=size,position=DV("position",(1,1)),
-                                        rotation=rotation,shape=LN.shape_exteriors["square"])
-        child_list[6]=VarDefNode(child)
-
-
-        parent_node = VarDefNode(parent_room)
-        n_children= (SV("child",low=3,high=7) )
-        parent_node.add_children(child_list,n_children)
 
 
     return parent_node,parent_room
@@ -201,7 +126,7 @@ def simple_model():
     parent_shape = VVU.from_variable_list("shape",
                        [DV("p0",(0, 0)), DV("p1",(0, 1)),DV("p2",(0.5,1)),
                         var_p3,DV("p4",(1, 0.5)),DV("p5",(1,0))])
-    n_children=SV("child",low=3,high=5)
+    n_children=SV("child",low=3,high=7)
     parent_room = LN(size=DV("size",(1,1)),name="parent",rotation=DV("rotation",0),
                                     position=DV("position",(0,0)),
                                     shape=parent_shape)

@@ -116,29 +116,31 @@ def test_model_var():
     training_params.title="test for model with additional variable "
     print(training_params.title)
     print("single stochastic variable")
-    methods=[training_model_0,training_model_1,training_model_2,training_model_3,training_model_4]
+    methods=[training_model_0,training_model_1,training_model_2,training_model_3,training_model_4,training_model_5]
+    scores=[]
+    times=[]
     for i,method in enumerate(methods):
         training_params.extra_info="single stochastic variable, model " + str(i)
-        scores=[]
-        times=[]
+
         try:
             start_time = timeit.default_timer()
-            score = method(False)
+            score = method(True)
             elapsed = timeit.default_timer() - start_time
             scores.append(score)
             times.append(elapsed)
         except KeyboardInterrupt:
             raise
-        except:
-            print("error")
+        except Exception as e:
+            print(e)
     print("model average computation time", np.average(times))
     print("model average score gain", np.average(scores))
     print()
     print("double stochastic variable")
+    scores=[]
+    times=[]
     for i,method in enumerate(methods):
         training_params.extra_info="double stochastic variable, model " + str(i)
-        scores=[]
-        times=[]
+
         try:
             start_time = timeit.default_timer()
             score = method(True)
@@ -188,6 +190,9 @@ def test_fitness_dim_regression():
     training_params.reset()
 def test_poisson():
     training_params.title="test for poisson disk sampling "
+    #also compare fluctuation between trials
+    training_params.n_trial=5
+    print_params.verbose_trial=True
     print(training_params.title)
     print()
     print("with poison")
@@ -372,12 +377,12 @@ def test_model_4_target():
 
     print_train_parameters()
     training_params.reset()
-def training_model_0(var_rot=False):
+def training_model_0(train_rot=False):
     print("model 0")
     fitness_funcs=[fn.Targetting_Fitness("Target distances",fn.min_dist_sb,fn.Fitness_Relation.pairwise_siblings,4,training_params.fitness_cap,training_params.fitness_regr_cond,target=2)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_pos(True,var_rot,True)
-    if var_rot:
+    model=tm.model_var_pos()
+    if train_rot:
         sibling_var_names=["position","rotation"]
     else:
         sibling_var_names=["position"]
@@ -388,11 +393,11 @@ def training_model_0(var_rot=False):
     return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
-def training_model_1(var_rot=True):
+def training_model_1(train_rot=True):
     print("model 1")
     fitness_funcs=[fn.Fitness("polygon overlay",fn.norm_overlap_pc,fn.Fitness_Relation.pairwise_parent_child,32,training_params.fitness_cap,training_params.fitness_regr_cond)]
-    model=tm.model_var_pos(var_rot)
-    if var_rot:
+    model=tm.model_var_pos()
+    if train_rot:
         sibling_var_names=["position","rotation"]
     else:
         sibling_var_names=["position"]
@@ -402,12 +407,11 @@ def training_model_1(var_rot=True):
     return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
 
-def training_model_2(var_pos=True):
+def training_model_2(train_pos=True):
     print("model 2")
-    fitness_funcs=[fn.Fitness("side alignment",fn.closest_side_alignment_pc,fn.Fitness_Relation.pairwise_parent_child,1,training_params.fitness_cap,training_params.fitness_regr_cond)]
-    #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_rot(var_pos)
-    if var_pos:
+    fitness_funcs=[fn.Fitness("side alignment",fn.rotation_alignment,fn.Fitness_Relation.pairwise_parent_child,1,training_params.fitness_cap,training_params.fitness_regr_cond)]
+    model=tm.model_var_rot()
+    if train_pos:
         sibling_var_names=["rotation","position"]
     else:
         sibling_var_names=["rotation"]
@@ -416,18 +420,31 @@ def training_model_2(var_pos=True):
 
     return training(model=model,fitness_funcs=fitness_funcs,
              sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
+def training_model_5(train_pos=True):
+    print("model 5")
+    fitness_funcs=[fn.Fitness("side alignment",fn.rotation_alignment_sb,fn.Fitness_Relation.pairwise_siblings,1,training_params.fitness_cap,training_params.fitness_regr_cond)]
+    model=tm.model_var_rot()
+    if train_pos:
+        sibling_var_names=["rotation","position"]
+    else:
+        sibling_var_names=["rotation"]
+    parent_var_names=["shape0"]
 
-def training_model_3(var_pos=True):
+
+    return training(model=model,fitness_funcs=fitness_funcs,
+             sibling_var_names=sibling_var_names,parent_var_names=parent_var_names)
+
+def training_model_3(train_size=True):
     print("model 3")
 
     fitness_funcs=[
                    fn.Fitness("centroid difference",fn.centroid_dist_absolute,fn.Fitness_Relation.absolute,1,training_params.fitness_cap,training_params.fitness_regr_cond)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_size(var_pos)
-    if var_pos:
+    model=tm.model_var_size()
+    if train_size:
         sibling_var_names=["size","position"]
     else:
-        sibling_var_names=["size"]
+        sibling_var_names=["position"]
     parent_var_names=["shape2","shape4"]
 
 
@@ -439,7 +456,7 @@ def training_model_4(var_pos=True):
     fitness_funcs=[
                    fn.Targetting_Fitness("surface ration",fn.combinatory_surface_ratio_absolute,fn.Fitness_Relation.absolute,8,training_params.fitness_cap,training_params.fitness_regr_cond,target=training_params.model_4_target)]
     #hierarchy,var_rot,var_nr_children)
-    model=tm.model_var_size(var_pos)
+    model=tm.model_var_size()
     if var_pos:
         sibling_var_names=["size","position"]
     else:
@@ -500,7 +517,6 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
     #training variables and fitness functions
     #this expliicitly also defines the format of the data
 
-    n_model_eval_data=400
 
     sibling_vars=[parent_def.children[child_name].variables[name] for name in sibling_var_names]
     parent_vars=[parent_def.variables[name] for name in parent_var_names]
@@ -643,6 +659,7 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
             if gmm_score>iteration_gmm_score:
                 max_gmm_vars=gmm_vars
                 iteration_gmm_score=gmm_score
+                delta_score=iteration_gmm_score-startscore
         #if it is better as the previous iteration-
         #inject new variable
         #else print that training didn't help
@@ -650,7 +667,7 @@ def training(model,fitness_funcs,sibling_var_names,parent_var_names):
         print("iteration ",iteration, " trial score mean: ", np.mean(gmm_scores)," variance: ",np.var(gmm_scores))
         if max_gmm_vars:
             print("improved selected with score: ",iteration_gmm_score )
-            delta_score=iteration_gmm_score-startscore
+
             for i in range(len(child_nodes)):
                 child_nodes[i].set_learned_variable(max_gmm_vars[sibling_order_sequence[i]])
         else:

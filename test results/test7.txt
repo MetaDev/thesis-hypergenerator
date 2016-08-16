@@ -1,20 +1,20 @@
 test for model 4 optimal fitness target
 target:  0.05
 model 4
-score before training:  -0.104850829243
+score before training:  -0.0440999650824
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.110014: variance= 0.002012
-iteration  0  trial score mean:  -0.105860263704  variance:  3.21021640804e-06
-improved selected with score:  -0.10333220093
+total mean= -0.039919: variance= 0.001056
+iteration  0  trial score mean:  -0.0364897755212  variance:  0.000109669629616
+improved selected with score:  -0.0270927487747
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.05
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -22,23 +22,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0.00151862831292
+score gain:  0.0170072163077
 target:  0.15
 model 4
-score before training:  -0.0480555880589
+score before training:  -0.0727448310058
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.038050: variance= 0.000875
-iteration  0  trial score mean:  -0.0477817926957  variance:  2.19822062805e-05
-improved selected with score:  -0.041162530351
+total mean= -0.077060: variance= 0.001549
+iteration  0  trial score mean:  -0.0529909188622  variance:  2.57139138992e-05
+improved selected with score:  -0.0458042844663
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.15
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -46,23 +46,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0.00689305770787
+score gain:  0.0269405465395
 target:  0.25
 model 4
-score before training:  -0.0954620756988
+score before training:  -0.167682689655
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.094145: variance= 0.001895
-iteration  0  trial score mean:  -0.0976098511739  variance:  5.77727311599e-06
-improved selected with score:  -0.0954335098689
+total mean= -0.172052: variance= 0.001889
+iteration  0  trial score mean:  -0.144203884593  variance:  0.00012779103328
+improved selected with score:  -0.12890025451
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.25
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -70,23 +70,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  2.85658299304e-05
+score gain:  0.0387824351444
 target:  0.35
 model 4
-score before training:  -0.192805951604
+score before training:  -0.267462935504
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.193072: variance= 0.002099
-iteration  0  trial score mean:  -0.193886757108  variance:  2.46372248085e-05
-improved selected with score:  -0.18902636984
+total mean= -0.270033: variance= 0.002016
+iteration  0  trial score mean:  -0.245420503223  variance:  0.000291371462801
+improved selected with score:  -0.217869695373
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.35
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -94,23 +94,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0.00377958176399
+score gain:  0.0495932401302
 target:  0.45
 model 4
-score before training:  -0.289182194922
+score before training:  -0.367235700448
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.288799: variance= 0.002128
-iteration  0  trial score mean:  -0.291263559026  variance:  6.56294763693e-06
-improved selected with score:  -0.287834241846
+total mean= -0.370403: variance= 0.002123
+iteration  0  trial score mean:  -0.341973344768  variance:  0.00011771803974
+improved selected with score:  -0.326481746026
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.45
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -118,23 +118,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0.00134795307582
+score gain:  0.0407539544216
 target:  0.55
 model 4
-score before training:  -0.385049746153
+score before training:  -0.47397188462
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.388450: variance= 0.002231
-iteration  0  trial score mean:  -0.393876485404  variance:  1.09350214997e-05
-The did not improve over consecutive training iteration.
+total mean= -0.471370: variance= 0.001940
+iteration  0  trial score mean:  -0.455424378002  variance:  0.00023741709584
+improved selected with score:  -0.431952459362
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.55
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -142,23 +142,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0
+score gain:  0.0420194252578
 target:  0.65
 model 4
-score before training:  -0.489194513774
+score before training:  -0.57213565328
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.490233: variance= 0.002170
-iteration  0  trial score mean:  -0.498725858288  variance:  1.6106257496e-05
-The did not improve over consecutive training iteration.
+total mean= -0.571762: variance= 0.002026
+iteration  0  trial score mean:  -0.553870889256  variance:  7.1748672587e-05
+improved selected with score:  -0.5414482775
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.65
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -166,23 +166,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0
+score gain:  0.0306873757793
 target:  0.75
 model 4
-score before training:  -0.588381199134
+score before training:  -0.6693099193
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.588585: variance= 0.002109
-iteration  0  trial score mean:  -0.587875908846  variance:  3.77176785224e-05
-improved selected with score:  -0.582822062688
+total mean= -0.671963: variance= 0.001856
+iteration  0  trial score mean:  -0.653019091962  variance:  0.000376725692071
+improved selected with score:  -0.627278190731
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.75
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -190,23 +190,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0.00555913644546
+score gain:  0.0420317285687
 target:  0.85
 model 4
-score before training:  -0.691893283783
+score before training:  -0.768794505569
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.692295: variance= 0.002306
-iteration  0  trial score mean:  -0.689796290513  variance:  4.12129526991e-05
-improved selected with score:  -0.684461423119
+total mean= -0.770399: variance= 0.002133
+iteration  0  trial score mean:  -0.755257005041  variance:  0.000252859914387
+improved selected with score:  -0.727037599534
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.85
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -214,23 +214,23 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0.00743186066396
+score gain:  0.0417569060348
 target:  0.95
 model 4
-score before training:  -0.79021266388
+score before training:  -0.874585632772
 fitness before training iteration  0
 seperate fitness
 surface ration
-total mean= -0.790378: variance= 0.002244
-iteration  0  trial score mean:  -0.789972316433  variance:  1.89580326278e-05
-improved selected with score:  -0.783889039584
+total mean= -0.871872: variance= 0.002032
+iteration  0  trial score mean:  -0.840921759729  variance:  0.000131211431815
+improved selected with score:  -0.824330669937
 fitness parameters,
-func: <function combinatory_surface_ratio_absolute at 0x11a819f28>
 threshhold: 0
+order: 8
 name: surface ration
+func: <function combinatory_surface_ratio_absolute at 0x19fade620>
 target: 0.95
 fitness_relation: Fitness_Relation.absolute
-order: 8
 regression_target: 1
 ,
 
@@ -238,7 +238,7 @@ model parameters
 parent variables, ['shape2', 'shape4']
 sibling variables, ['size', 'position']
 
-score gain:  0.00632362429593
+score gain:  0.0502549628346
 parameter configuration
 test for model 4 optimal fitness target
 model hierarchy parameters
@@ -254,7 +254,7 @@ GMM parameters
 minimum covariance,  0.02
 number of components,  30
 retraining
-number of trials, 3
+number of trials, 5
 number of iterations, 1
-number of samples for evaluations, 200
+number of samples for evaluations, 500
 

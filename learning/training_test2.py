@@ -21,20 +21,20 @@ def save_test_out(test_method,test_id):
 
 
 
-save_test_out(tgmm.test_min_covar,10)
-
-save_test_out(tgmm.test_n_component,11)
-
-save_test_out(tgmm.test_n_iter_n_trial,12)
-
-save_test_out(tgmm.test_poisson,13)
-
-save_test_out(tgmm.test_fitness_dim_regression,14)
-
-save_test_out(tgmm.test_model_var,15)
-
-save_test_out(tgmm.test_n_model_eval,16)
-
+#save_test_out(tgmm.test_min_covar,10)
+#
+#save_test_out(tgmm.test_n_component,11)
+#
+#
+#save_test_out(tgmm.test_poisson,13)
+#
+#save_test_out(tgmm.test_fitness_dim_regression,14)
+#
+#save_test_out(tgmm.test_model_var,15)
+#
+#save_test_out(tgmm.test_n_model_eval,16)
+#
+#save_test_out(tgmm.test_n_iter_n_trial,12)
 
 
 

@@ -1,37 +1,37 @@
 fitness orders TD PO: 4 4
-score before training:  0.495202030078
+score before training:  0.509891373289
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.607513: variance= 0.020121
+total mean= 0.608456: variance= 0.018718
 polygon overlay
-total mean= 0.414512: variance= 0.043229
-
-The did not improve over consecutive training iteration.
+total mean= 0.416313: variance= 0.047681
+iteration  0  trial score mean:  0.494810232361  variance:  0.0130254357916
+improved selected with score:  0.579262247604
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.612618: variance= 0.018255
+total mean= 0.593812: variance= 0.012499
 polygon overlay
-total mean= 0.425770: variance= 0.046099
-score gain:  0
+total mean= 0.576686: variance= 0.034262
+score gain:  0.0693708743148
 fitness parameters,
 order: 4
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 4
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -39,39 +39,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 4 8
-score before training:  0.496981087856
+score before training:  0.503110575722
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.613843: variance= 0.019145
+total mean= 0.619347: variance= 0.017952
 polygon overlay
-total mean= 0.435444: variance= 0.047142
-
-improved selected with score:  0.673510252911
+total mean= 0.406196: variance= 0.046208
+iteration  0  trial score mean:  0.599147217707  variance:  0.00245365873492
+improved selected with score:  0.655298601698
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.605343: variance= 0.006831
+total mean= 0.693120: variance= 0.016862
 polygon overlay
-total mean= 0.718741: variance= 0.045890
-score gain:  0.176529165055
+total mean= 0.582689: variance= 0.054851
+score gain:  0.152188025976
 fitness parameters,
 order: 4
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 8
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -79,39 +79,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 4 12
-score before training:  0.511999828263
+score before training:  0.503825365647
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.603607: variance= 0.016384
+total mean= 0.609501: variance= 0.018619
 polygon overlay
-total mean= 0.419542: variance= 0.042904
-
-improved selected with score:  0.688595288775
+total mean= 0.415409: variance= 0.042481
+iteration  0  trial score mean:  0.529656145392  variance:  0.00824333919476
+improved selected with score:  0.636235427977
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.610935: variance= 0.005652
+total mean= 0.591999: variance= 0.006873
 polygon overlay
-total mean= 0.713849: variance= 0.039871
-score gain:  0.176595460511
+total mean= 0.655012: variance= 0.039919
+score gain:  0.13241006233
 fitness parameters,
 order: 4
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 12
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -119,39 +119,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 4 16
-score before training:  0.50035279837
+score before training:  0.497460125875
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.623183: variance= 0.018294
+total mean= 0.607814: variance= 0.018242
 polygon overlay
-total mean= 0.438445: variance= 0.042359
-
-The did not improve over consecutive training iteration.
+total mean= 0.427915: variance= 0.048920
+iteration  0  trial score mean:  0.549862144784  variance:  0.0184749748314
+improved selected with score:  0.734414711185
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.610345: variance= 0.019076
+total mean= 0.611873: variance= 0.008688
 polygon overlay
-total mean= 0.418225: variance= 0.044604
-score gain:  0
+total mean= 0.804768: variance= 0.045466
+score gain:  0.23695458531
 fitness parameters,
 order: 4
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 16
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -159,39 +159,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 4 20
-score before training:  0.500674159716
+score before training:  0.513509972413
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.596595: variance= 0.021218
+total mean= 0.613722: variance= 0.018166
 polygon overlay
-total mean= 0.416163: variance= 0.044234
-
-improved selected with score:  0.676351296644
+total mean= 0.431953: variance= 0.043148
+iteration  0  trial score mean:  0.534779694633  variance:  0.010466937807
+improved selected with score:  0.617469556761
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.759417: variance= 0.014801
+total mean= 0.598025: variance= 0.010639
 polygon overlay
-total mean= 0.596422: variance= 0.019869
-score gain:  0.175677136928
+total mean= 0.629865: variance= 0.028902
+score gain:  0.103959584348
 fitness parameters,
 order: 4
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 20
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -199,39 +199,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 4 24
-score before training:  0.50373497063
+score before training:  0.505969104703
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.602152: variance= 0.020567
+total mean= 0.618332: variance= 0.018222
 polygon overlay
-total mean= 0.434658: variance= 0.049318
-
-The did not improve over consecutive training iteration.
+total mean= 0.413792: variance= 0.042840
+iteration  0  trial score mean:  0.486438998074  variance:  0.0055627634881
+improved selected with score:  0.591280134672
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.604871: variance= 0.019447
+total mean= 0.520177: variance= 0.025540
 polygon overlay
-total mean= 0.427152: variance= 0.042114
-score gain:  0
+total mean= 0.631318: variance= 0.045285
+score gain:  0.0853110299692
 fitness parameters,
 order: 4
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 24
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -239,39 +239,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 4 28
-score before training:  0.502185035201
+score before training:  0.500064169359
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.618858: variance= 0.019067
+total mean= 0.612769: variance= 0.018181
 polygon overlay
-total mean= 0.426618: variance= 0.042577
-
-improved selected with score:  0.63516384914
+total mean= 0.428504: variance= 0.043144
+iteration  0  trial score mean:  0.524271852562  variance:  0.000786016644974
+improved selected with score:  0.563694927144
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.569981: variance= 0.004666
+total mean= 0.484682: variance= 0.029688
 polygon overlay
-total mean= 0.733899: variance= 0.041115
-score gain:  0.13297881394
+total mean= 0.636172: variance= 0.057800
+score gain:  0.0636307577846
 fitness parameters,
 order: 4
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 28
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -279,39 +279,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 8 4
-score before training:  0.502205564825
+score before training:  0.500791905791
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.606484: variance= 0.021174
+total mean= 0.611812: variance= 0.018195
 polygon overlay
-total mean= 0.424091: variance= 0.039147
-
-improved selected with score:  0.699008194713
+total mean= 0.432027: variance= 0.042570
+iteration  0  trial score mean:  0.597743599306  variance:  0.0472359013763
+improved selected with score:  0.754172830587
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.645500: variance= 0.006212
+total mean= 0.597264: variance= 0.005592
 polygon overlay
-total mean= 0.722177: variance= 0.060348
-score gain:  0.196802629888
+total mean= 0.877896: variance= 0.034744
+score gain:  0.253380924796
 fitness parameters,
 order: 8
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 4
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -319,39 +319,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 8 8
-score before training:  0.515561258781
+score before training:  0.501117314389
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.608090: variance= 0.019984
+total mean= 0.613054: variance= 0.020118
 polygon overlay
-total mean= 0.432330: variance= 0.040335
-
-improved selected with score:  0.691607697301
+total mean= 0.423758: variance= 0.045907
+iteration  0  trial score mean:  0.48208819847  variance:  0.00384606403
+improved selected with score:  0.569789742272
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.560658: variance= 0.036707
+total mean= 0.544607: variance= 0.011845
 polygon overlay
-total mean= 0.805480: variance= 0.028145
-score gain:  0.17604643852
+total mean= 0.558607: variance= 0.033874
+score gain:  0.0686724278831
 fitness parameters,
 order: 8
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 8
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -359,39 +359,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 8 12
-score before training:  0.507339488451
+score before training:  0.511623523268
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.612875: variance= 0.018464
+total mean= 0.610659: variance= 0.019403
 polygon overlay
-total mean= 0.424433: variance= 0.042542
-
-improved selected with score:  0.544111677729
+total mean= 0.421543: variance= 0.036501
+iteration  0  trial score mean:  0.457919412856  variance:  0.0011507627187
+The did not improve over consecutive training iteration.
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.597172: variance= 0.003391
+total mean= 0.602448: variance= 0.019509
 polygon overlay
-total mean= 0.480856: variance= 0.058947
-score gain:  0.0367721892783
+total mean= 0.418973: variance= 0.040044
+score gain:  0
 fitness parameters,
 order: 8
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 12
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -399,39 +399,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 8 16
-score before training:  0.490147056848
+score before training:  0.503586825499
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.612636: variance= 0.017112
+total mean= 0.603793: variance= 0.020140
 polygon overlay
-total mean= 0.419224: variance= 0.040782
-
-improved selected with score:  0.590306126269
+total mean= 0.422293: variance= 0.044184
+iteration  0  trial score mean:  0.443981195006  variance:  0.0052722482671
+improved selected with score:  0.542602864769
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.579386: variance= 0.005933
+total mean= 0.544972: variance= 0.028883
 polygon overlay
-total mean= 0.641023: variance= 0.044599
-score gain:  0.100159069422
+total mean= 0.556868: variance= 0.034642
+score gain:  0.03901603927
 fitness parameters,
 order: 8
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 16
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -439,39 +439,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 8 20
-score before training:  0.498212024732
+score before training:  0.498467580107
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.613774: variance= 0.019359
+total mean= 0.607259: variance= 0.019054
 polygon overlay
-total mean= 0.428404: variance= 0.043516
-
-The did not improve over consecutive training iteration.
+total mean= 0.420341: variance= 0.043743
+iteration  0  trial score mean:  0.484372418584  variance:  0.00602627397861
+improved selected with score:  0.593993799315
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.610608: variance= 0.019149
+total mean= 0.575765: variance= 0.011173
 polygon overlay
-total mean= 0.416003: variance= 0.045840
-score gain:  0
+total mean= 0.566302: variance= 0.061015
+score gain:  0.0955262192088
 fitness parameters,
 order: 8
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 20
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -479,39 +479,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 8 24
-score before training:  0.503967702462
+score before training:  0.501270494271
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.610552: variance= 0.019853
+total mean= 0.613322: variance= 0.018825
 polygon overlay
-total mean= 0.408683: variance= 0.041111
-
-improved selected with score:  0.647169337121
+total mean= 0.425681: variance= 0.043770
+iteration  0  trial score mean:  0.624744777542  variance:  0.00185587124606
+improved selected with score:  0.683634027057
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.591439: variance= 0.016531
+total mean= 0.639398: variance= 0.039313
 polygon overlay
-total mean= 0.717798: variance= 0.031571
-score gain:  0.143201634659
+total mean= 0.764164: variance= 0.018371
+score gain:  0.182363532786
 fitness parameters,
 order: 8
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 24
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -519,39 +519,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 8 28
-score before training:  0.510152249332
+score before training:  0.505777903565
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.601816: variance= 0.020424
+total mean= 0.614614: variance= 0.015218
 polygon overlay
-total mean= 0.422517: variance= 0.043878
-
-improved selected with score:  0.652292224195
+total mean= 0.416014: variance= 0.042305
+iteration  0  trial score mean:  0.502329525392  variance:  0.00490384432962
+improved selected with score:  0.579289047289
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.561068: variance= 0.016541
+total mean= 0.573478: variance= 0.005474
 polygon overlay
-total mean= 0.738867: variance= 0.020153
-score gain:  0.142139974863
+total mean= 0.610421: variance= 0.014591
+score gain:  0.0735111437241
 fitness parameters,
 order: 8
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 28
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -559,39 +559,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 12 4
-score before training:  0.51082100783
+score before training:  0.506709702371
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.605668: variance= 0.019284
+total mean= 0.621828: variance= 0.018167
 polygon overlay
-total mean= 0.425366: variance= 0.043478
-
-improved selected with score:  0.596205850773
+total mean= 0.429458: variance= 0.040023
+iteration  0  trial score mean:  0.611179036938  variance:  0.00011954635997
+improved selected with score:  0.620145531557
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.576870: variance= 0.007318
+total mean= 0.671352: variance= 0.019704
 polygon overlay
-total mean= 0.685192: variance= 0.057146
-score gain:  0.0853848429429
+total mean= 0.558460: variance= 0.038584
+score gain:  0.113435829185
 fitness parameters,
 order: 12
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 4
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -599,39 +599,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 12 8
-score before training:  0.498655274276
+score before training:  0.506753711331
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.609644: variance= 0.019413
+total mean= 0.596260: variance= 0.020872
 polygon overlay
-total mean= 0.435154: variance= 0.046627
-
-The did not improve over consecutive training iteration.
+total mean= 0.427581: variance= 0.044624
+iteration  0  trial score mean:  0.49761438002  variance:  0.00347701411482
+improved selected with score:  0.580589797274
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.607674: variance= 0.016925
+total mean= 0.569069: variance= 0.008276
 polygon overlay
-total mean= 0.430579: variance= 0.042586
-score gain:  0
+total mean= 0.638026: variance= 0.037505
+score gain:  0.0738360859437
 fitness parameters,
 order: 12
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 8
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -639,39 +639,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 12 12
-score before training:  0.506404941348
+score before training:  0.506856865034
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.606657: variance= 0.019315
+total mean= 0.613587: variance= 0.017804
 polygon overlay
-total mean= 0.418143: variance= 0.044402
-
-improved selected with score:  0.610890831859
+total mean= 0.420338: variance= 0.046191
+iteration  0  trial score mean:  0.511449225924  variance:  0.00695602020632
+improved selected with score:  0.624545630457
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.635299: variance= 0.002749
+total mean= 0.609257: variance= 0.021422
 polygon overlay
-total mean= 0.606952: variance= 0.035409
-score gain:  0.104485890511
+total mean= 0.665613: variance= 0.066246
+score gain:  0.117688765422
 fitness parameters,
 order: 12
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 12
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -679,39 +679,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 12 16
-score before training:  0.50724994435
+score before training:  0.49784417093
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.605247: variance= 0.018115
+total mean= 0.607603: variance= 0.019221
 polygon overlay
-total mean= 0.423738: variance= 0.041496
-
-improved selected with score:  0.63609513212
+total mean= 0.413762: variance= 0.046493
+iteration  0  trial score mean:  0.53111535653  variance:  0.00142807051417
+improved selected with score:  0.569527171173
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.558514: variance= 0.031922
+total mean= 0.560281: variance= 0.019013
 polygon overlay
-total mean= 0.695756: variance= 0.042351
-score gain:  0.128845187769
+total mean= 0.618750: variance= 0.029594
+score gain:  0.071683000243
 fitness parameters,
 order: 12
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 16
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -719,39 +719,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 12 20
-score before training:  0.507157217088
+score before training:  0.502521139966
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.615814: variance= 0.018694
+total mean= 0.599796: variance= 0.020808
 polygon overlay
-total mean= 0.420110: variance= 0.041662
-
-improved selected with score:  0.580646188297
+total mean= 0.395471: variance= 0.041170
+iteration  0  trial score mean:  0.471631579847  variance:  0.0104247302911
+improved selected with score:  0.589639090946
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.544160: variance= 0.012892
+total mean= 0.567820: variance= 0.011884
 polygon overlay
-total mean= 0.604499: variance= 0.060062
-score gain:  0.0734889712089
+total mean= 0.615727: variance= 0.037597
+score gain:  0.0871179509801
 fitness parameters,
 order: 12
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 20
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -759,39 +759,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 12 24
-score before training:  0.505185739094
+score before training:  0.514226652282
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.608233: variance= 0.019932
+total mean= 0.602844: variance= 0.019287
 polygon overlay
-total mean= 0.417251: variance= 0.039563
-
-improved selected with score:  0.533043802464
+total mean= 0.414928: variance= 0.044207
+iteration  0  trial score mean:  0.542292993764  variance:  0.00407392030914
+improved selected with score:  0.630785809385
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.566632: variance= 0.012451
+total mean= 0.570916: variance= 0.010450
 polygon overlay
-total mean= 0.547999: variance= 0.016377
-score gain:  0.0278580633706
+total mean= 0.673832: variance= 0.014270
+score gain:  0.116559157103
 fitness parameters,
 order: 12
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 24
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -799,39 +799,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 12 28
-score before training:  0.512120789893
+score before training:  0.514994740355
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.609399: variance= 0.017403
+total mean= 0.608975: variance= 0.018237
 polygon overlay
-total mean= 0.428725: variance= 0.040948
-
-improved selected with score:  0.681523519624
+total mean= 0.425784: variance= 0.040922
+iteration  0  trial score mean:  0.566761557916  variance:  0.000613303328684
+improved selected with score:  0.601542745028
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.586457: variance= 0.007212
+total mean= 0.577506: variance= 0.008866
 polygon overlay
-total mean= 0.753031: variance= 0.018881
-score gain:  0.169402729732
+total mean= 0.648275: variance= 0.035262
+score gain:  0.0865480046735
 fitness parameters,
 order: 12
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 28
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -839,39 +839,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 16 4
-score before training:  0.505617249506
+score before training:  0.505458083367
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.608022: variance= 0.019344
+total mean= 0.604845: variance= 0.019331
 polygon overlay
-total mean= 0.404322: variance= 0.043379
-
-improved selected with score:  0.512201423993
+total mean= 0.421102: variance= 0.042676
+iteration  0  trial score mean:  0.464139712338  variance:  0.00372971103046
+improved selected with score:  0.538869095476
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.643884: variance= 0.008846
+total mean= 0.607786: variance= 0.007187
 polygon overlay
-total mean= 0.401146: variance= 0.029184
-score gain:  0.00658417448688
+total mean= 0.485722: variance= 0.076573
+score gain:  0.0334110121092
 fitness parameters,
 order: 16
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 4
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -879,39 +879,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 16 8
-score before training:  0.506545838836
+score before training:  0.512758168503
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.599581: variance= 0.020331
+total mean= 0.608986: variance= 0.018993
 polygon overlay
-total mean= 0.428402: variance= 0.046817
-
-improved selected with score:  0.580569652782
+total mean= 0.415781: variance= 0.043401
+iteration  0  trial score mean:  0.477424391914  variance:  0.00753225098227
+improved selected with score:  0.584453855217
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.539128: variance= 0.010172
+total mean= 0.597164: variance= 0.006969
 polygon overlay
-total mean= 0.641590: variance= 0.008824
-score gain:  0.0740238139466
+total mean= 0.611702: variance= 0.029336
+score gain:  0.0716956867143
 fitness parameters,
 order: 16
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 8
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -919,39 +919,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 16 12
-score before training:  0.495416447928
+score before training:  0.498316246788
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.614736: variance= 0.017129
+total mean= 0.608315: variance= 0.020060
 polygon overlay
-total mean= 0.427508: variance= 0.048990
-
-improved selected with score:  0.576900820449
+total mean= 0.421769: variance= 0.046833
+iteration  0  trial score mean:  0.399133572053  variance:  0.000125670156027
+The did not improve over consecutive training iteration.
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.566117: variance= 0.016528
+total mean= 0.596576: variance= 0.019146
 polygon overlay
-total mean= 0.569228: variance= 0.029379
-score gain:  0.0814843725206
+total mean= 0.423670: variance= 0.040925
+score gain:  0
 fitness parameters,
 order: 16
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 12
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -959,39 +959,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 16 16
-score before training:  0.509646403283
+score before training:  0.496699234908
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.599155: variance= 0.018475
+total mean= 0.605443: variance= 0.020337
 polygon overlay
-total mean= 0.403803: variance= 0.042194
-
-improved selected with score:  0.704912925564
+total mean= 0.428678: variance= 0.044644
+iteration  0  trial score mean:  0.531930532302  variance:  0.0100528322695
+improved selected with score:  0.672237976826
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.576658: variance= 0.016264
+total mean= 0.606683: variance= 0.010907
 polygon overlay
-total mean= 0.799403: variance= 0.043283
-score gain:  0.195266522281
+total mean= 0.738452: variance= 0.062436
+score gain:  0.175538741919
 fitness parameters,
 order: 16
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 16
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -999,39 +999,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 16 20
-score before training:  0.498628567709
+score before training:  0.505092803468
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.601452: variance= 0.018884
+total mean= 0.598221: variance= 0.021157
 polygon overlay
-total mean= 0.419925: variance= 0.041553
-
-improved selected with score:  0.723151564647
+total mean= 0.417204: variance= 0.042107
+iteration  0  trial score mean:  0.559641826351  variance:  0.00240503563688
+improved selected with score:  0.628969837962
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.602415: variance= 0.005206
+total mean= 0.615445: variance= 0.006150
 polygon overlay
-total mean= 0.748424: variance= 0.052302
-score gain:  0.224522996938
+total mean= 0.640821: variance= 0.032557
+score gain:  0.123877034494
 fitness parameters,
 order: 16
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 20
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1039,39 +1039,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 16 24
-score before training:  0.507403121016
+score before training:  0.497445054082
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.598348: variance= 0.019498
+total mean= 0.605081: variance= 0.018256
 polygon overlay
-total mean= 0.425952: variance= 0.046093
-
-improved selected with score:  0.589708723294
+total mean= 0.412609: variance= 0.044565
+iteration  0  trial score mean:  0.507386449929  variance:  0.0108955953715
+improved selected with score:  0.61923490622
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.566294: variance= 0.010283
+total mean= 0.614285: variance= 0.010880
 polygon overlay
-total mean= 0.633273: variance= 0.048492
-score gain:  0.0823056022778
+total mean= 0.577404: variance= 0.042015
+score gain:  0.121789852138
 fitness parameters,
 order: 16
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 24
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1079,39 +1079,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 16 28
-score before training:  0.513260748731
+score before training:  0.495147422622
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.603673: variance= 0.017687
+total mean= 0.602860: variance= 0.019355
 polygon overlay
-total mean= 0.420938: variance= 0.046162
-
-improved selected with score:  0.586734600781
+total mean= 0.420156: variance= 0.040445
+iteration  0  trial score mean:  0.517922314236  variance:  0.00249015906105
+improved selected with score:  0.565252494657
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.618703: variance= 0.006350
+total mean= 0.547085: variance= 0.006211
 polygon overlay
-total mean= 0.582501: variance= 0.025179
-score gain:  0.0734738520496
+total mean= 0.610813: variance= 0.032258
+score gain:  0.0701050720355
 fitness parameters,
 order: 16
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 28
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1119,39 +1119,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 20 4
-score before training:  0.507047579878
+score before training:  0.498671070978
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.603884: variance= 0.019095
+total mean= 0.617212: variance= 0.017415
 polygon overlay
-total mean= 0.414892: variance= 0.041062
-
-improved selected with score:  0.645241204015
+total mean= 0.412475: variance= 0.043346
+iteration  0  trial score mean:  0.504919177043  variance:  0.00736263057868
+improved selected with score:  0.626057771603
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.532543: variance= 0.017182
+total mean= 0.555691: variance= 0.014271
 polygon overlay
-total mean= 0.761022: variance= 0.035055
-score gain:  0.138193624137
+total mean= 0.684377: variance= 0.046058
+score gain:  0.127386700625
 fitness parameters,
 order: 20
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 4
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1159,39 +1159,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 20 8
-score before training:  0.496067999056
+score before training:  0.500482428112
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.607144: variance= 0.020249
+total mean= 0.608668: variance= 0.019482
 polygon overlay
-total mean= 0.427440: variance= 0.043001
-
-improved selected with score:  0.638875538562
+total mean= 0.419468: variance= 0.045345
+iteration  0  trial score mean:  0.433459412005  variance:  0.00312008494312
+improved selected with score:  0.512392164633
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.611103: variance= 0.012761
+total mean= 0.601763: variance= 0.010619
 polygon overlay
-total mean= 0.674479: variance= 0.019951
-score gain:  0.142807539505
+total mean= 0.448189: variance= 0.041143
+score gain:  0.0119097365202
 fitness parameters,
 order: 20
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 8
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1199,39 +1199,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 20 12
-score before training:  0.501676831612
+score before training:  0.512579561242
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.612645: variance= 0.018014
+total mean= 0.607762: variance= 0.019165
 polygon overlay
-total mean= 0.424600: variance= 0.039945
-
-improved selected with score:  0.679619451887
+total mean= 0.426307: variance= 0.046119
+iteration  0  trial score mean:  0.475065141038  variance:  0.00200917362802
+improved selected with score:  0.525746185265
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.513477: variance= 0.009980
+total mean= 0.589635: variance= 0.010208
 polygon overlay
-total mean= 0.804486: variance= 0.022382
-score gain:  0.177942620276
+total mean= 0.501710: variance= 0.022974
+score gain:  0.0131666240223
 fitness parameters,
 order: 20
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 12
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1239,39 +1239,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 20 16
-score before training:  0.495975637105
+score before training:  0.493456454924
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.629388: variance= 0.019637
+total mean= 0.604737: variance= 0.019853
 polygon overlay
-total mean= 0.430421: variance= 0.045440
-
-improved selected with score:  0.625750166999
+total mean= 0.405308: variance= 0.046231
+iteration  0  trial score mean:  0.531160178326  variance:  0.00144182543696
+improved selected with score:  0.5825568601
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.462894: variance= 0.019318
+total mean= 0.606135: variance= 0.006968
 polygon overlay
-total mean= 0.769630: variance= 0.027817
-score gain:  0.129774529895
+total mean= 0.595226: variance= 0.030703
+score gain:  0.0891004051755
 fitness parameters,
 order: 20
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 16
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1279,39 +1279,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 20 20
-score before training:  0.498748619265
+score before training:  0.498816666941
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.607671: variance= 0.019452
+total mean= 0.603706: variance= 0.017745
 polygon overlay
-total mean= 0.410160: variance= 0.038855
-
-The did not improve over consecutive training iteration.
+total mean= 0.410748: variance= 0.041549
+iteration  0  trial score mean:  0.512409301029  variance:  0.00196851893525
+improved selected with score:  0.569431356625
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.609215: variance= 0.019242
+total mean= 0.518530: variance= 0.007926
 polygon overlay
-total mean= 0.426860: variance= 0.041899
-score gain:  0
+total mean= 0.616326: variance= 0.017119
+score gain:  0.0706146896845
 fitness parameters,
 order: 20
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 20
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1319,39 +1319,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 20 24
-score before training:  0.516750569099
+score before training:  0.497618982216
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.621059: variance= 0.019222
+total mean= 0.606479: variance= 0.019331
 polygon overlay
-total mean= 0.419030: variance= 0.041863
-
-improved selected with score:  0.637858881139
+total mean= 0.427395: variance= 0.041244
+iteration  0  trial score mean:  0.483329370982  variance:  0.00763498555127
+improved selected with score:  0.606282877935
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.574713: variance= 0.015544
+total mean= 0.570845: variance= 0.008531
 polygon overlay
-total mean= 0.692973: variance= 0.033086
-score gain:  0.12110831204
+total mean= 0.658172: variance= 0.012836
+score gain:  0.108663895719
 fitness parameters,
 order: 20
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 24
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1359,39 +1359,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 20 28
-score before training:  0.500181443105
+score before training:  0.507509677116
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.616272: variance= 0.020602
+total mean= 0.617188: variance= 0.017189
 polygon overlay
-total mean= 0.423270: variance= 0.040294
-
-improved selected with score:  0.593374537004
+total mean= 0.429652: variance= 0.040464
+iteration  0  trial score mean:  0.494313908219  variance:  0.00324079805525
+improved selected with score:  0.554742690353
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.532344: variance= 0.026887
+total mean= 0.666078: variance= 0.015343
 polygon overlay
-total mean= 0.651629: variance= 0.039771
-score gain:  0.0931930938987
+total mean= 0.491686: variance= 0.024837
+score gain:  0.0472330132375
 fitness parameters,
 order: 20
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 28
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1399,39 +1399,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 24 4
-score before training:  0.493858045421
+score before training:  0.504525622138
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.614664: variance= 0.016294
+total mean= 0.597038: variance= 0.018038
 polygon overlay
-total mean= 0.409889: variance= 0.042483
-
-improved selected with score:  0.68160954936
+total mean= 0.407833: variance= 0.041226
+iteration  0  trial score mean:  0.557742918494  variance:  0.00121853551611
+improved selected with score:  0.591302121525
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.640451: variance= 0.002556
+total mean= 0.499084: variance= 0.012162
 polygon overlay
-total mean= 0.735599: variance= 0.036883
-score gain:  0.187751503939
+total mean= 0.688772: variance= 0.026676
+score gain:  0.0867764993863
 fitness parameters,
 order: 24
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 4
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1439,39 +1439,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 24 8
-score before training:  0.510492920069
+score before training:  0.505662868303
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.604651: variance= 0.019515
+total mean= 0.602614: variance= 0.020734
 polygon overlay
-total mean= 0.414148: variance= 0.044332
-
-improved selected with score:  0.557403556753
+total mean= 0.417319: variance= 0.045349
+iteration  0  trial score mean:  0.540501458035  variance:  0.00100134930297
+improved selected with score:  0.573855047761
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.538617: variance= 0.010440
+total mean= 0.528156: variance= 0.012150
 polygon overlay
-total mean= 0.586160: variance= 0.022048
-score gain:  0.0469106366842
+total mean= 0.645217: variance= 0.015952
+score gain:  0.0681921794578
 fitness parameters,
 order: 24
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 8
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1479,39 +1479,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 24 12
-score before training:  0.495604953546
+score before training:  0.498212377069
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.602695: variance= 0.020879
+total mean= 0.609817: variance= 0.017354
 polygon overlay
-total mean= 0.412667: variance= 0.040009
-
-improved selected with score:  0.611537503254
+total mean= 0.417876: variance= 0.043747
+iteration  0  trial score mean:  0.502753244996  variance:  0.00240034662456
+improved selected with score:  0.571942177122
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.600890: variance= 0.010463
+total mean= 0.591981: variance= 0.007781
 polygon overlay
-total mean= 0.625392: variance= 0.015625
-score gain:  0.115932549708
+total mean= 0.600269: variance= 0.030678
+score gain:  0.0737298000531
 fitness parameters,
 order: 24
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 12
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1519,39 +1519,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 24 16
-score before training:  0.499288950204
+score before training:  0.503082440842
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.604676: variance= 0.018306
+total mean= 0.602249: variance= 0.018450
 polygon overlay
-total mean= 0.392324: variance= 0.045968
-
-The did not improve over consecutive training iteration.
+total mean= 0.411845: variance= 0.042157
+iteration  0  trial score mean:  0.589588618474  variance:  0.000685158314279
+improved selected with score:  0.626116626387
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.611426: variance= 0.020663
+total mean= 0.585044: variance= 0.014520
 polygon overlay
-total mean= 0.420695: variance= 0.047311
-score gain:  0
+total mean= 0.673320: variance= 0.042793
+score gain:  0.123034185545
 fitness parameters,
 order: 24
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 16
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1559,39 +1559,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 24 20
-score before training:  0.514411556428
+score before training:  0.502130966609
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.596052: variance= 0.019267
+total mean= 0.605306: variance= 0.021879
 polygon overlay
-total mean= 0.414235: variance= 0.043381
-
-improved selected with score:  0.523032579152
+total mean= 0.414251: variance= 0.045062
+iteration  0  trial score mean:  0.595050265036  variance:  5.26591671695e-05
+improved selected with score:  0.604766935523
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.530112: variance= 0.032669
+total mean= 0.627509: variance= 0.005006
 polygon overlay
-total mean= 0.466688: variance= 0.056124
-score gain:  0.00862102272369
+total mean= 0.612940: variance= 0.021518
+score gain:  0.102635968914
 fitness parameters,
 order: 24
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 20
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1599,39 +1599,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 24 24
-score before training:  0.494675647958
+score before training:  0.514922732061
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.612302: variance= 0.018764
+total mean= 0.609365: variance= 0.020073
 polygon overlay
-total mean= 0.433310: variance= 0.040534
-
-improved selected with score:  0.583340313295
+total mean= 0.417442: variance= 0.046647
+iteration  0  trial score mean:  0.509164135176  variance:  0.00226007165473
+improved selected with score:  0.567916269989
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.516330: variance= 0.020296
+total mean= 0.502211: variance= 0.020761
 polygon overlay
-total mean= 0.667803: variance= 0.028150
-score gain:  0.088664665337
+total mean= 0.568247: variance= 0.054083
+score gain:  0.0529935379277
 fitness parameters,
 order: 24
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 24
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1639,39 +1639,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 24 28
-score before training:  0.493269099011
+score before training:  0.496662835523
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.602748: variance= 0.019125
+total mean= 0.606731: variance= 0.019490
 polygon overlay
-total mean= 0.413419: variance= 0.038552
-
-improved selected with score:  0.665159135504
+total mean= 0.411194: variance= 0.038044
+iteration  0  trial score mean:  0.544022315583  variance:  0.000506443419969
+improved selected with score:  0.566306097263
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.585894: variance= 0.012298
+total mean= 0.538862: variance= 0.011975
 polygon overlay
-total mean= 0.742758: variance= 0.030672
-score gain:  0.171890036493
+total mean= 0.649485: variance= 0.045516
+score gain:  0.0696432617405
 fitness parameters,
 order: 24
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 28
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1679,39 +1679,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 28 4
-score before training:  0.50257307666
+score before training:  0.495125771382
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.589806: variance= 0.019109
+total mean= 0.615157: variance= 0.018139
 polygon overlay
-total mean= 0.405403: variance= 0.049883
-
-improved selected with score:  0.642672050197
+total mean= 0.422684: variance= 0.043414
+iteration  0  trial score mean:  0.566308085109  variance:  0.000869150319715
+improved selected with score:  0.597105668387
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.623630: variance= 0.012244
+total mean= 0.568189: variance= 0.004215
 polygon overlay
-total mean= 0.659973: variance= 0.012277
-score gain:  0.140098973536
+total mean= 0.591571: variance= 0.071808
+score gain:  0.101979897005
 fitness parameters,
 order: 28
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 4
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1719,39 +1719,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 28 8
-score before training:  0.499984936615
+score before training:  0.499131490089
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.612943: variance= 0.018091
+total mean= 0.608125: variance= 0.019966
 polygon overlay
-total mean= 0.417196: variance= 0.044255
-
-improved selected with score:  0.680018643921
+total mean= 0.423064: variance= 0.041238
+iteration  0  trial score mean:  0.546850241056  variance:  0.004486126843
+improved selected with score:  0.641132058277
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.579521: variance= 0.005083
+total mean= 0.636514: variance= 0.008529
 polygon overlay
-total mean= 0.769122: variance= 0.016852
-score gain:  0.180033707307
+total mean= 0.653076: variance= 0.035574
+score gain:  0.142000568188
 fitness parameters,
 order: 28
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 8
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1759,39 +1759,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 28 12
-score before training:  0.497686988102
+score before training:  0.492553325957
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.614869: variance= 0.018114
+total mean= 0.627886: variance= 0.019502
 polygon overlay
-total mean= 0.420649: variance= 0.040673
-
-improved selected with score:  0.599325919563
+total mean= 0.419945: variance= 0.039357
+iteration  0  trial score mean:  0.531411118377  variance:  0.00189239292289
+improved selected with score:  0.568602233902
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.548587: variance= 0.020192
+total mean= 0.562693: variance= 0.004417
 polygon overlay
-total mean= 0.642729: variance= 0.043414
-score gain:  0.101638931461
+total mean= 0.623533: variance= 0.019727
+score gain:  0.0760489079455
 fitness parameters,
 order: 28
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 12
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1799,39 +1799,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 28 16
-score before training:  0.511318817828
+score before training:  0.495594186707
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.614811: variance= 0.017959
+total mean= 0.612752: variance= 0.019559
 polygon overlay
-total mean= 0.418179: variance= 0.040845
-
-improved selected with score:  0.645319510866
+total mean= 0.417672: variance= 0.047334
+iteration  0  trial score mean:  0.622233326955  variance:  0.00171639523128
+improved selected with score:  0.679068419895
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.567256: variance= 0.004072
+total mean= 0.522028: variance= 0.014377
 polygon overlay
-total mean= 0.732703: variance= 0.036764
-score gain:  0.134000693038
+total mean= 0.765272: variance= 0.023204
+score gain:  0.183474233188
 fitness parameters,
 order: 28
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 16
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1839,39 +1839,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 28 20
-score before training:  0.503406736142
+score before training:  0.510183368191
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.604695: variance= 0.019788
+total mean= 0.614880: variance= 0.020826
 polygon overlay
-total mean= 0.428276: variance= 0.042125
-
-improved selected with score:  0.579073192589
+total mean= 0.420356: variance= 0.042915
+iteration  0  trial score mean:  0.585697368596  variance:  0.0026669026918
+improved selected with score:  0.645649265941
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.549087: variance= 0.014883
+total mean= 0.501744: variance= 0.015359
 polygon overlay
-total mean= 0.629600: variance= 0.035375
-score gain:  0.0756664564472
+total mean= 0.775095: variance= 0.052654
+score gain:  0.13546589775
 fitness parameters,
 order: 28
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 20
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1879,39 +1879,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 28 24
-score before training:  0.514609241515
+score before training:  0.507756402
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.600702: variance= 0.020565
+total mean= 0.607444: variance= 0.019549
 polygon overlay
-total mean= 0.421631: variance= 0.043255
-
-improved selected with score:  0.590577640927
+total mean= 0.408215: variance= 0.043903
+iteration  0  trial score mean:  0.586335954339  variance:  0.00708399512412
+improved selected with score:  0.648445261641
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.567924: variance= 0.035239
+total mean= 0.609265: variance= 0.008317
 polygon overlay
-total mean= 0.617540: variance= 0.042193
-score gain:  0.0759683994121
+total mean= 0.688725: variance= 0.017817
+score gain:  0.140688859642
 fitness parameters,
 order: 28
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 24
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
@@ -1919,39 +1919,39 @@ parent variables, ['shape0']
 sibling variables, ['position']
 
 fitness orders TD PO: 28 28
-score before training:  0.514161973386
+score before training:  0.508355280032
 fitness before training iteration  0
 seperate fitness
 Target distances
-total mean= 0.595164: variance= 0.020139
+total mean= 0.605964: variance= 0.019975
 polygon overlay
-total mean= 0.415603: variance= 0.047130
-
-improved selected with score:  0.528178141012
+total mean= 0.425043: variance= 0.039011
+iteration  0  trial score mean:  0.507833252111  variance:  0.000397528320615
+improved selected with score:  0.535942947644
 
 final evaluation of fitness
 fitness before training iteration  -1
 seperate fitness
 Target distances
-total mean= 0.524084: variance= 0.009684
+total mean= 0.559198: variance= 0.014168
 polygon overlay
-total mean= 0.518581: variance= 0.089462
-score gain:  0.0140161676262
+total mean= 0.510844: variance= 0.048963
+score gain:  0.027587667612
 fitness parameters,
 order: 28
-func: <function min_dist_sb at 0x12cf64950>
-name: Target distances
-regression_target: 1
-target: 2
 fitness_relation: Fitness_Relation.pairwise_siblings
+func: <function min_dist_sb at 0x11aa0d2f0>
+regression_target: 1
 threshhold: 0
+target: 2
+name: Target distances
 ,
 order: 28
-func: <function norm_overlap_pc at 0x12cf64620>
-name: polygon overlay
-regression_target: 1
 fitness_relation: Fitness_Relation.pairwise_parent_child
+func: <function norm_overlap_pc at 0x11aa02f28>
+regression_target: 1
 threshhold: 0
+name: polygon overlay
 ,
 
 model parameters
