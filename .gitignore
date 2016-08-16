@@ -56,3 +56,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#PyCharm
+.idea/
+#IPython notebook
+.ipypnb_checkpoints
+#Spyder
+.spyderworkspace
