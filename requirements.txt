@@ -1,0 +1,15 @@
+descartes==1.0.2
+emcee==2.1.0
+gmr==1.0
+matplotlib==1.5.1
+networkx==1.11
+numpy==1.11.0
+Rx==1.2.6
+Shapely==1.5.13
+sklearn_bayes==0.1.0a1
+statsmodels==0.6.1
+hmmlearn==0.2.0
+pymc==2.3.6
+scipy==0.18.0
+scikit_learn==0.17.1
+typing==3.5.2
