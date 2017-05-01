@@ -1,5 +1,5 @@
 # Hyper-generator
-##Search space optimisation for procedural content generators.
+## Search space optimisation for procedural content generators
 
 The hyper-generator is a prototype for the generative system proposed in my master thesis (master computer science, 2016 University of Ghent). 
 In the system the user has to define the objects to be generated in two ways.
